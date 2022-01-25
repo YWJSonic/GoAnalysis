@@ -1,11 +1,14 @@
 package goanalysis
 
 import (
+	"codeanalysis/analysis/dao"
 	_ "codeanalysis/load/project/goloader"
 	wwe "codeanalysis/load/project/goloader"
 	"codeanalysis/tool"
 	"fmt"
 )
+
+var Instants *dao.ProjectInfo
 
 //專案節點樹分析 廣度優先
 func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
@@ -33,7 +36,7 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 			childs = append(childs, getSubChiles(currentChild)...)
 
 		} else if currentChild.FileType == "go" { // 檔案節點
-			PackageInfo := Instants.LoadOrStoryPackage(NewPackageInfoByNode(currentChild))
+			PackageInfo := Instants.LoadOrStoryPackage(dao.NewPackageInfoByNode(currentChild))
 			// 讀檔
 			code := tool.ReadFile(PackageInfo.FileNodes.Path())
 			// 檔案分析

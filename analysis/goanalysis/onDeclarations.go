@@ -1,6 +1,7 @@
 package goanalysis
 
 import (
+	"codeanalysis/analysis/dao"
 	"fmt"
 	"strings"
 )
@@ -49,7 +50,9 @@ func (s *source) OnDeclarationsResult() [][]string {
 		strLit = s.OnParams(true)
 
 	default:
-		strLit = append(strLit, []string{"", s.OnDeclarationsType()})
+		s.OnDeclarationsType()
+		var name string
+		strLit = append(strLit, []string{"", name})
 	}
 	return strLit
 }
@@ -58,20 +61,98 @@ func (s *source) OnDeclarationsResult() [][]string {
 /* 進入指標應當只在 _types
  * b=任意 r="_"
  */
-func (s *source) OnDeclarationsType() (str string) {
+func (s *source) OnDeclarationsType() (structInfo dao.IStructInfo) {
+
+	// s.nextCh()
+	switch s.buf[s.r+1] {
+	case '*': // PointerType
+		s.onPointType()
+	case '[': // ArrayType, SliceType
+		if s.buf[s.r+2] == ']' { // slice type
+			s.OnSliceType('\n')
+		} else { // array type
+			s.OnArrayType()
+		}
+
+	case '<': // OutPutChanelType
+		s.onChannelType()
+	case '.': // short ArranType
+		s.onShortArrayType()
+	default:
+		nextEndIdx := s.nextIdx()
+		nextTokenIdx := s.nextTokenIdx()
+
+		if nextEndIdx < nextTokenIdx {
+			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextEndIdx]))
+			if tmpStr == _struct {
+				structInfo = s.OnStructType()
+			} else if tmpStr == _chan {
+				s.next()
+				structChannelInfo := &dao.StructChannelInfo{}
+				structChannelInfo.ChanFlow = s.rangeStr()
+				structChannelInfo.StructInfo = s.OnDeclarationsType().(*dao.StructInfo)
+				structInfo = structChannelInfo
+			} else if tmpStr == _interface {
+				s.OnInterfaceType()
+			} else {
+				s.next()
+				s.rangeStr()
+			}
+		} else if nextTokenIdx == nextEndIdx {
+			s.nextToken()
+		} else if s.buf[nextTokenIdx] == '.' {
+			s.OnQualifiedIdentType()
+		} else if s.buf[nextTokenIdx] == '(' {
+			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
+			if tmpStr == _func {
+				s.OnFuncType('\n')
+			}
+		} else if s.buf[nextTokenIdx] == '{' {
+			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
+			if tmpStr == _interface {
+				s.OnInterfaceType()
+			} else if tmpStr == _struct {
+				s.OnStructType()
+			}
+		} else if s.buf[nextTokenIdx] == '[' {
+			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
+			if tmpStr == _map {
+				s.OnMapType()
+			}
+		} else if s.buf[nextTokenIdx] == '<' {
+			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
+			if tmpStr == _chan {
+				if s.buf[s.r+1] == '<' { // 單出
+					s.next()
+					s.rangeStr()
+
+				} else {
+					s.next()
+					s.rangeStr()
+				}
+
+				s.subDeclarationsType()
+			}
+		}
+	}
+
+	return
+}
+
+func (s *source) subDeclarationsType() (str string) {
 	// s.nextCh()
 	switch s.buf[s.r+1] {
 	case '*': // PointerType
 		s.nextCh()
 		str = string(s.ch)
-		str += s.OnDeclarationsType()
+		str += s.subDeclarationsType()
 	case '[': // ArrayType, SliceType
 		if s.buf[s.r+2] == ']' { // slice type
 			s.nextCh()
 			str += string(s.ch)
 			s.nextCh()
 			str += string(s.ch)
-			str += s.OnDeclarationsType()
+			str += s.subDeclarationsType()
 			return str
 		} else { // array type
 			s.nextCh()
@@ -79,7 +160,7 @@ func (s *source) OnDeclarationsType() (str string) {
 			s.nextTargetToken(']')
 			str += s.rangeStr()
 			str += string(s.ch)
-			str += s.OnDeclarationsType()
+			str += s.subDeclarationsType()
 		}
 	case '<': // OutPutChanelType
 		if s.buf[s.r+1] == '<' { // 單出
@@ -91,14 +172,14 @@ func (s *source) OnDeclarationsType() (str string) {
 			str = s.rangeStr()
 		}
 
-		str = str + " " + s.OnDeclarationsType()
+		str = str + " " + s.subDeclarationsType()
 	case '.': // ArranType
 		if string(s.buf[s.r+1:s.r+4]) == "..." {
 			s.nextCh()
 			s.nextCh()
 			s.nextCh()
 			str = "..."
-			str += s.OnDeclarationsType()
+			str += s.subDeclarationsType()
 		}
 	default:
 		nextEndIdx := s.nextIdx()
@@ -107,7 +188,7 @@ func (s *source) OnDeclarationsType() (str string) {
 		if nextEndIdx < nextTokenIdx {
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextEndIdx]))
 			if tmpStr == _struct {
-				str = s.OnStructType()
+				s.OnStructType()
 			} else if tmpStr == _chan {
 				if s.buf[s.r+1] == '<' { // 單出
 					s.next()
@@ -117,7 +198,7 @@ func (s *source) OnDeclarationsType() (str string) {
 					s.next()
 					str = s.rangeStr()
 				}
-				str = str + " " + s.OnDeclarationsType()
+				str = str + " " + s.subDeclarationsType()
 			} else if tmpStr == _interface {
 				str = s.OnInterfaceType()
 			} else {
@@ -127,7 +208,7 @@ func (s *source) OnDeclarationsType() (str string) {
 		} else if nextTokenIdx == nextEndIdx {
 			s.nextToken()
 		} else if s.buf[nextTokenIdx] == '.' {
-			str = s.OnQualifiedIdentType()
+			s.OnQualifiedIdentType()
 		} else if s.buf[nextTokenIdx] == '(' {
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
 			if tmpStr == _func {
@@ -138,12 +219,12 @@ func (s *source) OnDeclarationsType() (str string) {
 			if tmpStr == _interface {
 				str = s.OnInterfaceType()
 			} else if tmpStr == _struct {
-				str = s.OnStructType()
+				// str = s.OnStructType()
 			}
 		} else if s.buf[nextTokenIdx] == '[' {
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
 			if tmpStr == _map {
-				str = s.OnDeclarationsMapType()
+				str = s.OnMapType()
 			}
 		} else if s.buf[nextTokenIdx] == '<' {
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
@@ -157,24 +238,10 @@ func (s *source) OnDeclarationsType() (str string) {
 					str = s.rangeStr()
 				}
 
-				str = str + " " + s.OnDeclarationsType()
+				str = str + " " + s.subDeclarationsType()
 			}
 		}
 	}
 
-	return
-}
-
-// 處理 map 類型
-// 進入指標應當只在 _map[]
-// r="_"
-func (s *source) OnDeclarationsMapType() (str string) {
-	str = "map["
-	s.nextToken()
-	str += s.OnType(']') + "]"
-	if s.ch != ']' {
-		s.nextCh()
-	}
-	str += s.OnDeclarationsType()
 	return
 }

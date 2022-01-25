@@ -2,6 +2,7 @@ package goanalysis
 
 import (
 	"bytes"
+	"codeanalysis/analysis/dao"
 	"fmt"
 )
 
@@ -40,7 +41,7 @@ func AnalysisStyle1(code string) {
 	}
 }
 
-func AnalysisStyle2(packageInfo *PackageInfo, code string) {
+func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	// var package map[string]*PackageInfo
 	buf := bytes.NewBuffer([]byte(" "))
 	buf.WriteString(code)
@@ -71,7 +72,9 @@ func AnalysisStyle2(packageInfo *PackageInfo, code string) {
 				s.next()
 				s.PackageInfo.Name = s.rangeStr()
 			case "import":
-				s.ImportDeclarations()
+				for _, link := range s.ImportDeclarations() {
+					s.PackageInfo.ImportLink[link.Name()] = link
+				}
 			case "type":
 				s.TypeDeclarations()
 			case "func":

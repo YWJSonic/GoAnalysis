@@ -1,22 +1,26 @@
 package goanalysis
 
 import (
+	"codeanalysis/analysis/dao"
 	"fmt"
 	"strings"
 )
 
 type source struct {
-	buf          []byte
-	b, r, e      int
-	ch           rune
-	PackageInfo  *PackageInfo
-	isEnd        bool
-	isIncludeTag bool
+	buf         []byte           // 檔案內文資料
+	b, r, e     int              // 掃描錨點資料
+	ch          rune             // 當前文字資料
+	isEnd       bool             // 掃描進度
+	PackageInfo *dao.PackageInfo // 檔案資訊
 }
 
 //========== Import =================
-func (s *source) ImportDeclarations() {
-	var importSpecLit [][]string
+
+// 解析 import 區塊
+//
+// @return []*PackageLink 未關聯的 import 資料
+func (s *source) ImportDeclarations() []*dao.PackageLink {
+	var packageLinks []*dao.PackageLink
 	if s.buf[s.r+1] == '(' {
 		s.nextCh()
 		s.toNextCh()
@@ -31,23 +35,36 @@ func (s *source) ImportDeclarations() {
 				s.nextTargetToken('\n')
 				continue
 			}
-			importSpecLit = append(importSpecLit, s.importSpec())
+			name, importPath, packageInfo := s.importSpec()
+			packageLinks = append(packageLinks, dao.NewPackageLink(name, importPath, packageInfo))
 			s.toNextCh()
 
 		}
 	} else {
-		importSpecLit = append(importSpecLit, s.importSpec())
+		name, importPath, packageInfo := s.importSpec()
+		packageLinks = append(packageLinks, dao.NewPackageLink(name, importPath, packageInfo))
+
 	}
-	// fmt.Println(":: import (", importSpecLit, ") ::")
+	return packageLinks
 }
-func (s *source) importSpec() []string {
-	var data []string
+
+// 解析 import 內文
+//
+// @return name 		import檔案的替換名稱
+// @return importPath	import檔案的路徑
+func (s *source) importSpec() (name, importPath string, packageInfo *dao.PackageInfo) {
 	s.nextToken()
-	name := strings.TrimSpace(s.rangeStr())
+	name = strings.TrimSpace(s.rangeStr())
 	s.nextTargetToken('"')
-	importPath := strings.TrimSpace(s.rangeStr())
-	data = append(data, name, importPath)
-	return data
+	importPath = strings.TrimSpace(s.rangeStr())
+
+	packageInfo, ok := Instants.AllPackageMap[importPath]
+	if !ok {
+		packageInfo = dao.NewPackageInfo(importPath)
+		Instants.AllPackageMap[importPath] = packageInfo
+	}
+
+	return name, importPath, packageInfo
 }
 
 //========== Const =================
@@ -304,7 +321,8 @@ func (s *source) VarSpec() []string {
 		return datas
 	}
 
-	typeName := s.OnDeclarationsType()
+	s.OnDeclarationsType()
+	var typeName string
 	s.toNextCh()
 	expressionList := s.OnExpressionList(1)
 	datas = append(datas, name, typeName)
@@ -321,8 +339,11 @@ func (s *source) VarSpec() []string {
 // AliasDecl = identifier "=" Type .
 // TypeDef = identifier Type .
 
-func (s *source) TypeDeclarations() {
-	var typeSpec [][]string
+// 解析宣告區塊
+//
+// @return []*StructInfo 宣告內容
+func (s *source) TypeDeclarations() []dao.IStructInfo {
+	var structs []dao.IStructInfo
 	if s.buf[s.r+1] == '(' {
 		s.nextCh()
 		s.toNextCh()
@@ -337,15 +358,15 @@ func (s *source) TypeDeclarations() {
 				s.nextTargetToken('\n')
 				continue
 			}
-			typeSpec = append(typeSpec, s.TypeSpec())
+			structs = append(structs, s.TypeSpec())
 			s.toNextCh()
 
 		}
 	} else {
-		typeSpec = append(typeSpec, s.TypeSpec())
-	}
-	fmt.Println(":: type (", typeSpec, ") ::")
 
+		structs = append(structs, s.TypeSpec())
+	}
+	return structs
 }
 
 // 處理 Type 宣告
@@ -353,8 +374,7 @@ func (s *source) TypeDeclarations() {
 // TypeDef = identifier Type .
 // ex: _type t1 string
 // r="_"
-func (s *source) TypeSpec() []string {
-	var datas []string
+func (s *source) TypeSpec() (structInfo dao.IStructInfo) {
 
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
@@ -362,9 +382,9 @@ func (s *source) TypeSpec() []string {
 		s.next()
 	}
 	s.toNextCh()
-	typename := s.OnDeclarationsType()
-	datas = append(datas, name, typename)
-	return datas
+	structInfo = s.OnDeclarationsType()
+	structInfo.SetName(name)
+	return structInfo
 }
 
 func (s *source) typeformat() {
@@ -388,7 +408,8 @@ func (s *source) typeformat() {
 			if s.buf[s.r+1] == '=' {
 				s.next()
 			}
-			typename := s.OnDeclarationsType()
+			s.OnDeclarationsType()
+			var typename string
 			typeSpec = append(typeSpec, []string{name, typename})
 		}
 	} else {
@@ -397,7 +418,8 @@ func (s *source) typeformat() {
 		if s.buf[s.r+1] == '=' {
 			s.next()
 		}
-		typename := s.OnDeclarationsType()
+		s.OnDeclarationsType()
+		var typename string
 		typeSpec = append(typeSpec, []string{name, typename})
 	}
 	fmt.Println(":: type (", typeSpec, ") ::")
