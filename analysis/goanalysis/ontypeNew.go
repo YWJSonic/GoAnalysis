@@ -10,13 +10,14 @@ import (
 /* 進入指標應當只在
  * r="_" range="struct" // 應該調整為統一在
  */
-func (s *source) OnStructType() (structInfo *dao.StructInfo) {
-	strLit := [][]string{}
+func (s *source) OnStructType() *dao.TypeInfoStruct {
 	unknowData := []string{}
+	info := dao.NewTypeInfoStruct()
+	info.TypeName = _struct
 	s.nextToken()
 	if s.buf[s.r+1] == '}' {
-		s.nextCh()
-		return
+		s.next()
+		return info
 	}
 	s.nextCh()
 
@@ -24,57 +25,82 @@ func (s *source) OnStructType() (structInfo *dao.StructInfo) {
 		s.toNextCh()
 
 		if string(s.buf[s.r+1:s.r+3]) == "//" {
-			s.OnTag()
+			s.OnComments("//")
 		} else {
 			var name string
+			var tmpVarInfos []*dao.VarInfo
 			nextIdx := s.nextIdx()
 
+			// 解析變數名稱
 			if !(s.buf[nextIdx] == '\n') {
 				s.next()
 				name = strings.TrimSpace(s.rangeStr())
+
+				// 宣告語法糖
 				if s.buf[s.r-1] == ',' {
 					unknowData = append(unknowData, name[:len(name)-1])
 					continue
 				}
 			}
 
+			// 清除格式空格
 			if s.buf[s.r+1] == ' ' {
 				s.toNextCh()
 			}
 
-			s.OnDeclarationsType()
-			var typename string
-			for _, nameData := range unknowData {
-				strLit = append(strLit, []string{nameData, typename})
+			// 解析變數型態
+			contextInfo := s.OnDeclarationsType()
+			if len(unknowData) > 0 {
+				for _, nameData := range unknowData {
+					varInfo := dao.NewVarInfo(nameData)
+					varInfo.TypeInfo = contextInfo
+					info.VarInfos[nameData] = varInfo
+					tmpVarInfos = append(tmpVarInfos, varInfo)
+				}
+			} else {
+				varInfo := dao.NewVarInfo(name)
+				varInfo.TypeInfo = contextInfo
+				info.VarInfos[name] = varInfo
+				tmpVarInfos = append(tmpVarInfos, varInfo)
+
 			}
 			unknowData = make([]string, 0)
-			tmpStrLit := []string{name, typename}
 			s.toNextCh()
 			for s.ch == ' ' {
 				if string(s.buf[s.r+1:s.r+3]) == "//" {
-					s.OnTag()
+					common := s.OnComments("//")
+					for _, varInfo := range tmpVarInfos {
+						varInfo.Common = common
+					}
 				} else if s.buf[s.r+1] == '`' {
-					tmpStrLit = append(tmpStrLit, s.OnJsonTag())
+					if len(tmpVarInfos) != 1 {
+						panic("")
+					}
+					s.next()
+					tag := s.rangeStr()
+					tmpVarInfos[0].Tag = tag
+					// tmpStrLit = append(tmpStrLit, s.OnJsonTag())
 					s.toNextCh()
 				}
 			}
-			strLit = append(strLit, tmpStrLit)
 		}
 
-		// idx := s.nextEndIdx('}')
 		if s.buf[s.r+1] == '}' {
 			s.nextTargetToken('}')
 			break
 		}
 	}
 
-	return
+	return info
 }
 
-func (s *source) onPointType() (structInfo *dao.StructInfo) {
+func (s *source) onPointType() *dao.TypeInfoPointer {
 	s.nextCh()
-	structInfo = s.OnDeclarationsType().(*dao.StructInfo)
-	return
+
+	info := dao.NewTypeInfoPointer()
+	info.TypeName = "*"
+	info.ContentTypeInfo = s.OnDeclarationsType()
+	return info
 }
 
 // 處理 package type 類型
@@ -83,29 +109,27 @@ func (s *source) onPointType() (structInfo *dao.StructInfo) {
  * package.ide
  * b="p" r="." range="package"
  */
-func (s *source) OnQualifiedIdentType() (structInfo *dao.StructInfo) {
+func (s *source) OnQualifiedIdentType() *dao.TypeInfoQualifiedIdent {
+	var info = dao.NewTypeInfoQualifiedIdent()
+
 	s.nextToken()
 	packageName := s.rangeStr()
-	s.nextToken()
-	structName := fmt.Sprintf("%s.%s", packageName, strings.TrimSpace(s.rangeStr()))
+	s.next()
+	typeName := strings.TrimSpace(s.rangeStr())
+	fullName := fmt.Sprintf("%s.%s", packageName, typeName)
 
-	structInfo, ok := s.PackageInfo.StructInfo[structName]
-	if !ok {
-		structInfo = dao.NewStructInfo(structName)
-	}
-	structInfo.Name = structName
-	structInfo.Package = s.PackageInfo.ImportLink[packageName].Package
-
-	return structInfo
+	info.Name = fullName
+	info.ImportLink, info.ContentTypeInfo = s.PackageInfo.GetPackageType(packageName, typeName)
+	return info
 }
 
-func (s *source) OnSliceType(endTag byte) string {
+func (s *source) OnSliceType(endTag byte) *dao.TypeInfoSlice {
+	info := dao.NewTypeInfoSlice()
+	info.TypeName = "[]"
 	s.nextCh()
-	str := string(s.ch)
 	s.nextCh()
-	str += string(s.ch)
-	str += s.OnType(endTag)
-	return str
+	info.ContentTypeInfo = s.OnDeclarationsType()
+	return info
 }
 
 func (s *source) onShortArrayType() string {
@@ -115,7 +139,7 @@ func (s *source) onShortArrayType() string {
 		s.nextCh()
 		s.nextCh()
 		str = "..."
-		str += s.subDeclarationsType()
+		// str += s.subDeclarationsType()
 	}
 	return str
 }
@@ -123,7 +147,7 @@ func (s *source) onShortArrayType() string {
 func (s *source) onArrayType() string {
 	s.nextCh()
 	str := string(s.ch)
-	str += s.subDeclarationsType()
+	// str += s.subDeclarationsType()
 	return str
 
 }
@@ -138,19 +162,31 @@ func (s *source) OnArrayType() string {
 	return str
 }
 
-func (s *source) onChannelType() string {
-	var str string
+func (s *source) onChannelType() *dao.TypeInfoChannel {
+
+	info := dao.NewTypeInfoChannel()
 	if s.buf[s.r+1] == '<' { // 單出
 		s.next()
-		str = s.rangeStr()
+		info.Name = s.rangeStr()
+		info.FlowType = 1
 
 	} else {
 		s.next()
-		str = s.rangeStr()
+
+		info.Name = s.rangeStr()
+
+		// channel 方向
+		if info.Name == _chan { // 雙向
+			info.FlowType = 0
+
+		} else { // 單入
+			info.FlowType = 2
+
+		}
 	}
 
-	str = str + " " + s.subDeclarationsType()
-	return str
+	info.ContentTypeInfo = s.OnDeclarationsType()
+	return info
 }
 
 // 處理 channel 類型
@@ -181,15 +217,15 @@ func (s *source) OnChannelType() string {
 // 處理 map 類型
 // 進入指標應當只在 _map[]
 // r="_"
-func (s *source) OnMapType() (str string) {
-	str = "map["
+func (s *source) OnMapType() dao.ITypeInfo {
+	info := dao.NewTypeInfoMap()
 	s.nextToken()
-	str += s.OnType(']') + "]"
+	info.KeyType = s.OnDeclarationsType()
 	if s.ch != ']' {
 		s.nextCh()
 	}
-	s.OnDeclarationsType()
-	return
+	info.ValueType = s.OnDeclarationsType()
+	return info
 }
 
 // 處理 interface 類型
@@ -240,37 +276,20 @@ func (s *source) OnInterfaceType() string {
 // 處理 func 類型
 // 進入指標應當只在 _func(
 // r="_"
-func (s *source) OnFuncType(endTag byte) string {
+func (s *source) OnFuncType(endTag byte) *dao.FuncInfo {
+	info := dao.NewFuncInfo()
+	info.TypeName = _func
 	s.nextToken()
-	str := "func("
-	strLit := s.OnParams(true)
-	for i, s2 := range strLit {
-		if i == len(strLit)-1 {
-			str = str + s2[0] + " " + s2[1]
-		} else {
-			str = str + s2[0] + " " + s2[1] + ", "
-		}
-	}
-	str += ")"
+	info.ParamsInPoint = s.OnParams(true)
 	if endTag == '\n' {
-		strLit = s.OnDeclarationsResult()
+		info.ParamsOutPoint = s.OnDeclarationsResult()
 	} else {
-		strLit = s.OnResult(endTag)
+		panic("")
+		s.OnResult(endTag)
 
 	}
-	if len(strLit) == 1 && strLit[0][0] == "" {
-		str = str + strLit[0][0] + " " + strLit[0][1]
-	} else {
-		for i, s2 := range strLit {
-			if i == len(strLit)-1 {
-				str = str + s2[0] + " " + s2[1] + ")"
-			} else {
-				str = str + s2[0] + " " + s2[1] + ", "
-			}
-		}
-	}
 
-	return str
+	return info
 }
 
 // 處理 `_`json:"data"`` reflection interface 區塊

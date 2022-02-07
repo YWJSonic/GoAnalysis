@@ -1,28 +1,30 @@
 package dao
 
+type FuncInfo struct {
+	PointBase
+	Method         *MethodExpression // 篩選器
+	ParamsInPoint  []*FuncParams     // 輸入參數
+	ParamsOutPoint []*FuncParams     // 輸出參數
+}
+
 // Func關聯
-func NewFuncInfo(name string) *FuncInfo {
+func NewFuncInfo() *FuncInfo {
 	info := &FuncInfo{}
-	info.Name = name
 	return info
 }
 
-type FuncInfo struct {
+type FuncParams struct {
 	PointBase
-	Method         *MethodExpression
-	ParamsInPoint  []*FuncParams
-	ParamsOutPoint []*FuncParams
+	ContentTypeInfo ITypeInfo
 }
 
 // Func 傳輸參數
-func NewFuncParams(name string, structPoint *StructInfo) *FuncParams {
+func NewFuncParams() *FuncParams {
 	params := &FuncParams{}
-	params.Name = name
-	params.StructPoint = structPoint
 	return params
 }
 
-type FuncParams struct {
+type MethodExpression struct {
 	PointBase
 	StructPoint *StructInfo
 }
@@ -33,9 +35,4 @@ func NewMethodExpression(name string, structPoint *StructInfo) *MethodExpression
 	params.Name = name
 	params.StructPoint = structPoint
 	return params
-}
-
-type MethodExpression struct {
-	PointBase
-	StructPoint *StructInfo
 }

@@ -40,36 +40,37 @@ func (s *source) OnDeclarationsInterfaceType() string {
 }
 
 // func 輸出參數
-func (s *source) OnDeclarationsResult() [][]string {
-	strLit := [][]string{}
+func (s *source) OnDeclarationsResult() []*dao.FuncParams {
+	params := []*dao.FuncParams{}
 	switch s.buf[s.r+1] {
 	case '{', '\t', '}':
-		return strLit
+		return params
 	case '(':
 		s.nextCh()
-		strLit = s.OnParams(true)
+		params = s.OnParams(true)
 
 	default:
-		s.OnDeclarationsType()
-		var name string
-		strLit = append(strLit, []string{"", name})
+		info := s.OnDeclarationsType()
+		param := dao.NewFuncParams()
+		param.ContentTypeInfo = info
+		params = append(params, param)
 	}
-	return strLit
+	return params
 }
 
 // 處理 type 參數類型
 /* 進入指標應當只在 _types
  * b=任意 r="_"
  */
-func (s *source) OnDeclarationsType() (structInfo dao.IStructInfo) {
+func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 
 	// s.nextCh()
 	switch s.buf[s.r+1] {
 	case '*': // PointerType
-		s.onPointType()
+		info = s.onPointType()
 	case '[': // ArrayType, SliceType
 		if s.buf[s.r+2] == ']' { // slice type
-			s.OnSliceType('\n')
+			info = s.OnSliceType('\n')
 		} else { // array type
 			s.OnArrayType()
 		}
@@ -84,164 +85,55 @@ func (s *source) OnDeclarationsType() (structInfo dao.IStructInfo) {
 
 		if nextEndIdx < nextTokenIdx {
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextEndIdx]))
-			if tmpStr == _struct {
-				structInfo = s.OnStructType()
-			} else if tmpStr == _chan {
+
+			baseInfo, ok := dao.BaseTypeInfo[tmpStr]
+			if ok {
 				s.next()
-				structChannelInfo := &dao.StructChannelInfo{}
-				structChannelInfo.ChanFlow = s.rangeStr()
-				structChannelInfo.StructInfo = s.OnDeclarationsType().(*dao.StructInfo)
-				structInfo = structChannelInfo
-			} else if tmpStr == _interface {
-				s.OnInterfaceType()
+				info = baseInfo
 			} else {
-				s.next()
-				s.rangeStr()
+				if tmpStr == _struct {
+					info = s.OnStructType()
+				} else if tmpStr == _chan {
+					info = s.onChannelType()
+				} else if tmpStr == _interface {
+					s.OnInterfaceType()
+				} else {
+					panic("")
+					// s.next()
+					// s.rangeStr()
+				}
 			}
+
 		} else if nextTokenIdx == nextEndIdx {
 			s.nextToken()
-		} else if s.buf[nextTokenIdx] == '.' {
-			s.OnQualifiedIdentType()
-		} else if s.buf[nextTokenIdx] == '(' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _func {
-				s.OnFuncType('\n')
-			}
-		} else if s.buf[nextTokenIdx] == '{' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _interface {
-				s.OnInterfaceType()
-			} else if tmpStr == _struct {
-				s.OnStructType()
-			}
-		} else if s.buf[nextTokenIdx] == '[' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _map {
-				s.OnMapType()
-			}
-		} else if s.buf[nextTokenIdx] == '<' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _chan {
-				if s.buf[s.r+1] == '<' { // 單出
-					s.next()
-					s.rangeStr()
-
-				} else {
-					s.next()
-					s.rangeStr()
-				}
-
-				s.subDeclarationsType()
-			}
-		}
-	}
-
-	return
-}
-
-func (s *source) subDeclarationsType() (str string) {
-	// s.nextCh()
-	switch s.buf[s.r+1] {
-	case '*': // PointerType
-		s.nextCh()
-		str = string(s.ch)
-		str += s.subDeclarationsType()
-	case '[': // ArrayType, SliceType
-		if s.buf[s.r+2] == ']' { // slice type
-			s.nextCh()
-			str += string(s.ch)
-			s.nextCh()
-			str += string(s.ch)
-			str += s.subDeclarationsType()
-			return str
-		} else { // array type
-			s.nextCh()
-			str += string(s.ch)
-			s.nextTargetToken(']')
-			str += s.rangeStr()
-			str += string(s.ch)
-			str += s.subDeclarationsType()
-		}
-	case '<': // OutPutChanelType
-		if s.buf[s.r+1] == '<' { // 單出
-			s.next()
-			str = s.rangeStr()
-
 		} else {
-			s.next()
-			str = s.rangeStr()
-		}
 
-		str = str + " " + s.subDeclarationsType()
-	case '.': // ArranType
-		if string(s.buf[s.r+1:s.r+4]) == "..." {
-			s.nextCh()
-			s.nextCh()
-			s.nextCh()
-			str = "..."
-			str += s.subDeclarationsType()
-		}
-	default:
-		nextEndIdx := s.nextIdx()
-		nextTokenIdx := s.nextTokenIdx()
+			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
 
-		if nextEndIdx < nextTokenIdx {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextEndIdx]))
-			if tmpStr == _struct {
-				s.OnStructType()
-			} else if tmpStr == _chan {
-				if s.buf[s.r+1] == '<' { // 單出
-					s.next()
-					str = s.rangeStr()
-
-				} else {
-					s.next()
-					str = s.rangeStr()
-				}
-				str = str + " " + s.subDeclarationsType()
-			} else if tmpStr == _interface {
-				str = s.OnInterfaceType()
+			baseInfo, ok := dao.BaseTypeInfo[tmpStr]
+			if ok {
+				s.nextToken()
+				info = baseInfo
 			} else {
-				s.next()
-				str = s.rangeStr()
-			}
-		} else if nextTokenIdx == nextEndIdx {
-			s.nextToken()
-		} else if s.buf[nextTokenIdx] == '.' {
-			s.OnQualifiedIdentType()
-		} else if s.buf[nextTokenIdx] == '(' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _func {
-				str = s.OnFuncType('\n')
-			}
-		} else if s.buf[nextTokenIdx] == '{' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _interface {
-				str = s.OnInterfaceType()
-			} else if tmpStr == _struct {
-				// str = s.OnStructType()
-			}
-		} else if s.buf[nextTokenIdx] == '[' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _map {
-				str = s.OnMapType()
-			}
-		} else if s.buf[nextTokenIdx] == '<' {
-			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-			if tmpStr == _chan {
-				if s.buf[s.r+1] == '<' { // 單出
-					s.next()
-					str = s.rangeStr()
 
-				} else {
-					s.next()
-					str = s.rangeStr()
+				switch tmpStr {
+				case _func:
+					info = s.OnFuncType('\n')
+				case _map:
+					info = s.OnMapType()
+				case _interface:
+					s.OnInterfaceType()
+				case _struct:
+					info = s.OnStructType()
+				case _chan:
+					info = s.onChannelType()
+				default:
+					if s.buf[nextTokenIdx] == '.' {
+						info = s.OnQualifiedIdentType()
+					}
 				}
-
-				str = str + " " + s.subDeclarationsType()
 			}
 		}
 	}
-
 	return
 }

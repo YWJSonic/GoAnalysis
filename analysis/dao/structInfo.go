@@ -29,7 +29,3 @@ type StructChannelInfo struct {
 	FuncPoint  *FuncInfo
 	ChanFlow   string
 }
-
-func (self *StructChannelInfo) SetName(name string) {
-	self.Name = name
-}

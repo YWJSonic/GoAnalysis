@@ -2,6 +2,7 @@ package goanalysis
 
 import (
 	"codeanalysis/analysis/dao"
+	"codeanalysis/tool"
 	"fmt"
 	"strings"
 )
@@ -73,8 +74,9 @@ func (s *source) importSpec() (name, importPath string, packageInfo *dao.Package
 // ConstSpec      = IdentifierList [ [ Type ] "=" ExpressionList ] .
 // IdentifierList = identifier { "," identifier } .
 // ExpressionList = Expression { "," Expression } .
+
+// 解析 const 區塊
 func (s *source) ConstantDeclarations() {
-	var constSpec [][]string
 	if s.buf[s.r+1] == '(' {
 		if s.buf[s.r+2] == ')' {
 			fmt.Println(":: const () ::")
@@ -87,7 +89,10 @@ func (s *source) ConstantDeclarations() {
 			if s.CheckCommon() {
 				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			} else {
-				constSpec = append(constSpec, s.ConstSpec())
+				infos := s.ConstSpec()
+				for _, info := range infos {
+					s.PackageInfo.AllTypeInfos[info.Name] = info
+				}
 			}
 
 			if s.buf[s.r+1] == ')' {
@@ -96,13 +101,228 @@ func (s *source) ConstantDeclarations() {
 			}
 		}
 	} else {
-		constSpec = append(constSpec, s.ConstSpec())
+		infos := s.ConstSpec()
+		for _, info := range infos {
+			s.PackageInfo.AllTypeInfos[info.Name] = info
+		}
 	}
-	fmt.Println(":: const (", constSpec, ") ::")
 }
 
-func (s *source) ConstSpec() []string {
+// ConstSpec 解析
+func (s *source) ConstSpec() []*dao.ConstInfo {
 	var datas []string
+	var infos []*dao.ConstInfo
+	nextIdx := s.nextIdx()
+
+	// top commin
+	if s.buf[nextIdx] == '\n' {
+		s.next()
+		name := s.rangeStr()
+		s.toNextCh()
+
+		datas = append(datas, name, "_", "_")
+
+		if s.CheckCommon() {
+			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+		}
+		return infos
+	}
+
+	infos = s.ConstantIdentifierList()
+
+	if s.buf[s.r+1] == '=' { // 隱藏型態 初始化
+		s.next()
+		exps := s.OnConstantExpression()
+		for idx, info := range infos {
+			info.Expressions = exps[idx]
+		}
+
+	} else { // 一般 初始化
+
+		typeInfo := s.OnDeclarationsType()
+		for idx, info := range infos {
+
+			info.TypeInfo = typeInfo
+
+			s.next()
+			info.Expressions = s.OnConstantExpression()[idx]
+		}
+	}
+
+	if s.CheckCommon() {
+		common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+		for _, info := range infos {
+			info.Common = common
+		}
+	}
+	return infos
+}
+
+func (s *source) ConstantIdentifierList() []*dao.ConstInfo {
+	var infos []*dao.ConstInfo
+	nextIdx := s.nextIdx()
+	// 變數名稱解析
+	if s.buf[nextIdx-1] == ',' { // 多參數初始化
+		for {
+			s.next()
+			name := s.rangeStr()
+			if name[len(name)-1] == ',' {
+				info := dao.NewConstInfo(name[:len(name)-1])
+				infos = append(infos, info)
+				continue
+
+			} else {
+				info := dao.NewConstInfo(name)
+				infos = append(infos, info)
+				break
+			}
+		}
+
+	} else { // 單一參數初始化
+
+		s.next()
+		name := s.rangeStr()
+		info := dao.NewConstInfo(name)
+		infos = append(infos, info)
+	}
+
+	return infos
+}
+
+// const a, b, c = Expression, Expression, Expression
+
+// 解析表達式
+//
+// @param dao.ITypeInfo	表達式型別
+// @param int			表達是數量
+//
+// @return []string 表達式內容
+func (s *source) OnConstantExpression() []*dao.Expressions {
+
+	var infos []*dao.Expressions
+
+	for {
+		info := dao.NewExpressions()
+		info.Objs = s.OnConstantExpressionMath()
+		infos = append(infos, info)
+		if s.ch != ',' {
+			break
+		}
+		s.toNextCh()
+	}
+
+	return infos
+}
+
+// 解析 算式陣列
+func (s *source) OnConstantExpressionMath() []dao.ITypeInfo {
+	var infos []dao.ITypeInfo
+	// 暫時不解析隱藏宣告
+	baseInfo := dao.BaseTypeInfo[_string]
+	infos = append(infos, baseInfo)
+	toNext := false
+	for {
+		s.nextCh()
+		switch s.ch {
+		case ',', '\n':
+			toNext = true
+		case ' ':
+			if s.buf[s.r+1] == '/' {
+				toNext = true
+			}
+		}
+		if toNext {
+			break
+		}
+
+	}
+	return infos
+
+	s.toNextCh()
+	ch := rune(s.buf[s.r+1])
+
+	if tool.IsDecimal(ch) || ch == '.' && tool.IsDecimal(rune(s.buf[s.r+2])) {
+		info := s.scanNumber()
+		infos = append(infos, info)
+
+		// s.toNextCh()
+		switch s.ch {
+		case ',':
+			break
+
+		case ' ':
+			s.nextCh()
+			switch s.ch {
+			case '+':
+				// s.nextCh()
+				infos = append(infos, s.OnConstantExpressionMath()...)
+			}
+		case '/':
+			infos = append(infos, s.OnConstantExpressionMath()...)
+		}
+
+	} else if ch == '"' {
+
+		info := s.scanString()
+		infos = append(infos, info)
+
+		switch s.ch {
+		case ',':
+			break
+
+		case ' ':
+			s.nextCh()
+			switch s.ch {
+			case '+':
+				s.nextCh()
+				infos = append(infos, s.OnConstantExpressionMath()...)
+			}
+
+		}
+	}
+
+	return infos
+}
+
+//========== Var =================
+
+// VarDecl = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
+// VarSpec = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
+func (s *source) VariableDeclarations() {
+
+	if s.buf[s.r+1] == '(' {
+		if s.buf[s.r+2] == ')' {
+			fmt.Println(":: var () ::")
+			return
+		}
+		s.nextCh()
+
+		for {
+			s.toNextCh()
+			for _, info := range s.VarSpec() {
+				s.PackageInfo.AllTypeInfos[info.Name] = info
+			}
+			s.toNextCh()
+			if s.buf[s.r+1] == ')' {
+				s.next()
+				break
+			}
+		}
+	} else {
+		for _, info := range s.VarSpec() {
+			s.PackageInfo.AllTypeInfos[info.Name] = info
+		}
+	}
+}
+
+// ShortVarDecl = IdentifierList ":=" ExpressionList .
+func (s *source) ShortVariableDeclarations() {
+
+}
+
+func (s *source) VarSpec() []*dao.VarInfo {
+	var datas []string
+	var infos []*dao.VarInfo
 	nextIdx := s.nextIdx()
 
 	if s.buf[nextIdx] == '\n' {
@@ -115,220 +335,158 @@ func (s *source) ConstSpec() []string {
 		if s.CheckCommon() {
 			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		}
-		return datas
-
+		return infos
 	}
+
+	infos = s.VariableIdentifierList()
+
+	if s.buf[s.r+1] == '=' {
+		s.nextCh()
+
+		return infos
+	} else {
+		typeInfo := s.OnDeclarationsType()
+		for idx, info := range infos {
+
+			info.Expressions.Objs = append(info.Expressions.Objs, typeInfo)
+
+			s.next()
+			info.Expressions = s.OnVariableExpression()[idx]
+		}
+	}
+
+	if s.CheckCommon() {
+		common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+		for _, info := range infos {
+			info.Common = common
+		}
+	}
+
+	return infos
+}
+
+func (s *source) VariableIdentifierList() []*dao.VarInfo {
+	var infos []*dao.VarInfo
+	nextIdx := s.nextIdx()
+	// 變數名稱解析
 	if s.buf[nextIdx-1] == ',' { // 多參數初始化
-		var nameList []string
 		for {
-			s.nextToken()
-			nameList = append(nameList, s.rangeStr())
-			s.nextCh()
-			nextIdx = s.nextIdx()
-			if s.buf[nextIdx-1] != ',' {
+			s.next()
+			name := s.rangeStr()
+			if name[len(name)-1] == ',' {
+				info := dao.NewVarInfo(name[:len(name)-1])
+				infos = append(infos, info)
+				continue
+
+			} else {
+				info := dao.NewVarInfo(name)
+				infos = append(infos, info)
 				break
 			}
 		}
-		s.next()
-		nameList = append(nameList, s.rangeStr())
-		s.toNextCh()
-		if s.buf[s.r+1] == '=' {
-			s.next()
-			expressionList := s.OnExpressionList(len(nameList))
-			datas = append(datas, nameList...)
-			datas = append(datas, "_")
-			datas = append(datas, expressionList...)
-		} else {
-			typeName := s.OnType()
-			expressionList := s.OnExpressionList(len(nameList))
-			datas = append(datas, nameList...)
-			datas = append(datas, typeName)
-			datas = append(datas, expressionList...)
-		}
+
 	} else { // 單一參數初始化
 
 		s.next()
 		name := s.rangeStr()
+		info := dao.NewVarInfo(name)
+		infos = append(infos, info)
+	}
+
+	return infos
+}
+
+// 解析表達式
+//
+// @param dao.ITypeInfo	表達式型別
+// @param int			表達是數量
+//
+// @return []string 表達式內容
+func (s *source) OnVariableExpression() []*dao.Expressions {
+
+	var infos []*dao.Expressions
+
+	for {
+		info := dao.NewExpressions()
+		info.Objs = s.OnConstantExpressionMath()
+		infos = append(infos, info)
+		if s.ch != ',' {
+			break
+		}
 		s.toNextCh()
-
-		switch s.buf[s.r+1] {
-		case '=': // 隱藏型態
-			s.next()
-			expressionList := s.OnExpressionList(1)
-			datas = append(datas, name, "_")
-			datas = append(datas, expressionList...)
-
-		case '/': // Common
-			if s.CheckCommon() {
-				datas = append(datas, name, "_", "_")
-				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
-				return datas
-			}
-		case '\n': // 段落已結束
-			datas = append(datas, name, "_", "_")
-			return datas
-
-		default: // 標準初始化
-			typeName := s.OnType()
-			s.next()
-			expressionList := s.OnExpressionList(1)
-			datas = append(datas, name, typeName)
-			datas = append(datas, expressionList...)
-		}
-
 	}
-	if s.CheckCommon() {
-		s.OnComments(string(s.buf[s.r+1 : s.r+3]))
-	}
-	return datas
+
+	return infos
 }
 
-func (s *source) OnExpressionList(count int) (strLit []string) {
-	str := ""
-	if count == 1 {
-
-		for {
-			if s.ch == '\n' {
-				break
-			} else if s.buf[s.r+1] == '`' {
-				str += s.OnJsonTag()
-			} else if string(s.buf[s.r+1:s.r+3]) == "//" {
-				s.nextTargetToken('\n')
-				break
-			} else {
-				s.next()
-				str += s.rangeStr()
-				break
-			}
-			// s.next()
-			// str += s.rangeStr()
-			// if s.ch == '\n' {
-			// 	break
-			// } else if string(s.buf[s.r+1:s.r+3]) == "//" {
-			// 	s.nextTargetToken('\n')
-			// 	break
-			// }
-		}
-		if str != "" {
-			strLit = append(strLit, str)
-		}
-	} else {
-		for i := 0; i < count-1; i++ {
-			s.nextTargetToken(',')
-			strLit = append(strLit, s.rangeStr())
-			s.nextCh()
-		}
-		for {
-			s.next()
-			str += s.rangeStr()
-			if s.ch == '\n' {
-				break
-			} else if string(s.buf[s.r+1:s.r+3]) == "//" {
-				s.nextTargetToken('\n')
-				break
-			}
-		}
-		strLit = append(strLit, str)
-	}
-	return
-}
-
-//========== Var =================
-
-// VarDecl = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
-// VarSpec = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
-func (s *source) VariableDeclarations() {
-	var varSpec [][]string
-	if s.buf[s.r+1] == '(' {
-		if s.buf[s.r+2] == ')' {
-			fmt.Println(":: var () ::")
-			return
-		}
+// 解析 算式陣列
+func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
+	var infos []dao.ITypeInfo
+	// 暫時不解析隱藏宣告
+	baseInfo := dao.BaseTypeInfo[_string]
+	infos = append(infos, baseInfo)
+	toNext := false
+	for {
 		s.nextCh()
-
-		for {
-			s.toNextCh()
-			varSpec = append(varSpec, s.VarSpec())
-			s.toNextCh()
-			if s.buf[s.r+1] == ')' {
-				s.next()
-				break
+		switch s.ch {
+		case ',', '\n':
+			toNext = true
+		case ' ':
+			if s.buf[s.r+1] == '/' {
+				toNext = true
 			}
 		}
-	} else {
-		varSpec = append(varSpec, s.VarSpec())
-	}
-	fmt.Println(":: var (", varSpec, ") ::")
-}
-
-// ShortVarDecl = IdentifierList ":=" ExpressionList .
-func (s *source) ShortVariableDeclarations() {
-
-}
-
-func (s *source) VarSpec() []string {
-	var datas []string
-	nextIdx := s.nextIdx()
-
-	if s.buf[nextIdx] == '\n' {
-		s.next()
-		name := s.rangeStr()
-		s.toNextCh()
-
-		datas = append(datas, name, "_", "_")
-		return datas
+		if toNext {
+			break
+		}
 
 	}
-	if s.buf[nextIdx-1] == ',' {
-		var nameList []string
-		for {
-			s.nextToken()
-			nameList = append(nameList, s.rangeStr())
+	return infos
+
+	s.toNextCh()
+	ch := rune(s.buf[s.r+1])
+
+	if tool.IsDecimal(ch) || ch == '.' && tool.IsDecimal(rune(s.buf[s.r+2])) {
+		info := s.scanNumber()
+		infos = append(infos, info)
+
+		// s.toNextCh()
+		switch s.ch {
+		case ',':
+			break
+
+		case ' ':
 			s.nextCh()
-			nextIdx = s.nextIdx()
-			if s.buf[nextIdx-1] != ',' {
-				break
+			switch s.ch {
+			case '+':
+				// s.nextCh()
+				infos = append(infos, s.OnConstantExpressionMath()...)
 			}
+		case '/':
+			infos = append(infos, s.OnConstantExpressionMath()...)
 		}
-		s.next()
-		nameList = append(nameList, s.rangeStr())
-		s.toNextCh()
-		if s.buf[s.r+1] == '=' {
-			s.next()
-			expressionList := s.OnExpressionList(len(nameList))
-			datas = append(datas, nameList...)
-			datas = append(datas, "_")
-			datas = append(datas, expressionList...)
-		} else {
-			typeName := s.OnType()
-			expressionList := s.OnExpressionList(len(nameList))
-			datas = append(datas, nameList...)
-			datas = append(datas, typeName)
-			datas = append(datas, expressionList...)
+
+	} else if ch == '"' {
+
+		info := s.scanString()
+		infos = append(infos, info)
+
+		switch s.ch {
+		case ',':
+			break
+
+		case ' ':
+			s.nextCh()
+			switch s.ch {
+			case '+':
+				s.nextCh()
+				infos = append(infos, s.OnConstantExpressionMath()...)
+			}
+
 		}
-		return datas
 	}
 
-	s.next()
-	name := s.rangeStr()
-	s.toNextCh()
-
-	if s.buf[s.r+1] == '=' {
-		s.nextCh()
-		expressionList := s.OnExpressionList(1)
-		datas = append(datas, name, "_")
-		datas = append(datas, expressionList...)
-		return datas
-	}
-
-	s.OnDeclarationsType()
-	var typeName string
-	s.toNextCh()
-	expressionList := s.OnExpressionList(1)
-	datas = append(datas, name, typeName)
-	datas = append(datas, expressionList...)
-
-	return datas
+	return infos
 }
 
 //========== Type =================
@@ -342,12 +500,10 @@ func (s *source) VarSpec() []string {
 // 解析宣告區塊
 //
 // @return []*StructInfo 宣告內容
-func (s *source) TypeDeclarations() []dao.IStructInfo {
-	var structs []dao.IStructInfo
+func (s *source) TypeDeclarations() {
 	if s.buf[s.r+1] == '(' {
 		s.nextCh()
 		s.toNextCh()
-
 		for {
 			if s.buf[s.r+1] == ')' {
 				s.next()
@@ -358,15 +514,13 @@ func (s *source) TypeDeclarations() []dao.IStructInfo {
 				s.nextTargetToken('\n')
 				continue
 			}
-			structs = append(structs, s.TypeSpec())
+			s.TypeSpec()
 			s.toNextCh()
 
 		}
 	} else {
-
-		structs = append(structs, s.TypeSpec())
+		s.TypeSpec()
 	}
-	return structs
 }
 
 // 處理 Type 宣告
@@ -374,17 +528,20 @@ func (s *source) TypeDeclarations() []dao.IStructInfo {
 // TypeDef = identifier Type .
 // ex: _type t1 string
 // r="_"
-func (s *source) TypeSpec() (structInfo dao.IStructInfo) {
+func (s *source) TypeSpec() (typeInfo dao.ITypeInfo) {
 
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
-	if s.buf[s.r+1] == '=' {
+	isExist := s.PackageInfo.ExistType(name)
+	if isExist {
+		panic("")
+	} else if s.buf[s.r+1] == '=' {
 		s.next()
 	}
 	s.toNextCh()
-	structInfo = s.OnDeclarationsType()
-	structInfo.SetName(name)
-	return structInfo
+	typeInfo = s.OnDeclarationsType()
+	typeInfo.SetName(name)
+	return typeInfo
 }
 
 func (s *source) typeformat() {
@@ -438,7 +595,8 @@ func (s *source) FunctionDeclarations() {
 }
 
 func (s *source) Signature() (Signatures [][]string, Results [][]string) {
-	Signatures = s.OnParams(true)
+	panic("")
+	s.OnParams(true)
 	Results = s.OnResult(' ')
 	return
 }
@@ -503,6 +661,7 @@ func (s *source) MethodDeclarations() {
 }
 
 func (s *source) OnReceiver() [][]string {
+	panic("")
 	// s.nextTargetToken(')')
 	// receivers := strings.TrimSpace(s.rangeStr())
 	// receiversLost := strings.Split(receivers, " ")
@@ -516,8 +675,8 @@ func (s *source) OnReceiver() [][]string {
 	// 	isPoint = receiversLost[1][0] == '*'
 	// }
 	// s.nextCh()
-
-	return s.OnParams(true)
+	s.OnParams(true)
+	return nil
 }
 
 // func 名稱
@@ -533,17 +692,14 @@ func (s *source) OnFuncName() string {
  * =====================
  * 輸出參數指標 b=任意 r="("
  */
-func (s *source) OnParams(isParameters bool) [][]string {
-	strLit := [][]string{}
+func (s *source) OnParams(isParameters bool) []*dao.FuncParams {
+	strLit := []*dao.FuncParams{}
 	var nextIdx int = s.r
 	var unknowCount int
 	unknowData := []string{}
 
 	if s.buf[s.r+1] == ')' {
-		// case in
-		//	func name()
-		s.nextCh()
-		s.nextCh()
+		s.next()
 		return strLit
 	}
 
@@ -555,16 +711,17 @@ func (s *source) OnParams(isParameters bool) [][]string {
 			unknowCount++
 
 		case ')':
+			panic("")
 			// 隱藏名稱宣告
-			for i := 0; i < unknowCount; i++ {
-				data := s.OnType(')')
-				s.nextCh()
-				strLit = append(strLit, []string{"", data})
-			}
-			strLit = append(strLit, []string{"", s.OnType(')')})
-			unknowCount = 0
+			// for i := 0; i < unknowCount; i++ {
+			// 	data := s.OnType(')')
+			// 	s.nextCh()
+			// 	strLit = append(strLit, []string{"", data})
+			// }
+			// strLit = append(strLit, []string{"", s.OnType(')')})
+			// unknowCount = 0
 
-			isNext = false
+			// isNext = false
 
 		default:
 			// 存在簡易變數宣告
@@ -578,14 +735,15 @@ func (s *source) OnParams(isParameters bool) [][]string {
 				unknowCount = 0
 			}
 			s.next()
-			paramName := strings.TrimSpace(s.rangeStr())
-			paramType := s.OnType(')')
+			panic("")
+			// paramName := strings.TrimSpace(s.rangeStr())
+			// paramType := s.OnType(')')
 
-			for _, name := range unknowData {
-				strLit = append(strLit, []string{name, paramType})
-			}
-			strLit = append(strLit, []string{paramName, paramType})
-			unknowData = make([]string, 0)
+			// for _, name := range unknowData {
+			// 	strLit = append(strLit, []string{name, paramType})
+			// }
+			// strLit = append(strLit, []string{paramName, paramType})
+			// unknowData = make([]string, 0)
 
 			if s.ch == ')' {
 				isNext = false
@@ -607,7 +765,7 @@ func (s *source) OnResult(endTag ...byte) [][]string {
 		return strLit
 	case '(':
 		s.nextCh()
-		strLit = s.OnParams(true)
+		s.OnParams(true)
 
 	default:
 		strLit = append(strLit, []string{"", s.OnType(endTag[0])})

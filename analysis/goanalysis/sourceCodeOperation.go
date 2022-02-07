@@ -41,12 +41,15 @@ func (s *source) nextCh() rune {
 // 跳至下一個文字存在"前"的位置
 func (s *source) toNextCh() rune {
 	var rp1 byte
+	var beSkip = true
 	for nextR := s.r + 1; ; nextR++ {
 		if s.e == nextR {
 			break
 		}
 		rp1 = s.buf[nextR]
-		if rp1 != ' ' && rp1 != '\t' && rp1 != '\n' && rp1 != '\r' {
+		if rp1 == '\\' && beSkip { // 遇到第一次跳脫字元
+			beSkip = false
+		} else if rp1 != ' ' && rp1 != '\t' && rp1 != '\n' && rp1 != '\r' {
 			break
 		}
 		s.nextCh()

@@ -6,7 +6,7 @@ import (
 )
 
 type G16Options struct {
-	writeFlow chan *wwe.ANAT1 // 提供使用者發布訊息的通道
+	writeFlow chan *wwe.ANAT1 `json:"te"` // 提供使用者發布訊息的通道
 	ww        chan<- string
 	// w2w             chan string
 	writeFlowBackup <-chan *wwe.ANAT1 // 暫存publish失敗的訊息，若重新連線成功再次發送

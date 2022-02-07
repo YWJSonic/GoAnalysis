@@ -8,7 +8,7 @@ import (
 )
 
 func TestGolandAnalysis(t *testing.T) {
-	projectRootNode := goloader.LoadRoot("./structTest/")
+	projectRootNode := goloader.LoadRoot("./analysis/goanalysis")
 	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 }

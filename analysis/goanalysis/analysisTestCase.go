@@ -6,7 +6,9 @@ import (
 	"sync"
 )
 
-var handlerIdx int // 本次取用的 arangodb client index
+const ca1, cb1, cc1 = 0b1001, "\\foo" + "fqw", 3_5 + .52/4
+const ca2, cb3, cc4 int = 0b1001, 443 + 333/2, 312_435 + 52/4                // a = 3, b = 4, c = "foo", untyped integer and string constants
+var HandlerIdxgfwer, HandlerIdx12332, HandlerIdx5tt2 = 1_5.0, 32 + 2, 5 / 11 // 本次取用的 arangodb client index
 var once sync.Once
 var initialized bool
 
@@ -16,8 +18,7 @@ const (
 	size int64 = 1024
 	eof        = -1 // untyped integer constant
 )
-const ca1, cb1, cc1 = 3, 4, "foo" // a = 3, b = 4, c = "foo", untyped integer and string constants
-const u, v float32 = 0, 3         // u = 0.0, v = 3.0
+const u, v float32 = 0, 3 // u = 0.0, v = 3.0
 const ()
 const ca = 2 + 3.0 // a == 5.0   (untyped floating-point constant)
 const (
