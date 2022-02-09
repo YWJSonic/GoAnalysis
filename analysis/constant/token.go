@@ -9,7 +9,7 @@ const (
 	_EOF       // EOF
 
 	// names and literals
-	_Name    // name
+	_Name    // nametokenLit
 	_Literal // literal
 
 	// operators and operations
@@ -258,4 +258,4 @@ const (
 	_var         KeyWordString = "var"
 )
 
-var tokenLit = []byte{'"', '`', '\'', '(', '{', '[', ';', ',', ']', ')', ':', '}', '+', '.', '*', '-', '%', '/', '|', '&', '<', '^', '=', '>', '~', '!'}
+var TokenLit = []byte{'"', '`', '\'', '(', '{', '[', ';', ',', ']', ')', ':', '}', '+', '.', '*', '-', '%', '/', '|', '&', '<', '^', '=', '>', '~', '!'}

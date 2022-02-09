@@ -8,7 +8,7 @@ func NewProjectInfo(node *goloader.GoFileNode) *ProjectInfo {
 		// AllStructMap:     make(map[string]*StructInfo),
 		// AllPublicFuncMap: make(map[string]*FuncInfo),
 	}
-	info.Name = node.Path()
+	info.name = node.Path()
 	info.ProjectRoot = node
 	return info
 }

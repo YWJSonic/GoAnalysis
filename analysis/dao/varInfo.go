@@ -10,6 +10,6 @@ type VarInfo struct {
 
 func NewVarInfo(name string) *VarInfo {
 	info := &VarInfo{}
-	info.Name = name
+	info.name = name
 	return info
 }

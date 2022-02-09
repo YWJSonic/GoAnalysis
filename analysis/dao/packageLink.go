@@ -1,24 +1,23 @@
 package dao
 
-func NewPackageLink(name, path string, targetPackage *PackageInfo) *PackageLink {
-	link := &PackageLink{
+func NewImportLink(name, path string, targetPackage *PackageInfo) *ImportInfo {
+	return &ImportInfo{
 		NewName: name,
 		Path:    path,
 		Package: targetPackage,
 	}
-	return link
 }
 
 // Package 關聯(import 資料)
-type PackageLink struct {
+type ImportInfo struct {
 	Package *PackageInfo
 	Path    string
 	NewName string
 }
 
-func (self *PackageLink) Name() string {
+func (self *ImportInfo) GetName() string {
 	if self.NewName == "" || self.NewName == "_" { // 未明新命名或隱藏式 import
-		return self.Package.Name
+		return self.Package.name
 	}
 	return self.NewName
 }

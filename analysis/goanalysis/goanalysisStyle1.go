@@ -7,39 +7,39 @@ import (
 )
 
 // 語言分析
-func AnalysisStyle1(code string) {
-	// var package map[string]*PackageInfo
-	buf := bytes.NewBuffer([]byte(" "))
-	buf.WriteString(code)
-	s := source{
-		buf: buf.Bytes(),
-	}
-	s.start()
-	for {
-		if s.r == s.e {
-			break
-		}
+// func AnalysisStyle1(code string) {
+// 	// var package map[string]*PackageInfo
+// 	buf := bytes.NewBuffer([]byte(" "))
+// 	buf.WriteString(code)
+// 	s := source{
+// 		buf: buf.Bytes(),
+// 	}
+// 	s.start()
+// 	for {
+// 		if s.r == s.e {
+// 			break
+// 		}
 
-		s.next()
-		switch s.rangeStr() {
-		case "package":
-			s.next()
-			s.PackageInfo.Name = s.rangeStr()
-		case "import":
-			s.importSpec()
-		case "type":
-			s.TypeDeclarations()
-		case "func":
-			s.FunctionDeclarations()
-		case "const":
-			s.ConstantDeclarations()
-		case "var":
-			s.VariableDeclarations()
-		default:
-			fmt.Println("--- ", s.rangeStr())
-		}
-	}
-}
+// 		s.next()
+// 		switch s.rangeStr() {
+// 		case "package":
+// 			s.next()
+// 			s.PackageInfo.Name = s.rangeStr()
+// 		case "import":
+// 			s.importSpec()
+// 		case "type":
+// 			s.TypeDeclarations()
+// 		case "func":
+// 			s.FunctionDeclarations()
+// 		case "const":
+// 			s.ConstantDeclarations()
+// 		case "var":
+// 			s.VariableDeclarations()
+// 		default:
+// 			fmt.Println("--- ", s.rangeStr())
+// 		}
+// 	}
+// }
 
 func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	// var package map[string]*PackageInfo
@@ -70,13 +70,13 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 			switch s.rangeStr() {
 			case "package":
 				s.next()
-				s.PackageInfo.Name = s.rangeStr()
+				s.PackageInfo.SetName(s.rangeStr())
 			case "import":
-				for _, link := range s.ImportDeclarations() {
-					s.PackageInfo.ImportLink[link.Name()] = link
-				}
+				s.ImportDeclarations()
+
 			case "type":
 				s.TypeDeclarations()
+
 			case "func":
 				if s.buf[s.r+1] == '(' {
 					s.MethodDeclarations()

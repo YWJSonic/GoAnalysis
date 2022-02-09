@@ -24,8 +24,11 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 		}
 		return childs
 	}
-
-	childs = node.Childes
+	if node.FileType == "go" {
+		childs = append(childs, node)
+	} else {
+		childs = node.Childes
+	}
 	var currentChild *wwe.GoFileNode
 	// 要輪尋的節點尚未
 	for len(childs) > 0 {
@@ -48,17 +51,17 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 }
 
 // 專案節點樹分析  深度優先
-func GoAnalysisDepthFirst(node *wwe.GoFileNode) {
-	// 節點下還有子節點
-	for _, child := range node.Childes {
-		GoAnalysisDepthFirst(child)
-	}
+// func GoAnalysisDepthFirst(node *wwe.GoFileNode) {
+// 	// 節點下還有子節點
+// 	for _, child := range node.Childes {
+// 		GoAnalysisDepthFirst(child)
+// 	}
 
-	if node.FileType == "go" { // 檔案節點
-		// fmt.Println(node.Name())
-		// 讀檔
-		code := tool.ReadFile(node.Path())
-		// 檔案分析
-		AnalysisStyle1(code)
-	}
-}
+// 	if node.FileType == "go" { // 檔案節點
+// 		// fmt.Println(node.Name())
+// 		// 讀檔
+// 		code := tool.ReadFile(node.Path())
+// 		// 檔案分析
+// 		AnalysisStyle1(code)
+// 	}
+// }

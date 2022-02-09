@@ -41,11 +41,11 @@ func (s *source) scanNumber() *dao.Expressions {
 		for s.nextCh(); tool.IsDecimal(s.ch); s.nextCh() {
 			value += string(s.ch)
 		}
-		baseInfo := dao.BaseTypeInfo[_float64]
+		baseInfo := dao.BaseTypeInfo["float64"]
 		baseInfo.SetName(value)
 		info.Objs = append(info.Objs, baseInfo)
 	default:
-		baseInfo := dao.BaseTypeInfo[_int]
+		baseInfo := dao.BaseTypeInfo["int"]
 		baseInfo.SetName(string(s.buf[offset:s.r]))
 		info.Objs = append(info.Objs, baseInfo)
 	}
@@ -80,7 +80,7 @@ func (s *source) scanString() *dao.Expressions {
 	}
 
 	value := string(s.buf[offset:s.r])
-	baseInfo := dao.BaseTypeInfo[_string]
+	baseInfo := dao.BaseTypeInfo["string"]
 	baseInfo.SetName(value)
 
 	info := dao.NewExpressions()
@@ -88,16 +88,15 @@ func (s *source) scanString() *dao.Expressions {
 	return info
 }
 
-func (s *source) scanToken() *dao.TokenInfo {
-	switch s.nextCh() {
-	case '|':
-		if s.buf[s.r+1] == '|' {
+func (s *source) scanIdentifiers() string {
+	offset := s.r
+	for {
+		if tool.IsLetter(s.ch) || tool.IsDecimal(s.ch) || s.ch == '_' {
 			s.nextCh()
+			continue
 		}
-		return dao.BaseTokenInfo["||"]
-	default:
-		return dao.BaseTokenInfo[string(s.ch)]
+		break
 	}
 
-	return nil
+	return string(s.buf[offset:s.r])
 }

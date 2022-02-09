@@ -20,8 +20,8 @@ type source struct {
 // 解析 import 區塊
 //
 // @return []*PackageLink 未關聯的 import 資料
-func (s *source) ImportDeclarations() []*dao.PackageLink {
-	var packageLinks []*dao.PackageLink
+func (s *source) ImportDeclarations() {
+	var packageLinks []*dao.ImportInfo
 	if s.buf[s.r+1] == '(' {
 		s.nextCh()
 		s.toNextCh()
@@ -37,16 +37,18 @@ func (s *source) ImportDeclarations() []*dao.PackageLink {
 				continue
 			}
 			name, importPath, packageInfo := s.importSpec()
-			packageLinks = append(packageLinks, dao.NewPackageLink(name, importPath, packageInfo))
+			packageLinks = append(packageLinks, dao.NewImportLink(name, importPath, packageInfo))
 			s.toNextCh()
 
 		}
 	} else {
 		name, importPath, packageInfo := s.importSpec()
-		packageLinks = append(packageLinks, dao.NewPackageLink(name, importPath, packageInfo))
-
+		packageLinks = append(packageLinks, dao.NewImportLink(name, importPath, packageInfo))
 	}
-	return packageLinks
+
+	for _, link := range packageLinks {
+		s.PackageInfo.ImportLink[link.GetName()] = link
+	}
 }
 
 // 解析 import 內文
@@ -77,6 +79,8 @@ func (s *source) importSpec() (name, importPath string, packageInfo *dao.Package
 
 // 解析 const 區塊
 func (s *source) ConstantDeclarations() {
+	var infos []*dao.ConstInfo
+
 	if s.buf[s.r+1] == '(' {
 		if s.buf[s.r+2] == ')' {
 			fmt.Println(":: const () ::")
@@ -89,9 +93,9 @@ func (s *source) ConstantDeclarations() {
 			if s.CheckCommon() {
 				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			} else {
-				infos := s.ConstSpec()
-				for _, info := range infos {
-					s.PackageInfo.AllTypeInfos[info.Name] = info
+				constInfos := s.ConstSpec()
+				for _, constInfo := range constInfos {
+					infos = append(infos, constInfo)
 				}
 			}
 
@@ -101,10 +105,13 @@ func (s *source) ConstantDeclarations() {
 			}
 		}
 	} else {
-		infos := s.ConstSpec()
-		for _, info := range infos {
-			s.PackageInfo.AllTypeInfos[info.Name] = info
+		constInfos := s.ConstSpec()
+		for _, constInfo := range constInfos {
+			infos = append(infos, constInfo)
 		}
+	}
+	for _, info := range infos {
+		s.PackageInfo.AllTypeInfos[info.GetName()] = info
 	}
 }
 
@@ -129,6 +136,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 	}
 
 	infos = s.ConstantIdentifierList()
+	s.toNextCh()
 
 	if s.buf[s.r+1] == '=' { // 隱藏型態 初始化
 		s.next()
@@ -140,12 +148,12 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 	} else { // 一般 初始化
 
 		typeInfo := s.OnDeclarationsType()
+		s.next()
+		exps := s.OnConstantExpression()
 		for idx, info := range infos {
 
 			info.TypeInfo = typeInfo
-
-			s.next()
-			info.Expressions = s.OnConstantExpression()[idx]
+			info.Expressions = exps[idx]
 		}
 	}
 
@@ -218,7 +226,7 @@ func (s *source) OnConstantExpression() []*dao.Expressions {
 func (s *source) OnConstantExpressionMath() []dao.ITypeInfo {
 	var infos []dao.ITypeInfo
 	// 暫時不解析隱藏宣告
-	baseInfo := dao.BaseTypeInfo[_string]
+	baseInfo := dao.BaseTypeInfo["string"]
 	infos = append(infos, baseInfo)
 	toNext := false
 	for {
@@ -227,7 +235,7 @@ func (s *source) OnConstantExpressionMath() []dao.ITypeInfo {
 		case ',', '\n':
 			toNext = true
 		case ' ':
-			if s.buf[s.r+1] == '/' {
+			if s.CheckCommon() {
 				toNext = true
 			}
 		}
@@ -300,7 +308,7 @@ func (s *source) VariableDeclarations() {
 		for {
 			s.toNextCh()
 			for _, info := range s.VarSpec() {
-				s.PackageInfo.AllTypeInfos[info.Name] = info
+				s.PackageInfo.AllTypeInfos[info.GetName()] = info
 			}
 			s.toNextCh()
 			if s.buf[s.r+1] == ')' {
@@ -310,7 +318,7 @@ func (s *source) VariableDeclarations() {
 		}
 	} else {
 		for _, info := range s.VarSpec() {
-			s.PackageInfo.AllTypeInfos[info.Name] = info
+			s.PackageInfo.AllTypeInfos[info.GetName()] = info
 		}
 	}
 }
@@ -339,19 +347,36 @@ func (s *source) VarSpec() []*dao.VarInfo {
 	}
 
 	infos = s.VariableIdentifierList()
+	s.toNextCh()
 
 	if s.buf[s.r+1] == '=' {
-		s.nextCh()
+		s.next()
+		exps := s.OnVariableExpression()
+		for idx, info := range infos {
+			info.Expressions = exps[idx]
+		}
 
-		return infos
 	} else {
 		typeInfo := s.OnDeclarationsType()
-		for idx, info := range infos {
-
-			info.Expressions.Objs = append(info.Expressions.Objs, typeInfo)
-
+		var exps []*dao.Expressions
+		// 指定初始化
+		if s.buf[s.r+1] == '=' {
 			s.next()
-			info.Expressions = s.OnVariableExpression()[idx]
+			// 解析表達式
+			exps = s.OnVariableExpression()
+
+		}
+		// 默認初始化
+
+		// 建立關聯
+		for idx, info := range infos {
+			// 指定型別
+			info.TypeInfo = typeInfo
+
+			// 關聯 表達式內容
+			if len(exps) > idx {
+				info.Expressions = exps[idx]
+			}
 		}
 	}
 
@@ -408,7 +433,7 @@ func (s *source) OnVariableExpression() []*dao.Expressions {
 
 	for {
 		info := dao.NewExpressions()
-		info.Objs = s.OnConstantExpressionMath()
+		info.Objs = s.OnVariableExpressionMath()
 		infos = append(infos, info)
 		if s.ch != ',' {
 			break
@@ -423,7 +448,7 @@ func (s *source) OnVariableExpression() []*dao.Expressions {
 func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
 	var infos []dao.ITypeInfo
 	// 暫時不解析隱藏宣告
-	baseInfo := dao.BaseTypeInfo[_string]
+	baseInfo := dao.BaseTypeInfo["string"]
 	infos = append(infos, baseInfo)
 	toNext := false
 	for {
@@ -432,7 +457,7 @@ func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
 		case ',', '\n':
 			toNext = true
 		case ' ':
-			if s.buf[s.r+1] == '/' {
+			if s.CheckCommon() {
 				toNext = true
 			}
 		}
@@ -501,6 +526,7 @@ func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
 //
 // @return []*StructInfo 宣告內容
 func (s *source) TypeDeclarations() {
+	infos := []dao.ITypeInfo{}
 	if s.buf[s.r+1] == '(' {
 		s.nextCh()
 		s.toNextCh()
@@ -514,12 +540,15 @@ func (s *source) TypeDeclarations() {
 				s.nextTargetToken('\n')
 				continue
 			}
-			s.TypeSpec()
+			info := s.TypeSpec()
+			s.PackageInfo.AllTypeInfos[info.GetName()] = info
+			infos = append(infos, info)
 			s.toNextCh()
-
 		}
 	} else {
-		s.TypeSpec()
+		info := s.TypeSpec()
+		s.PackageInfo.AllTypeInfos[info.GetName()] = info
+		infos = append(infos, info)
 	}
 }
 
@@ -528,8 +557,8 @@ func (s *source) TypeDeclarations() {
 // TypeDef = identifier Type .
 // ex: _type t1 string
 // r="_"
-func (s *source) TypeSpec() (typeInfo dao.ITypeInfo) {
-
+func (s *source) TypeSpec() dao.ITypeInfo {
+	var typeInfo dao.ITypeInfo
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
 	isExist := s.PackageInfo.ExistType(name)
@@ -537,49 +566,20 @@ func (s *source) TypeSpec() (typeInfo dao.ITypeInfo) {
 		panic("")
 	} else if s.buf[s.r+1] == '=' {
 		s.next()
-	}
-	s.toNextCh()
-	typeInfo = s.OnDeclarationsType()
-	typeInfo.SetName(name)
-	return typeInfo
-}
+		s.toNextCh()
 
-func (s *source) typeformat() {
-	var typeSpec [][]string
-	if s.buf[s.r+1] == '(' {
-		if s.buf[s.r+2] == ')' {
-			fmt.Println(":: type () ::")
-			return
-		}
-		s.next()
-		for {
-			if s.buf[s.r+1] == ')' {
-				s.nextCh()
-				break
-			}
-			s.next()
-			name := strings.TrimSpace(s.rangeStr())
-			if name == "" {
-				continue
-			}
-			if s.buf[s.r+1] == '=' {
-				s.next()
-			}
-			s.OnDeclarationsType()
-			var typename string
-			typeSpec = append(typeSpec, []string{name, typename})
-		}
+		info := dao.NewTypeAliasDecl()
+		info.ContentTypeInfo = s.OnDeclarationsType()
+		info.SetName(name)
+		typeInfo = info
 	} else {
-		s.next()
-		name := strings.TrimSpace(s.rangeStr())
-		if s.buf[s.r+1] == '=' {
-			s.next()
-		}
-		s.OnDeclarationsType()
-		var typename string
-		typeSpec = append(typeSpec, []string{name, typename})
+		s.toNextCh()
+		info := dao.NewTypeDef()
+		info.ContentTypeInfo = s.OnDeclarationsType()
+		info.SetName(name)
+		typeInfo = info
 	}
-	fmt.Println(":: type (", typeSpec, ") ::")
+	return typeInfo
 }
 
 //========== Func =================
@@ -588,28 +588,244 @@ func (s *source) typeformat() {
 // FunctionName = identifier .
 // FunctionBody = Block .
 func (s *source) FunctionDeclarations() {
-	name := s.OnFuncName()
-	signatures, results := s.Signature()
-	s.funcBodyBlock()
-	fmt.Println(":: func (", name, signatures, results, ") ::")
+	s.nextCh()
+	info := dao.NewFuncInfo()
+
+	// FunctionName
+	info.SetName(s.scanIdentifiers())
+
+	// Signature
+	info.ParamsInPoint = s.OnParameters()
+	info.ParamsOutPoint = s.OnDeclarationsResult()
+
+	// FunctionBody
+	info.Body = s.funcBodyBlock()
+	s.PackageInfo.FuncInfo[info.GetName()] = info
 }
 
-func (s *source) Signature() (Signatures [][]string, Results [][]string) {
-	panic("")
-	s.OnParams(true)
-	Results = s.OnResult(' ')
-	return
+// MethodDecl = "func" Receiver MethodName Signature [ FunctionBody ] .
+// Receiver   = Parameters .
+func (s *source) MethodDeclarations() {
+	s.nextCh()
+
+	// Receiver
+	info := dao.NewFuncInfo()
+	receiver := s.OnParameters()
+	if len(receiver) == 0 {
+		panic("")
+	}
+	info.Receiver = receiver[0]
+
+	// MethodName
+	s.nextCh()
+	info.SetName(s.scanIdentifiers())
+
+	// Signature
+	info.ParamsInPoint = s.OnParameters()
+	info.ParamsOutPoint = s.OnDeclarationsResult()
+
+	// FunctionBody
+	info.Body = s.funcBodyBlock()
+	s.PackageInfo.FuncInfo[info.GetName()] = info
+}
+
+// func 名稱
+func (s *source) OnFuncName() string {
+	s.nextToken()
+	return strings.TrimSpace(s.rangeStr())
+}
+
+// 處理 func 多參數資料
+/* 進入指標應當只在 abc(w *int) (x, z int)
+ * 輸入參數指標 b=任意 r="("
+ * =====================
+ * 輸出參數指標 b=任意 r="("
+ */
+func (s *source) OnParameters() []*dao.FuncParams {
+	strLit := []*dao.FuncParams{}
+	nextCh := rune(s.buf[s.r+1])
+
+	// 無參數
+	if nextCh == ')' {
+		s.next()
+		return strLit
+	}
+
+	// 解析 ParameterList
+	istype := false // 匿名參數
+	for {
+
+		// 解析 ParameterDecl
+		identifiers := []string{}
+		if istype {
+			// 匿名參數解析
+			info := s.OnDeclarationsType()
+			params := dao.NewFuncParams()
+			params.SetName("_")
+			params.ContentTypeInfo = info
+			strLit = append(strLit, params)
+
+		} else {
+			// 第一次處理與多名稱宣告解析
+			parameterDeclDone := false // 多名稱宣告是否完成
+			for !parameterDeclDone && !istype {
+
+				// 提前判斷到隱藏宣告
+				if !tool.IsLetter(nextCh) && !tool.IsDecimal(nextCh) && s.ch != '_' {
+					// 處理未解析完成的資料
+					if len(identifiers) > 0 {
+						for _, identifier := range identifiers {
+							// 基礎類型
+							info, ok := dao.BaseTypeInfo[identifier]
+							if !ok {
+								// 自定義類型
+								info = s.PackageInfo.GetType(identifier)
+								if info == nil {
+									panic("")
+								}
+							}
+
+							params := dao.NewFuncParams()
+							params.SetName("_")
+							params.ContentTypeInfo = info
+							strLit = append(strLit, params)
+
+						}
+					}
+
+					info := s.OnDeclarationsType()
+					params := dao.NewFuncParams()
+					params.SetName("_")
+					params.ContentTypeInfo = info
+					strLit = append(strLit, params)
+					istype = true
+					parameterDeclDone = true
+					continue
+				}
+
+				s.nextCh()
+				identifierOrType := s.scanIdentifiers()
+
+				switch s.ch {
+				case '.':
+					// Qualified 類型
+					s.nextCh()
+					typeName := s.scanIdentifiers()
+					fullName := fmt.Sprintf("%s.%s", identifierOrType, typeName)
+					info := dao.NewTypeInfoQualifiedIdent()
+					info.SetName(fullName)
+					info.ImportLink, info.ContentTypeInfo = s.PackageInfo.GetPackageType(identifierOrType, typeName)
+
+					params := dao.NewFuncParams()
+					params.SetName("_")
+					params.ContentTypeInfo = info
+					strLit = append(strLit, params)
+					istype = true
+
+				default:
+					// 多重隱藏宣告 基礎類型
+					info, ok := dao.BaseTypeInfo[identifierOrType]
+					if ok {
+						params := dao.NewFuncParams()
+						params.SetName("_")
+						params.ContentTypeInfo = info
+						strLit = append(strLit, params)
+						istype = true
+					} else {
+						identifiers = append(identifiers, identifierOrType)
+					}
+				}
+
+				// 結束判斷
+				if s.ch != ',' {
+					// 多重宣告
+					if len(identifiers) > 0 {
+						// 多重隱藏宣告 自定義類型
+						if s.ch == ')' {
+							// (int, float) 類型解析
+							info := s.PackageInfo.GetType(identifierOrType)
+							if info == nil {
+								panic("")
+							}
+							params := dao.NewFuncParams()
+							params.SetName("_")
+							params.ContentTypeInfo = info
+							strLit = append(strLit, params)
+
+						} else {
+							// (a, b Type) 類型解析
+							info := s.OnDeclarationsType()
+							for _, identifier := range identifiers {
+								params := dao.NewFuncParams()
+								params.SetName(identifier)
+								params.ContentTypeInfo = info
+								strLit = append(strLit, params)
+							}
+						}
+					}
+
+					parameterDeclDone = true
+				} else {
+					s.next()
+					nextCh = rune(s.buf[s.r+1])
+				}
+			}
+		}
+
+		if s.ch == ',' {
+			s.nextCh()
+		} else if s.ch == ')' {
+			s.nextCh()
+			break
+		}
+
+	}
+
+	return strLit
+}
+
+// func 輸出參數
+func (s *source) OnDeclarationsResult() []*dao.FuncParams {
+	params := []*dao.FuncParams{}
+
+	nextCh := s.buf[s.r+1]
+	// 判斷無 result
+	if s.ch == '\n' || nextCh == '{' {
+		return params
+	}
+
+	if nextCh == '\t' {
+		s.toNextCh()
+		nextCh = s.buf[s.r+1]
+	}
+
+	if nextCh == '(' {
+		s.nextCh()
+		params = s.OnParameters()
+	} else {
+		info := s.OnDeclarationsType()
+		param := dao.NewFuncParams()
+		param.ContentTypeInfo = info
+		params = append(params, param)
+	}
+
+	return params
 }
 
 // _{
 //   return
 //  }
 // b=任意 r="_"
-func (s *source) funcBodyBlock() {
+func (s *source) funcBodyBlock() string {
+	if s.buf[s.r+1] != '{' || s.ch == '\n' {
+		return ""
+	}
+	s.nextCh()
+	offset := s.r
+	scanDone := false
 	var blockCount int
 
-	s.nextToken()
-	for {
+	for !scanDone {
 		s.toNextToken()
 		switch s.buf[s.r+1] {
 		case '}':
@@ -618,7 +834,7 @@ func (s *source) funcBodyBlock() {
 				blockCount--
 				continue
 			}
-			return
+			scanDone = true
 		case '\'':
 			s.nextCh()
 			if s.buf[s.r+1] == '\\' { // 跳脫字元
@@ -641,136 +857,8 @@ func (s *source) funcBodyBlock() {
 			s.nextCh()
 		}
 	}
-}
-
-// MethodDecl = "func" Receiver MethodName Signature [ FunctionBody ] .
-// Receiver   = Parameters .
-func (s *source) MethodDeclarations() {
 	s.nextCh()
-	receiver := s.OnReceiver()
-	name := s.OnFuncName()
-	if name == "OnDeclarationsResult" {
-		fmt.Println("")
-	}
-	signatures, results := s.Signature()
-	if string(s.buf[s.r]) != " " {
-		fmt.Println("")
-	}
-	s.funcBodyBlock()
-	fmt.Println(":: method (", receiver, name, signatures, results, ") ::")
-}
-
-func (s *source) OnReceiver() [][]string {
-	panic("")
-	// s.nextTargetToken(')')
-	// receivers := strings.TrimSpace(s.rangeStr())
-	// receiversLost := strings.Split(receivers, " ")
-
-	// if len(receiversLost) == 1 {
-	// 	seltype = receiversLost[0]
-	// 	isPoint = receiversLost[0][0] == '*'
-	// } else {
-	// 	selname = receiversLost[0]
-	// 	seltype = receiversLost[1]
-	// 	isPoint = receiversLost[1][0] == '*'
-	// }
-	// s.nextCh()
-	s.OnParams(true)
-	return nil
-}
-
-// func 名稱
-func (s *source) OnFuncName() string {
-	s.nextToken()
-	return strings.TrimSpace(s.rangeStr())
-}
-
-// 處理 func 多參數資料
-/* @params isParameters 是否為輸入參數
- * 進入指標應當只在 abc(w *int) (x, z int)
- * 輸入參數指標 b=任意 r="("
- * =====================
- * 輸出參數指標 b=任意 r="("
- */
-func (s *source) OnParams(isParameters bool) []*dao.FuncParams {
-	strLit := []*dao.FuncParams{}
-	var nextIdx int = s.r
-	var unknowCount int
-	unknowData := []string{}
-
-	if s.buf[s.r+1] == ')' {
-		s.next()
-		return strLit
-	}
-
-	for isNext := true; isNext; {
-		nextIdx = s.nextIdxByPosition(nextIdx)
-
-		switch s.buf[nextIdx-1] {
-		case ',':
-			unknowCount++
-
-		case ')':
-			panic("")
-			// 隱藏名稱宣告
-			// for i := 0; i < unknowCount; i++ {
-			// 	data := s.OnType(')')
-			// 	s.nextCh()
-			// 	strLit = append(strLit, []string{"", data})
-			// }
-			// strLit = append(strLit, []string{"", s.OnType(')')})
-			// unknowCount = 0
-
-			// isNext = false
-
-		default:
-			// 存在簡易變數宣告
-			if unknowCount > 0 {
-				for i := 0; i < unknowCount; i++ {
-					s.nextToken()
-					data := strings.TrimSpace(s.rangeStr())
-					unknowData = append(unknowData, data)
-				}
-				s.nextCh()
-				unknowCount = 0
-			}
-			s.next()
-			panic("")
-			// paramName := strings.TrimSpace(s.rangeStr())
-			// paramType := s.OnType(')')
-
-			// for _, name := range unknowData {
-			// 	strLit = append(strLit, []string{name, paramType})
-			// }
-			// strLit = append(strLit, []string{paramName, paramType})
-			// unknowData = make([]string, 0)
-
-			if s.ch == ')' {
-				isNext = false
-			} else {
-				s.next()
-				nextIdx = s.r
-			}
-		}
-	}
-	s.nextCh()
-	return strLit
-}
-
-// func 輸出參數
-func (s *source) OnResult(endTag ...byte) [][]string {
-	strLit := [][]string{}
-	switch s.buf[s.r+1] {
-	case '{', '\t', '}':
-		return strLit
-	case '(':
-		s.nextCh()
-		s.OnParams(true)
-
-	default:
-		strLit = append(strLit, []string{"", s.OnType(endTag[0])})
-	}
-	return strLit
+	return string(s.buf[offset:s.r])
 }
 
 // 確認後續是否為註解

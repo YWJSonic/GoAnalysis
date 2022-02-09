@@ -8,14 +8,22 @@ type FileDataNode interface {
 
 // 全指標共用基底
 type PointBase struct {
-	Name     string
-	TypeName string
+	name     string
+	typeName string
+}
+
+func (self *PointBase) GetName() string {
+	return self.name
 }
 
 func (self *PointBase) SetName(name string) {
-	self.Name = name
+	self.name = name
 }
 
 func (self *PointBase) GetTypeName() string {
-	return self.TypeName
+	return self.typeName
+}
+
+func (self *PointBase) SetTypeName(typeName string) {
+	self.typeName = typeName
 }

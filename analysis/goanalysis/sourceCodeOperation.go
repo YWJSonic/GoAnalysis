@@ -1,5 +1,7 @@
 package goanalysis
 
+import "codeanalysis/analysis/constant"
+
 // 索引開始
 func (s *source) start() {
 	s.b, s.r = 0, 0
@@ -61,7 +63,7 @@ func (s *source) toNextToken() rune {
 	var rp1 byte = s.buf[s.r+1]
 	var isRun bool = true
 	for isRun {
-		for _, token := range tokenLit {
+		for _, token := range constant.TokenLit {
 			if token == rp1 {
 				isRun = false
 			}
@@ -137,7 +139,7 @@ func (s *source) nextToken() {
 			return
 		}
 
-		for _, token := range tokenLit {
+		for _, token := range constant.TokenLit {
 			if token == s.buf[s.r] {
 				return
 			}
@@ -160,7 +162,7 @@ func (s *source) nextTokenIdxByPosition(idx int) (tmpr int) {
 			return
 		}
 
-		for _, token := range tokenLit {
+		for _, token := range constant.TokenLit {
 			if token == s.buf[tmpr] {
 				return
 			}

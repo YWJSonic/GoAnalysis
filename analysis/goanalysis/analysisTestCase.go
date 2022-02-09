@@ -6,8 +6,32 @@ import (
 	"sync"
 )
 
+type (
+	t1 [1024]byte
+	t2 int
+	// t3 []int
+	t4 []*int
+	t5 = t1
+	t6 struct {
+		T6_1 t1
+		T6_2 t2
+	}
+	t7 interface{}
+	t8 interface {
+		T8_1(int) int
+	}
+	// t9 t1
+)
+
+func (As) m5(Bs, [1238]byte, float64, interface{}) (success bool) {
+	return
+}
+
+var tf1 func(a, b int, z float64, opt ...interface{}) (success bool)
+var tf2 func(fd, dss int, f wwe.ANAT1, w float64) (float64, *[]int)
+
 const ca1, cb1, cc1 = 0b1001, "\\foo" + "fqw", 3_5 + .52/4
-const ca2, cb3, cc4 int = 0b1001, 443 + 333/2, 312_435 + 52/4                // a = 3, b = 4, c = "foo", untyped integer and string constants
+const ca2, cb3, cc4 int = 0b1001, 443 + 333/2, 2 / 4                         // a = 3, b = 4, c = "foo", untyped integer and string constants
 var HandlerIdxgfwer, HandlerIdx12332, HandlerIdx5tt2 = 1_5.0, 32 + 2, 5 / 11 // 本次取用的 arangodb client index
 var once sync.Once
 var initialized bool
@@ -103,10 +127,12 @@ func Test8(n int, f func() int) func(p *int) {
 	return func(p *int) {}
 }
 
-func (As) m91(a, b, w, z float64, opt interface{}) (success bool) {
-	return
+type Ds struct {
+	WWe int
+	asd string
 }
-func (As) m5(Bs, [1024]byte, float64, ...interface{}) (success bool) {
+
+func (Ds) m91(a, b, w, z float64, opt interface{}) (success bool) {
 	return
 }
 func (As) m4(a, b int, w, z float64, opt ...interface{}) (success bool) {
@@ -119,22 +145,6 @@ func (As) m9(prefix string, node ...*wwe.GoFileNode) (ww *wwe.GoFileNode, e *wwe
 type f1 func() int
 
 type ()
-type (
-	t1 [1024]byte
-	t2 int
-	// t3 []int
-	t4 []*int
-	t5 = t1
-	t6 struct {
-		T6_1 t1
-		T6_2 t2
-	}
-	t7 interface{}
-	t8 interface {
-		T8_1(int) int
-	}
-	// t9 t1
-)
 
 type m1 map[string]interface{}
 type m2 map[struct {

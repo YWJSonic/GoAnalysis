@@ -7,9 +7,9 @@ func NewPackageInfo(name string) *PackageInfo {
 		AllTypeInfos: make(map[string]ITypeInfo),
 		// StructInfo:   make(map[string]*StructInfo),
 		FuncInfo:   make(map[string]*FuncInfo),
-		ImportLink: make(map[string]*PackageLink),
+		ImportLink: make(map[string]*ImportInfo),
 	}
-	info.Name = name
+	info.name = name
 	return info
 }
 
@@ -18,7 +18,7 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 		AllTypeInfos: make(map[string]ITypeInfo),
 		// StructInfo:   make(map[string]*StructInfo),
 		FuncInfo:   make(map[string]*FuncInfo),
-		ImportLink: make(map[string]*PackageLink),
+		ImportLink: make(map[string]*ImportInfo),
 	}
 	info.FileNodes = node
 	return info
@@ -27,14 +27,15 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 // Package 節點
 type PackageInfo struct {
 	PointBase
-	FileNodes    FileDataNode
-	AllTypeInfos map[string]ITypeInfo
-	// StructInfo   map[string]*StructInfo
-	FuncInfo   map[string]*FuncInfo
-	ImportLink map[string]*PackageLink
+	FileNodes     FileDataNode
+	AllTypeInfos  map[string]ITypeInfo
+	AllVarInfos   map[string]ITypeInfo
+	AllConstInfos map[string]ITypeInfo
+	FuncInfo      map[string]*FuncInfo
+	ImportLink    map[string]*ImportInfo
 }
 
-func (self *PackageInfo) GetPackageType(packageName, typeName string) (*PackageLink, ITypeInfo) {
+func (self *PackageInfo) GetPackageType(packageName, typeName string) (*ImportInfo, ITypeInfo) {
 	link, ok := self.ImportLink[packageName]
 	if !ok {
 		panic("")
@@ -54,6 +55,7 @@ func (self *PackageInfo) GetType(typeName string) ITypeInfo {
 	if !ok {
 		structInfo := NewTypeInfoStruct()
 		structInfo.SetName(typeName)
+		structInfo.SetTypeName("struct")
 		typeInfo = structInfo
 		self.AllTypeInfos[typeName] = structInfo
 	}

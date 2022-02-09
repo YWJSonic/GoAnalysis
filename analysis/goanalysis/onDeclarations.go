@@ -24,7 +24,7 @@ func (s *source) OnDeclarationsInterfaceType() string {
 			// name := strings.TrimSpace(s.rangeStr())
 			// strLit = append(strLit, [2]string{name, s.OnFuncType()})
 			name := s.OnFuncName()
-			Signatures := s.OnParams(true)
+			Signatures := s.OnParameters()
 			Results := s.OnDeclarationsInterfaceType()
 			strLit = append(strLit, [2]string{name, fmt.Sprint(Signatures, Results)})
 
@@ -37,25 +37,6 @@ func (s *source) OnDeclarationsInterfaceType() string {
 		str = fmt.Sprint(strLit)
 	}
 	return str
-}
-
-// func 輸出參數
-func (s *source) OnDeclarationsResult() []*dao.FuncParams {
-	params := []*dao.FuncParams{}
-	switch s.buf[s.r+1] {
-	case '{', '\t', '}':
-		return params
-	case '(':
-		s.nextCh()
-		params = s.OnParams(true)
-
-	default:
-		info := s.OnDeclarationsType()
-		param := dao.NewFuncParams()
-		param.ContentTypeInfo = info
-		params = append(params, param)
-	}
-	return params
 }
 
 // 處理 type 參數類型
@@ -72,13 +53,13 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 		if s.buf[s.r+2] == ']' { // slice type
 			info = s.OnSliceType('\n')
 		} else { // array type
-			s.OnArrayType()
+			info = s.OnArrayType()
 		}
 
 	case '<': // OutPutChanelType
 		s.onChannelType()
 	case '.': // short ArranType
-		s.onShortArrayType()
+		info = s.onShortArrayType()
 	default:
 		nextEndIdx := s.nextIdx()
 		nextTokenIdx := s.nextTokenIdx()
@@ -91,16 +72,15 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 				s.next()
 				info = baseInfo
 			} else {
-				if tmpStr == _struct {
+				if tmpStr == "struct" {
 					info = s.OnStructType()
-				} else if tmpStr == _chan {
+				} else if tmpStr == "chan" {
 					info = s.onChannelType()
-				} else if tmpStr == _interface {
+				} else if tmpStr == "interface" {
 					s.OnInterfaceType()
 				} else {
-					panic("")
-					// s.next()
-					// s.rangeStr()
+					info = s.PackageInfo.GetType(tmpStr)
+					s.next()
 				}
 			}
 
@@ -117,15 +97,15 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 			} else {
 
 				switch tmpStr {
-				case _func:
-					info = s.OnFuncType('\n')
-				case _map:
+				case "func":
+					info = s.OnFuncType()
+				case "map":
 					info = s.OnMapType()
-				case _interface:
-					s.OnInterfaceType()
-				case _struct:
+				case "interface":
+					info = s.OnInterfaceType()
+				case "struct":
 					info = s.OnStructType()
-				case _chan:
+				case "chan":
 					info = s.onChannelType()
 				default:
 					if s.buf[nextTokenIdx] == '.' {

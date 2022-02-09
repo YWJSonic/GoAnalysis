@@ -9,6 +9,6 @@ type ConstInfo struct {
 
 func NewConstInfo(name string) *ConstInfo {
 	info := &ConstInfo{}
-	info.Name = name
+	info.name = name
 	return info
 }
