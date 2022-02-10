@@ -47,7 +47,7 @@ func (s *source) ImportDeclarations() {
 	}
 
 	for _, link := range packageLinks {
-		s.PackageInfo.ImportLink[link.GetName()] = link
+		s.PackageInfo.AllImportLink[link.GetName()] = link
 	}
 }
 
@@ -111,7 +111,7 @@ func (s *source) ConstantDeclarations() {
 		}
 	}
 	for _, info := range infos {
-		s.PackageInfo.AllTypeInfos[info.GetName()] = info
+		s.PackageInfo.AllConstInfos[info.GetName()] = info
 	}
 }
 
@@ -308,7 +308,7 @@ func (s *source) VariableDeclarations() {
 		for {
 			s.toNextCh()
 			for _, info := range s.VarSpec() {
-				s.PackageInfo.AllTypeInfos[info.GetName()] = info
+				s.PackageInfo.AllVarInfos[info.GetName()] = info
 			}
 			s.toNextCh()
 			if s.buf[s.r+1] == ')' {
@@ -318,7 +318,7 @@ func (s *source) VariableDeclarations() {
 		}
 	} else {
 		for _, info := range s.VarSpec() {
-			s.PackageInfo.AllTypeInfos[info.GetName()] = info
+			s.PackageInfo.AllVarInfos[info.GetName()] = info
 		}
 	}
 }
@@ -536,16 +536,18 @@ func (s *source) TypeDeclarations() {
 				break
 			}
 
-			if string(s.buf[s.r+1:s.r+3]) == "//" {
+			if s.CheckCommon() {
 				s.nextTargetToken('\n')
 				continue
 			}
+
 			info := s.TypeSpec()
 			s.PackageInfo.AllTypeInfos[info.GetName()] = info
 			infos = append(infos, info)
 			s.toNextCh()
 		}
 	} else {
+		s.toNextCh()
 		info := s.TypeSpec()
 		s.PackageInfo.AllTypeInfos[info.GetName()] = info
 		infos = append(infos, info)
@@ -558,26 +560,38 @@ func (s *source) TypeDeclarations() {
 // ex: _type t1 string
 // r="_"
 func (s *source) TypeSpec() dao.ITypeInfo {
-	var typeInfo dao.ITypeInfo
+	var typeInfo *dao.TypeInfo
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
-	isExist := s.PackageInfo.ExistType(name)
-	if isExist {
-		panic("")
-	} else if s.buf[s.r+1] == '=' {
+	if s.buf[s.r+1] == '=' {
 		s.next()
 		s.toNextCh()
 
 		info := dao.NewTypeAliasDecl()
-		info.ContentTypeInfo = s.OnDeclarationsType()
 		info.SetName(name)
+		info.ContentTypeInfo = s.OnDeclarationsType()
 		typeInfo = info
 	} else {
 		s.toNextCh()
 		info := dao.NewTypeDef()
-		info.ContentTypeInfo = s.OnDeclarationsType()
 		info.SetName(name)
+		info.ContentTypeInfo = s.OnDeclarationsType()
 		typeInfo = info
+	}
+
+	isExist := s.PackageInfo.ExistType(typeInfo.GetName())
+	if isExist {
+		info := s.PackageInfo.GetType(name).(*dao.TypeInfo)
+		switch typeInfo.DefType {
+		case "Decl":
+			info.DefType = typeInfo.DefType
+			info.ContentTypeInfo = typeInfo.ContentTypeInfo
+
+		case "Def":
+			info.DefType = typeInfo.DefType
+			info.ContentTypeInfo = typeInfo.ContentTypeInfo
+		}
+
 	}
 	return typeInfo
 }
@@ -600,7 +614,7 @@ func (s *source) FunctionDeclarations() {
 
 	// FunctionBody
 	info.Body = s.funcBodyBlock()
-	s.PackageInfo.FuncInfo[info.GetName()] = info
+	s.PackageInfo.AllFuncInfo[info.GetName()] = info
 }
 
 // MethodDecl = "func" Receiver MethodName Signature [ FunctionBody ] .
@@ -626,7 +640,7 @@ func (s *source) MethodDeclarations() {
 
 	// FunctionBody
 	info.Body = s.funcBodyBlock()
-	s.PackageInfo.FuncInfo[info.GetName()] = info
+	s.PackageInfo.AllFuncInfo[info.GetName()] = info
 }
 
 // func 名稱
@@ -641,8 +655,8 @@ func (s *source) OnFuncName() string {
  * =====================
  * 輸出參數指標 b=任意 r="("
  */
-func (s *source) OnParameters() []*dao.FuncParams {
-	strLit := []*dao.FuncParams{}
+func (s *source) OnParameters() []dao.FuncParams {
+	strLit := []dao.FuncParams{}
 	nextCh := rune(s.buf[s.r+1])
 
 	// 無參數
@@ -785,8 +799,8 @@ func (s *source) OnParameters() []*dao.FuncParams {
 }
 
 // func 輸出參數
-func (s *source) OnDeclarationsResult() []*dao.FuncParams {
-	params := []*dao.FuncParams{}
+func (s *source) OnDeclarationsResult() []dao.FuncParams {
+	params := []dao.FuncParams{}
 
 	nextCh := s.buf[s.r+1]
 	// 判斷無 result
@@ -805,6 +819,7 @@ func (s *source) OnDeclarationsResult() []*dao.FuncParams {
 	} else {
 		info := s.OnDeclarationsType()
 		param := dao.NewFuncParams()
+		param.SetName("_")
 		param.ContentTypeInfo = info
 		params = append(params, param)
 	}

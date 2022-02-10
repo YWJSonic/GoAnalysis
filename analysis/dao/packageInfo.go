@@ -4,10 +4,11 @@ import "codeanalysis/load/project/goloader"
 
 func NewPackageInfo(name string) *PackageInfo {
 	info := &PackageInfo{
-		AllTypeInfos: make(map[string]ITypeInfo),
-		// StructInfo:   make(map[string]*StructInfo),
-		FuncInfo:   make(map[string]*FuncInfo),
-		ImportLink: make(map[string]*ImportInfo),
+		AllTypeInfos:  make(map[string]ITypeInfo),
+		AllVarInfos:   make(map[string]ITypeInfo),
+		AllConstInfos: make(map[string]ITypeInfo),
+		AllFuncInfo:   make(map[string]*FuncInfo),
+		AllImportLink: make(map[string]*ImportInfo),
 	}
 	info.name = name
 	return info
@@ -15,10 +16,11 @@ func NewPackageInfo(name string) *PackageInfo {
 
 func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 	info := &PackageInfo{
-		AllTypeInfos: make(map[string]ITypeInfo),
-		// StructInfo:   make(map[string]*StructInfo),
-		FuncInfo:   make(map[string]*FuncInfo),
-		ImportLink: make(map[string]*ImportInfo),
+		AllTypeInfos:  make(map[string]ITypeInfo),
+		AllVarInfos:   make(map[string]ITypeInfo),
+		AllConstInfos: make(map[string]ITypeInfo),
+		AllFuncInfo:   make(map[string]*FuncInfo),
+		AllImportLink: make(map[string]*ImportInfo),
 	}
 	info.FileNodes = node
 	return info
@@ -31,12 +33,12 @@ type PackageInfo struct {
 	AllTypeInfos  map[string]ITypeInfo
 	AllVarInfos   map[string]ITypeInfo
 	AllConstInfos map[string]ITypeInfo
-	FuncInfo      map[string]*FuncInfo
-	ImportLink    map[string]*ImportInfo
+	AllFuncInfo   map[string]*FuncInfo
+	AllImportLink map[string]*ImportInfo
 }
 
 func (self *PackageInfo) GetPackageType(packageName, typeName string) (*ImportInfo, ITypeInfo) {
-	link, ok := self.ImportLink[packageName]
+	link, ok := self.AllImportLink[packageName]
 	if !ok {
 		panic("")
 	}
@@ -53,11 +55,9 @@ func (self *PackageInfo) ExistType(typeName string) bool {
 func (self *PackageInfo) GetType(typeName string) ITypeInfo {
 	typeInfo, ok := self.AllTypeInfos[typeName]
 	if !ok {
-		structInfo := NewTypeInfoStruct()
-		structInfo.SetName(typeName)
-		structInfo.SetTypeName("struct")
-		typeInfo = structInfo
-		self.AllTypeInfos[typeName] = structInfo
+		typeInfo = NewTypeDef()
+		typeInfo.SetName(typeName)
+		self.AllTypeInfos[typeName] = typeInfo
 	}
 
 	return typeInfo

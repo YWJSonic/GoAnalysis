@@ -77,7 +77,7 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 				} else if tmpStr == "chan" {
 					info = s.onChannelType()
 				} else if tmpStr == "interface" {
-					s.OnInterfaceType()
+					info = s.OnInterfaceType()
 				} else {
 					info = s.PackageInfo.GetType(tmpStr)
 					s.next()
@@ -110,7 +110,12 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 				default:
 					if s.buf[nextTokenIdx] == '.' {
 						info = s.OnQualifiedIdentType()
+
+					} else {
+						info = s.PackageInfo.GetType(tmpStr)
+						s.nextToken()
 					}
+
 				}
 			}
 		}

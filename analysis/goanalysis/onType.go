@@ -23,10 +23,13 @@ func (s *source) OnStructType() *dao.TypeInfoStruct {
 	}
 	s.nextCh()
 
+	// FieldDecl
+	s.OnFieldDecl(info)
+
 	return info
 }
 
-func (s *source) OnSreuctFieldDecl(info *dao.TypeInfoStruct) {
+func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 	unknowData := []string{}
 	for {
 		s.toNextCh()
@@ -51,9 +54,7 @@ func (s *source) OnSreuctFieldDecl(info *dao.TypeInfoStruct) {
 			}
 
 			// 清除格式空格
-			if s.buf[s.r+1] == ' ' {
-				s.toNextCh()
-			}
+			s.toNextCh()
 
 			// 解析變數型態
 			contextInfo := s.OnDeclarationsType()
@@ -61,13 +62,13 @@ func (s *source) OnSreuctFieldDecl(info *dao.TypeInfoStruct) {
 				for _, nameData := range unknowData {
 					varInfo := dao.NewVarInfo(nameData)
 					varInfo.TypeInfo = contextInfo
-					// info.VarInfos[nameData] = varInfo
+					info.VarInfos[nameData] = varInfo
 					tmpVarInfos = append(tmpVarInfos, varInfo)
 				}
 			} else {
 				varInfo := dao.NewVarInfo(name)
 				varInfo.TypeInfo = contextInfo
-				// info.VarInfos[name] = varInfo
+				info.VarInfos[name] = varInfo
 				tmpVarInfos = append(tmpVarInfos, varInfo)
 
 			}
@@ -124,13 +125,14 @@ func (s *source) OnQualifiedIdentType() *dao.TypeInfoQualifiedIdent {
 	fullName := fmt.Sprintf("%s.%s", packageName, typeName)
 
 	info.SetName(fullName)
-	info.ImportLink, info.ContentTypeInfo = s.PackageInfo.GetPackageType(packageName, typeName)
+	link, iItype := s.PackageInfo.GetPackageType(packageName, typeName)
+	info.ImportLink, info.ContentTypeInfo = link, iItype
 	return info
 }
 
 func (s *source) OnSliceType(endTag byte) *dao.TypeInfoSlice {
 	info := dao.NewTypeInfoSlice()
-	info.SetTypeName("[]")
+	info.SetTypeName("slice")
 	s.nextCh()
 	s.nextCh()
 	info.ContentTypeInfo = s.OnDeclarationsType()
@@ -139,6 +141,7 @@ func (s *source) OnSliceType(endTag byte) *dao.TypeInfoSlice {
 
 func (s *source) onShortArrayType() *dao.TypeInfoSlice {
 	info := dao.NewTypeInfoSlice()
+	info.SetTypeName("slice")
 	if string(s.buf[s.r+1:s.r+4]) == "..." {
 		s.nextCh()
 		s.nextCh()
@@ -225,6 +228,7 @@ func (s *source) OnChannelType() string {
 // r="_"
 func (s *source) OnMapType() dao.ITypeInfo {
 	info := dao.NewTypeInfoMap()
+	info.SetTypeName("map")
 	s.nextToken()
 	info.KeyType = s.OnDeclarationsType()
 	if s.ch != ']' {
@@ -234,7 +238,10 @@ func (s *source) OnMapType() dao.ITypeInfo {
 	return info
 }
 
-// 處理 interface 類型
+// InterfaceType      = "interface" "{" { ( MethodSpec | InterfaceTypeName ) ";" } "}" .
+// MethodSpec         = MethodName Signature .
+// MethodName         = identifier .
+// InterfaceTypeName  = TypeName .
 /* 進入指標應當只在
  * interface{
  * b=i r={ rang="interface"
@@ -242,33 +249,47 @@ func (s *source) OnMapType() dao.ITypeInfo {
 
 // 解析 interface 類型
 func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
+	s.nextCh()
+
+	var matchInfos []dao.ITypeInfo
+	typeName := s.scanIdentifiers()
 	info := dao.NewTypeInfoInterface()
-	info.SetTypeName("interface")
-	s.nextToken()
+	info.SetTypeName(typeName)
 
-	if s.buf[s.r+1] == '}' {
+	if s.ch == '{' {
 		s.nextCh()
 		s.nextCh()
-
 	} else {
-		// str = "interface {"
-		// s.toNextCh()
-		// for {
-		// 	// name := strings.TrimSpace(s.rangeStr())
-		// 	// strLit = append(strLit, [2]string{name, s.OnFuncType()})
-		// 	name := s.OnFuncName()
-		// 	Signatures := s.OnParameters()
-		// 	Results := s.OnDeclarationsResult()
-		// 	strLit = append(strLit, [2]string{name, fmt.Sprint(Signatures, Results)})
+		// MethodSpec | InterfaceTypeName
+		s.next()
+		s.toNextCh()
 
-		// 	idx := s.nextIdx()
-		// 	if strings.TrimSpace(string(s.buf[s.r+1:idx])) == "}" {
-		// 		s.next()
-		// 		break
-		// 	}
-		// }
-		// str += fmt.Sprint(strLit) + "}"
+		// 解析內文
+		for {
+			s.nextCh()
+			name := s.scanIdentifiers()
+			switch s.ch {
+			case '(':
+				// 解析 MathodSpec
+				matchInfo := dao.NewFuncInfo()
+				matchInfo.SetName(name)
+				matchInfo.ParamsInPoint = s.OnParameters()
+				matchInfo.ParamsOutPoint = s.OnDeclarationsResult()
+				matchInfos = append(matchInfos, matchInfo)
+			case '\n':
+				// 解析 InterfaceTypeName
+				iInfo := s.PackageInfo.GetType(name)
+				matchInfos = append(matchInfos, iInfo)
+			}
+
+			s.toNextCh()
+			if s.buf[s.r+1] == '}' {
+				break
+			}
+		}
+		s.nextCh()
 	}
+
 	return info
 }
 
@@ -288,6 +309,7 @@ func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 // 解析 func 類型 *不包含方法
 func (s *source) OnFuncType() *dao.TypeInfoFunction {
 	info := dao.NewTypeInfoFunction()
+	info.SetTypeName("func")
 	s.nextToken()
 	info.ParamsInPoint = s.OnParameters()
 	info.ParamsOutPoint = s.OnDeclarationsResult()

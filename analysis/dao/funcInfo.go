@@ -2,10 +2,10 @@ package dao
 
 type FuncInfo struct {
 	PointBase
-	Receiver       *FuncParams   // 篩選器
-	ParamsInPoint  []*FuncParams // 輸入參數
-	ParamsOutPoint []*FuncParams // 輸出參數
-	Body           string        // 方法內文 *尚未解析
+	Receiver       FuncParams   // 篩選器
+	ParamsInPoint  []FuncParams // 輸入參數
+	ParamsOutPoint []FuncParams // 輸出參數
+	Body           string       // 方法內文 *尚未解析
 }
 
 // Func關聯
@@ -20,7 +20,7 @@ type FuncParams struct {
 }
 
 // Func 傳輸參數
-func NewFuncParams() *FuncParams {
-	params := &FuncParams{}
+func NewFuncParams() FuncParams {
+	params := FuncParams{}
 	return params
 }

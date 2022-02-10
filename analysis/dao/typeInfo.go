@@ -1,5 +1,7 @@
 package dao
 
+import "fmt"
+
 // Type declarations 類型聲明結構
 
 type ITypeInfo interface {
@@ -9,26 +11,28 @@ type ITypeInfo interface {
 	SetTypeName(typeName string)
 }
 
-// 別名宣告
-
-type TypeAliasDecl struct {
+type TypeInfo struct {
 	PointBase
+	DefType         string
 	ContentTypeInfo ITypeInfo
 }
 
-func NewTypeAliasDecl() *TypeAliasDecl {
-	return &TypeAliasDecl{}
+func (self *TypeInfo) GetTypeName() string {
+	return self.ContentTypeInfo.GetTypeName()
+}
+
+// 別名宣告
+func NewTypeAliasDecl() *TypeInfo {
+	return &TypeInfo{
+		DefType: "Decl",
+	}
 }
 
 // 類型定義
-
-type TypeDef struct {
-	PointBase
-	ContentTypeInfo ITypeInfo
-}
-
-func NewTypeDef() *TypeDef {
-	return &TypeDef{}
+func NewTypeDef() *TypeInfo {
+	return &TypeInfo{
+		DefType: "Def",
+	}
 }
 
 // struct 類型
@@ -51,6 +55,10 @@ type TypeInfoPointer struct {
 	ContentTypeInfo ITypeInfo
 }
 
+func (self *TypeInfoPointer) GetTypeName() string {
+	return fmt.Sprintf("*%s", self.ContentTypeInfo.GetTypeName())
+}
+
 func NewTypeInfoPointer() *TypeInfoPointer {
 	return &TypeInfoPointer{}
 }
@@ -58,9 +66,9 @@ func NewTypeInfoPointer() *TypeInfoPointer {
 // func 類型
 type TypeInfoFunction struct {
 	PointBase
-	ParamsInPoint  []*FuncParams // 輸入參數
-	ParamsOutPoint []*FuncParams // 輸出參數
-	Common         string        // 註解
+	ParamsInPoint  []FuncParams // 輸入參數
+	ParamsOutPoint []FuncParams // 輸出參數
+	Common         string       // 註解
 }
 
 func NewTypeInfoFunction() *TypeInfoFunction {
@@ -70,7 +78,7 @@ func NewTypeInfoFunction() *TypeInfoFunction {
 // interface 類型
 type TypeInfoInterface struct {
 	PointBase
-	MatchInfos []*FuncInfo
+	MatchInfos []ITypeInfo
 }
 
 func NewTypeInfoInterface() *TypeInfoInterface {
@@ -83,6 +91,10 @@ type TypeInfoSlice struct {
 	ContentTypeInfo ITypeInfo // 資料型別
 }
 
+func (self *TypeInfoSlice) GetTypeName() string {
+	return fmt.Sprintf("[]%s", self.ContentTypeInfo.GetTypeName())
+}
+
 func NewTypeInfoSlice() *TypeInfoSlice {
 	return &TypeInfoSlice{}
 }
@@ -92,6 +104,10 @@ type TypeInfoArray struct {
 	PointBase
 	Size            string    // 陣列大小
 	ContentTypeInfo ITypeInfo // 資料型別
+}
+
+func (self *TypeInfoArray) GetTypeName() string {
+	return fmt.Sprintf("[%s]%s", self.Size, self.ContentTypeInfo.GetTypeName())
 }
 
 func NewTypeInfoArray() *TypeInfoArray {

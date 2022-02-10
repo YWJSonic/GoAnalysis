@@ -53,6 +53,7 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	if packageInfo.FileNodes.Path() == "analysis/goanalysis/token.go" {
 		fmt.Println("")
 	}
+
 	s.start()
 	for {
 		s.toNextCh()
@@ -62,8 +63,7 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 
 		// 最外層註解
 		if s.CheckCommon() {
-			previrwCh := string(s.buf[s.r+1 : s.r+3])
-			s.OnComments(previrwCh)
+			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		} else {
 
 			s.next()
@@ -92,4 +92,19 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 			}
 		}
 	}
+	// for name, info := range s.PackageInfo.AllImportLink {
+	// 	fmt.Println(name, info.Path)
+	// }
+	// for name, info := range s.PackageInfo.AllConstInfos {
+	// 	fmt.Println(name, info.GetTypeName())
+	// }
+	// for name, info := range s.PackageInfo.AllVarInfos {
+	// 	fmt.Println(name, info.GetTypeName())
+	// }
+	// for name, info := range s.PackageInfo.AllTypeInfos {
+	// 	fmt.Println(name, info.GetTypeName())
+	// }
+	// for name, info := range s.PackageInfo.AllFuncInfo {
+	// 	fmt.Println(name, info.GetTypeName())
+	// }
 }

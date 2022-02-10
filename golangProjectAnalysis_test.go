@@ -5,10 +5,13 @@ import (
 	"codeanalysis/analysis/goanalysis"
 	"codeanalysis/load/project/goloader"
 	"testing"
+
+	_ "net/http/pprof"
 )
 
 func TestGolandAnalysis(t *testing.T) {
-	projectRootNode := goloader.LoadRoot("./analysis/goanalysis/analysisTestCase.go")
+	// go http.ListenAndServe("0.0.0.0:6060", nil)
+	projectRootNode := goloader.LoadRoot("./analysis/")
 	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 }

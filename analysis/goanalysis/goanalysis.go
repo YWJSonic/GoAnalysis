@@ -14,7 +14,7 @@ var Instants *dao.ProjectInfo
 func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 	var childs []*wwe.GoFileNode
 
-	//取得節點下的全部子節點
+	// 取得節點下的全部子節點方法
 	getSubChiles := func(node *wwe.GoFileNode) []*wwe.GoFileNode {
 		var childs []*wwe.GoFileNode
 		for _, child := range node.Childes {
@@ -24,17 +24,18 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 		}
 		return childs
 	}
+
+	// 根節點如果是 go 檔直接加入解析
 	if node.FileType == "go" {
 		childs = append(childs, node)
 	} else {
 		childs = node.Childes
 	}
-	var currentChild *wwe.GoFileNode
+
 	// 要輪尋的節點尚未
+	var currentChild *wwe.GoFileNode
 	for len(childs) > 0 {
-
 		currentChild, childs = childs[0], childs[1:]
-
 		if currentChild.Childes != nil { // 節點下還有子節點
 			childs = append(childs, getSubChiles(currentChild)...)
 

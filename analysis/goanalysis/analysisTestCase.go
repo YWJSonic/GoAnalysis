@@ -6,6 +6,14 @@ import (
 	"sync"
 )
 
+func (self As) M3() (*wwe.GoFileNode, *wwe.GoFileNode) {
+	self.WWe += 1
+	return &wwe.GoFileNode{}, &wwe.GoFileNode{}
+}
+
+type Gs = Ws
+type Ws = As
+
 type (
 	t1 [1024]byte
 	t2 int
@@ -22,6 +30,10 @@ type (
 	}
 	// t9 t1
 )
+
+func (Ws) wm5(Bs, [1238]byte, float64, interface{}) (success bool) {
+	return
+}
 
 func (As) m5(Bs, [1238]byte, float64, interface{}) (success bool) {
 	return
@@ -165,7 +177,18 @@ type As struct {
 	asd string
 }
 
-type gg1 struct{}
+type gg1 = struct {
+	Gw1 int
+}
+
+func GGB1() {
+	var gga gg1
+	fmt.Println(gga.Gw1)
+}
+func GGA1() {
+	var gga gg1
+	fmt.Println(gga.Gw1)
+}
 
 type g61 struct{}
 type g9 g1
@@ -178,10 +201,6 @@ type g5 = t1
 
 func m8(node *wwe.GoFileNode) *wwe.GoFileNode {
 	return &wwe.GoFileNode{}
-}
-func (self As) M3() (*wwe.GoFileNode, *wwe.GoFileNode) {
-	self.WWe += 1
-	return &wwe.GoFileNode{}, &wwe.GoFileNode{}
 }
 func (self *As) M3_1() (*wwe.GoFileNode, *wwe.GoFileNode) {
 	self.WWe += 1
