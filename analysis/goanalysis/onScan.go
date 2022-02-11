@@ -2,7 +2,7 @@ package goanalysis
 
 import (
 	"codeanalysis/analysis/dao"
-	"codeanalysis/tool"
+	"codeanalysis/util"
 )
 
 // 解析常數
@@ -28,7 +28,7 @@ func (s *source) scanNumber() *dao.Expressions {
 			}
 		}
 
-		for tool.IsDecimal(s.ch) || s.ch == '_' {
+		for util.IsDecimal(s.ch) || s.ch == '_' {
 			s.nextCh()
 		}
 
@@ -38,7 +38,7 @@ func (s *source) scanNumber() *dao.Expressions {
 
 	case '.': // 浮點數表示
 		value += string(s.ch)
-		for s.nextCh(); tool.IsDecimal(s.ch); s.nextCh() {
+		for s.nextCh(); util.IsDecimal(s.ch); s.nextCh() {
 			value += string(s.ch)
 		}
 		baseInfo := dao.BaseTypeInfo["float64"]
@@ -91,11 +91,28 @@ func (s *source) scanString() *dao.Expressions {
 func (s *source) scanIdentifiers() string {
 	offset := s.r
 	for {
-		if tool.IsLetter(s.ch) || tool.IsDecimal(s.ch) || s.ch == '_' {
+		if util.IsLetter(s.ch) || util.IsDecimal(s.ch) || s.ch == '_' {
 			s.nextCh()
 			continue
 		}
 		break
+	}
+
+	return string(s.buf[offset:s.r])
+}
+
+func (s *source) scanExpression() string {
+	offset := s.r
+	endToken := map[rune]struct{}{
+		']':  {},
+		')':  {},
+		'\n': {},
+	}
+	for {
+		if _, ok := endToken[s.ch]; ok {
+			break
+		}
+		s.nextCh()
 	}
 
 	return string(s.buf[offset:s.r])
