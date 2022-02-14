@@ -37,18 +37,16 @@ func (s *source) ImportDeclarations() {
 				s.nextTargetToken('\n')
 				continue
 			}
-			name, importPath, packageInfo := s.importSpec()
-			packageLinks = append(packageLinks, dao.NewImportLink(name, importPath, packageInfo))
+			packageLinks = append(packageLinks, s.importSpec())
 			s.toNextCh()
 
 		}
 	} else {
-		name, importPath, packageInfo := s.importSpec()
-		packageLinks = append(packageLinks, dao.NewImportLink(name, importPath, packageInfo))
+		packageLinks = append(packageLinks, s.importSpec())
 	}
 
 	for _, link := range packageLinks {
-		s.PackageInfo.AllImportLink[link.GetName()] = link
+		s.PackageInfo.AllImportLink[link.Path] = link
 	}
 }
 
@@ -56,19 +54,48 @@ func (s *source) ImportDeclarations() {
 //
 // @return name 		import檔案的替換名稱
 // @return importPath	import檔案的路徑
-func (s *source) importSpec() (name, importPath string, packageInfo *dao.PackageInfo) {
+func (s *source) importSpec() *dao.ImportInfo {
 	s.nextToken()
-	name = strings.TrimSpace(s.rangeStr())
-	s.nextTargetToken('"')
-	importPath = strings.TrimSpace(s.rangeStr())
 
-	packageInfo, ok := Instants.AllPackageMap[importPath]
-	if !ok {
-		packageInfo = dao.NewPackageInfo(importPath)
-		Instants.AllPackageMap[importPath] = packageInfo
+	var importMod string
+	var newName, name, path string
+	var packageInfo *dao.PackageInfo
+
+	// 解析 新名稱
+	newName = strings.TrimSpace(s.rangeStr())
+	s.nextTargetToken('"')
+	if newName == "." || newName == "_" {
+		importMod = newName
 	}
 
-	return name, importPath, packageInfo
+	// 解析 路徑
+	path = strings.TrimSpace(s.rangeStr())
+
+	// 解析 預設名稱
+	splitStr := strings.Split(path, "/")
+	name = splitStr[len(splitStr)-1]
+
+	// 需要再次定義, 其他模式下的關聯名稱
+	if importMod != "" || newName == "" {
+		// 不明格式可能是 gopls 作用
+		if len(name) > 3 && name[:3] == "go-" {
+			newName = name[3:]
+		} else {
+			newName = name
+		}
+	}
+
+	if name == "" {
+		fmt.Println("")
+	}
+	// 根據預設名稱取得 package 關聯資料
+	packageInfo, _ = Instants.LoadOrStoryPackage(path, dao.NewPackageInfo())
+	importInfo := dao.NewImportLink()
+	importInfo.NewName = newName
+	importInfo.ImportMod = importMod
+	importInfo.Path = path
+	importInfo.Package = packageInfo
+	return importInfo
 }
 
 //========== Const =================
@@ -95,9 +122,15 @@ func (s *source) ConstantDeclarations() {
 				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			} else {
 				constInfos := s.ConstSpec()
-				for _, constInfo := range constInfos {
-					infos = append(infos, constInfo)
+				if len(constInfos) > 1 {
+					panic("")
 				}
+				if constInfos[0].TypeInfo == nil && len(infos) > 0 {
+					for _, constInfo := range constInfos {
+						constInfo.TypeInfo = infos[len(infos)-1].TypeInfo
+					}
+				}
+				infos = append(infos, constInfos...)
 			}
 
 			if s.buf[s.r+1] == ')' {
@@ -107,9 +140,7 @@ func (s *source) ConstantDeclarations() {
 		}
 	} else {
 		constInfos := s.ConstSpec()
-		for _, constInfo := range constInfos {
-			infos = append(infos, constInfo)
-		}
+		infos = append(infos, constInfos...)
 	}
 	for _, info := range infos {
 		s.PackageInfo.AllConstInfos[info.GetName()] = info
@@ -118,52 +149,50 @@ func (s *source) ConstantDeclarations() {
 
 // ConstSpec 解析
 func (s *source) ConstSpec() []*dao.ConstInfo {
-	var datas []string
-	var infos []*dao.ConstInfo
-	nextIdx := s.nextIdx()
+	infos := s.ConstantIdentifierList()
 
-	// top commin
-	if s.buf[nextIdx] == '\n' {
-		s.next()
-		name := s.rangeStr()
+	if s.ch != '\n' { // 判斷區塊未結束
 		s.toNextCh()
 
-		datas = append(datas, name, "_", "_")
+		// 確認下個區塊類型
+		nextCh := rune(s.buf[s.r+1])
+		if nextCh == '=' { // 隱藏型態 初始化
+			s.next()
 
-		if s.CheckCommon() {
-			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+			// 解析表達式
+			exps := s.OnConstantExpression()
+			for idx, info := range infos {
+				info.Expressions = exps[idx]
+			}
+
+			// 解析註解
+			if s.CheckCommon() {
+				common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+				for _, info := range infos {
+					info.Common = common
+				}
+			}
+
+		} else if s.CheckCommon() {
+			// 解析註解
+			common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+			for _, info := range infos {
+				info.Common = common
+			}
+		} else {
+			// 一般初始化流程
+			typeInfo := s.OnDeclarationsType()
+			s.next()
+			exps := s.OnConstantExpression()
+			for idx, info := range infos {
+
+				info.TypeInfo = typeInfo
+				info.Expressions = exps[idx]
+			}
 		}
-		return infos
+
 	}
 
-	infos = s.ConstantIdentifierList()
-	s.toNextCh()
-
-	if s.buf[s.r+1] == '=' { // 隱藏型態 初始化
-		s.next()
-		exps := s.OnConstantExpression()
-		for idx, info := range infos {
-			info.Expressions = exps[idx]
-		}
-
-	} else { // 一般 初始化
-
-		typeInfo := s.OnDeclarationsType()
-		s.next()
-		exps := s.OnConstantExpression()
-		for idx, info := range infos {
-
-			info.TypeInfo = typeInfo
-			info.Expressions = exps[idx]
-		}
-	}
-
-	if s.CheckCommon() {
-		common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
-		for _, info := range infos {
-			info.Common = common
-		}
-	}
 	return infos
 }
 
@@ -189,8 +218,8 @@ func (s *source) ConstantIdentifierList() []*dao.ConstInfo {
 
 	} else { // 單一參數初始化
 
-		s.next()
-		name := s.rangeStr()
+		s.nextCh()
+		name := s.scanIdentifiers()
 		info := dao.NewConstInfo(name)
 		infos = append(infos, info)
 	}
@@ -245,8 +274,10 @@ func (s *source) OnConstantExpressionMath() []dao.ITypeInfo {
 		}
 
 	}
+	// 後續補完此解析
 	return infos
 
+	// 解析流程
 	s.toNextCh()
 	ch := rune(s.buf[s.r+1])
 
@@ -330,21 +361,19 @@ func (s *source) ShortVariableDeclarations() {
 }
 
 func (s *source) VarSpec() []*dao.VarInfo {
-	var datas []string
 	var infos []*dao.VarInfo
 	nextIdx := s.nextIdx()
 
 	if s.buf[nextIdx] == '\n' {
-		s.next()
-		name := s.rangeStr()
-		s.toNextCh()
+		panic("")
+		// s.next()
+		// name := s.rangeStr()
+		// s.toNextCh()
 
-		datas = append(datas, name, "_", "_")
-
-		if s.CheckCommon() {
-			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
-		}
-		return infos
+		// if s.CheckCommon() {
+		// 	s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+		// }
+		// return infos
 	}
 
 	infos = s.VariableIdentifierList()
@@ -467,8 +496,10 @@ func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
 		}
 
 	}
+	// 後續補完解析
 	return infos
 
+	// 解析流程
 	s.toNextCh()
 	ch := rune(s.buf[s.r+1])
 
@@ -525,8 +556,8 @@ func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
 
 // 解析宣告區塊
 //
-// @return []*StructInfo 宣告內容
-func (s *source) TypeDeclarations() {
+// @return []dao.ITypeInfo 宣告內容
+func (s *source) TypeDeclarations() []dao.ITypeInfo {
 	infos := []dao.ITypeInfo{}
 	if s.buf[s.r+1] == '(' {
 		s.nextCh()
@@ -543,6 +574,9 @@ func (s *source) TypeDeclarations() {
 			}
 
 			info := s.TypeSpec()
+			if info.GetName() == "" {
+				fmt.Println("")
+			}
 			s.PackageInfo.AllTypeInfos[info.GetName()] = info
 			infos = append(infos, info)
 			s.toNextCh()
@@ -550,9 +584,13 @@ func (s *source) TypeDeclarations() {
 	} else {
 		s.toNextCh()
 		info := s.TypeSpec()
+		if info.GetName() == "" {
+			fmt.Println("")
+		}
 		s.PackageInfo.AllTypeInfos[info.GetName()] = info
 		infos = append(infos, info)
 	}
+	return infos
 }
 
 // 處理 Type 宣告
@@ -564,6 +602,9 @@ func (s *source) TypeSpec() dao.ITypeInfo {
 	var typeInfo *dao.TypeInfo
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
+	if name == "ITheme" {
+		fmt.Println("")
+	}
 	if s.buf[s.r+1] == '=' {
 		s.next()
 		s.toNextCh()
@@ -575,6 +616,9 @@ func (s *source) TypeSpec() dao.ITypeInfo {
 	} else {
 		s.toNextCh()
 		info := dao.NewTypeDef()
+		if name == "Gc_OpenByEcSiteReq" {
+			fmt.Println("")
+		}
 		info.SetName(name)
 		info.ContentTypeInfo = s.OnDeclarationsType()
 		typeInfo = info
@@ -949,6 +993,8 @@ func (s *source) funcBodyBlock() string {
 			commentType := string(s.buf[s.r+1 : s.r+3])
 			if commentType == "//" || commentType == "/*" {
 				s.OnComments(commentType)
+			} else {
+				s.nextCh()
 			}
 		case '{':
 			s.nextCh()

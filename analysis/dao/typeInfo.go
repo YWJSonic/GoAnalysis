@@ -18,7 +18,7 @@ type TypeInfo struct {
 }
 
 func (self *TypeInfo) GetTypeName() string {
-	return self.ContentTypeInfo.GetTypeName()
+	return self.name
 }
 
 // 別名宣告
@@ -42,6 +42,9 @@ type TypeInfoStruct struct {
 	FuncPoint map[string]*FuncInfo
 }
 
+func (self *TypeInfoStruct) GetTypeName() string {
+	return self.name
+}
 func NewTypeInfoStruct() *TypeInfoStruct {
 	return &TypeInfoStruct{
 		VarInfos:  make(map[string]*VarInfo),
@@ -78,7 +81,7 @@ func NewTypeInfoFunction() *TypeInfoFunction {
 // interface 類型
 type TypeInfoInterface struct {
 	PointBase
-	MatchInfos []ITypeInfo
+	MatchInfos []ITypeInfo // interface 定義的方法
 }
 
 func NewTypeInfoInterface() *TypeInfoInterface {

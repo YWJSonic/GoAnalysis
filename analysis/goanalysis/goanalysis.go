@@ -16,15 +16,15 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 	var childs []*wwe.GoFileNode
 
 	// 取得節點下的全部子節點方法
-	getSubChiles := func(node *wwe.GoFileNode) []*wwe.GoFileNode {
-		var childs []*wwe.GoFileNode
-		for _, child := range node.Childes {
-			if child.Childes != nil {
-				childs = append(childs, child.Childes...)
-			}
-		}
-		return childs
-	}
+	// getSubChiles := func(node *wwe.GoFileNode) []*wwe.GoFileNode {
+	// 	var childs []*wwe.GoFileNode
+	// 	for _, child := range node.Childes {
+	// 		if child.Childes != nil {
+	// 			childs = append(childs, child.Childes...)
+	// 		}
+	// 	}
+	// 	return childs
+	// }
 
 	// 根節點如果是 go 檔直接加入解析
 	if node.FileType == "go" {
@@ -37,17 +37,20 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 	var currentChild *wwe.GoFileNode
 	for len(childs) > 0 {
 		currentChild, childs = childs[0], childs[1:]
-		if currentChild.Childes != nil { // 節點下還有子節點
-			childs = append(childs, getSubChiles(currentChild)...)
-
+		if currentChild.FileType != "go" {
+			GoAnalysisSpaceFirst(currentChild)
 		} else if currentChild.FileType == "go" { // 檔案節點
-			PackageInfo := Instants.LoadOrStoryPackage(dao.NewPackageInfoByNode(currentChild))
+			PackageInfo, ok := Instants.LoadOrStoryPackage(node.Path(), dao.NewPackageInfoByNode(currentChild))
+			if ok {
+				PackageInfo.CurrentFileNodes = currentChild
+			}
 			// 讀檔
-			code := util.ReadFile(PackageInfo.FileNodes.Path())
+			code := util.ReadFile(PackageInfo.CurrentFileNodes.Path())
 			// 檔案分析
 			fmt.Println("------------------------")
 			AnalysisStyle2(PackageInfo, code)
 			fmt.Println("------------------------")
+			PackageInfo.CurrentFileNodes = nil
 		}
 	}
 }
@@ -110,10 +113,6 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	s := source{
 		buf:         buf.Bytes(),
 		PackageInfo: packageInfo,
-	}
-	fmt.Println("FileName:", packageInfo.FileNodes.Path())
-	if packageInfo.FileNodes.Path() == "analysis/goanalysis/token.go" {
-		fmt.Println("")
 	}
 
 	s.start()

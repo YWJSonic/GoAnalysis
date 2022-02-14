@@ -34,9 +34,16 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 	for {
 		s.toNextCh()
 
-		if string(s.buf[s.r+1:s.r+3]) == "//" {
-			s.OnComments("//")
+		// 判斷整行註解
+		if s.CheckCommon() {
+			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		} else {
+
+			if s.buf[s.r+1] == '}' {
+				s.nextTargetToken('}')
+				break
+			}
+
 			var name string
 			var tmpVarInfos []*dao.VarInfo
 			nextIdx := s.nextIdx()
@@ -93,10 +100,10 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 			}
 		}
 
-		if s.buf[s.r+1] == '}' {
-			s.nextTargetToken('}')
-			break
-		}
+		// if s.buf[s.r+1] == '}' {
+		// 	s.nextTargetToken('}')
+		// 	break
+		// }
 	}
 }
 
@@ -251,7 +258,6 @@ func (s *source) OnMapType() dao.ITypeInfo {
 func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 	s.nextCh()
 
-	var matchInfos []dao.ITypeInfo
 	typeName := s.scanIdentifiers()
 	info := dao.NewTypeInfoInterface()
 	info.SetTypeName(typeName)
@@ -266,6 +272,18 @@ func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 
 		// 解析內文
 		for {
+			if s.buf[s.r+1] == '}' {
+				break
+			}
+
+			// 解析註解
+			if s.CheckCommon() {
+				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+				s.toNextCh()
+				continue
+			}
+
+			// 解析 interface 方法
 			s.nextCh()
 			name := s.scanIdentifiers()
 			switch s.ch {
@@ -275,17 +293,15 @@ func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 				matchInfo.SetName(name)
 				matchInfo.ParamsInPoint = s.OnParameters()
 				matchInfo.ParamsOutPoint = s.OnDeclarationsResult()
-				matchInfos = append(matchInfos, matchInfo)
+				info.MatchInfos = append(info.MatchInfos, matchInfo)
+
 			case '\n':
 				// 解析 InterfaceTypeName
 				iInfo := s.PackageInfo.GetType(name)
-				matchInfos = append(matchInfos, iInfo)
+				info.MatchInfos = append(info.MatchInfos, iInfo)
 			}
 
 			s.toNextCh()
-			if s.buf[s.r+1] == '}' {
-				break
-			}
 		}
 		s.nextCh()
 	}

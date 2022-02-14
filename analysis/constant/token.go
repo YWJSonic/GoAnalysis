@@ -1,9 +1,5 @@
 package constant
 
-type token = uint
-
-//go:generate stringer -type token -linecomment tokens.go
-
 const (
 	_    token = iota
 	_EOF       // EOF
@@ -78,6 +74,23 @@ const (
 	Defer = _Defer
 )
 
+type LitKind uint8
+
+// TODO(gri) With the 'i' (imaginary) suffix now permitted on integer
+//           and floating-point numbers, having a single ImagLit does
+//           not represent the literal kind well anymore. Remove it?
+const (
+	IntLit   LitKind = iota
+	FloatLit int     = 5
+	ImagLit  string  = "3"
+	RuneLit
+	StringLit
+)
+
+type token = uint
+
+//go:generate stringer -type token -linecomment tokens.go
+
 // Make sure we have at most 64 tokens so we can use them in a set.
 const _ uint64 = 1 << (tokenCount - 1)
 
@@ -85,19 +98,6 @@ const _ uint64 = 1 << (tokenCount - 1)
 func contains(tokset uint64, tok token) bool {
 	return tokset&(1<<tok) != 0
 }
-
-type LitKind uint8
-
-// TODO(gri) With the 'i' (imaginary) suffix now permitted on integer
-//           and floating-point numbers, having a single ImagLit does
-//           not represent the literal kind well anymore. Remove it?
-const (
-	IntLit LitKind = iota
-	FloatLit
-	ImagLit
-	RuneLit
-	StringLit
-)
 
 type Operator uint
 

@@ -53,9 +53,32 @@ func (s *source) scanNumber() *dao.Expressions {
 	return info
 }
 
+func (s *source) scanStringLit(strToken rune) string {
+	var ch rune
+	offset := s.r
+	for {
+
+		ch = s.ch
+		if ch == '\n' || ch < 0 { // 字串格式錯誤
+			panic("")
+		}
+
+		s.nextCh()
+		if ch == strToken { // 字串結束
+			break
+		}
+
+		if ch == '\\' { //跳脫符號
+			s.nextCh()
+		}
+	}
+	return string(s.buf[offset:s.r])
+}
+
 // 掃描字串
 //
 // 起始位置 _"stringcontext"
+// 起始位置 _`stringcontext`
 func (s *source) scanString() *dao.Expressions {
 	var ch rune
 	s.nextCh()

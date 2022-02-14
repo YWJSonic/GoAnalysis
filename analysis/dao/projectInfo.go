@@ -1,6 +1,9 @@
 package dao
 
-import "codeanalysis/load/project/goloader"
+import (
+	"codeanalysis/load/project/goloader"
+	"fmt"
+)
 
 func NewProjectInfo(node *goloader.GoFileNode) *ProjectInfo {
 	info := &ProjectInfo{
@@ -22,21 +25,22 @@ type ProjectInfo struct {
 	// AllVendorMap     map[string]string
 }
 
-func (self *ProjectInfo) LoadOrStoryPackage(info *PackageInfo) *PackageInfo {
+// 讀寫此 package 關連資料
+//
+// @params string		package 路徑
+// @params *PackageInfo	預設關聯結構
+//
+// @return *PackageInfo	回傳的關聯資料
+// @return bool			是否已存在資料
+func (self *ProjectInfo) LoadOrStoryPackage(pwd string, info *PackageInfo) (*PackageInfo, bool) {
 
-	if packageInfo, ok := self.AllPackageMap[info.FileNodes.Path()]; ok {
-		return packageInfo
+	if pwd == "codeanalysis" {
+		fmt.Println("")
+	}
+	if packageInfo, ok := self.AllPackageMap[pwd]; ok {
+		return packageInfo, true
 	}
 
-	self.AllPackageMap[info.FileNodes.Path()] = info
-	return info
-}
-
-func (self *ProjectInfo) LorSPackageInfo(name string) (*PackageInfo, bool) {
-	packageInfo, isLoad := self.AllPackageMap[name]
-	if isLoad {
-		return packageInfo, isLoad
-	}
-	packageInfo = NewPackageInfo(name)
-	return packageInfo, isLoad
+	self.AllPackageMap[pwd] = info
+	return info, false
 }

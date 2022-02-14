@@ -1,23 +1,22 @@
 package dao
 
-func NewImportLink(name, path string, targetPackage *PackageInfo) *ImportInfo {
-	return &ImportInfo{
-		NewName: name,
-		Path:    path,
-		Package: targetPackage,
-	}
+import "fmt"
+
+func NewImportLink() *ImportInfo {
+	return &ImportInfo{}
 }
 
 // Package 關聯(import 資料)
 type ImportInfo struct {
-	Package *PackageInfo
-	Path    string
-	NewName string
+	Package   *PackageInfo
+	Path      string
+	NewName   string // 使用一般引入方式
+	ImportMod string // 包引入方式定義, 一般使用： "", 隱藏式: ".", 只限初始化: "_"
 }
 
 func (self *ImportInfo) GetName() string {
-	if self.NewName == "" || self.NewName == "_" { // 未明新命名或隱藏式 import
-		return self.Package.name
+	if self.ImportMod == "_" || self.ImportMod == "." {
+		return fmt.Sprintf("%s%s", self.ImportMod, self.NewName)
 	}
 	return self.NewName
 }
