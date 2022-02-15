@@ -219,7 +219,7 @@ func (s *source) ConstantIdentifierList() []*dao.ConstInfo {
 	} else { // 單一參數初始化
 
 		s.nextCh()
-		name := s.scanIdentifiers()
+		name := s.scanIdentifier()
 		info := dao.NewConstInfo(name)
 		infos = append(infos, info)
 	}
@@ -735,7 +735,7 @@ func (s *source) FunctionDeclarations() {
 	info := dao.NewFuncInfo()
 
 	// FunctionName
-	info.SetName(s.scanIdentifiers())
+	info.SetName(s.scanIdentifier())
 
 	// Signature
 	info.ParamsInPoint = s.OnParameters()
@@ -761,7 +761,7 @@ func (s *source) MethodDeclarations() {
 
 	// MethodName
 	s.nextCh()
-	info.SetName(s.scanIdentifiers())
+	info.SetName(s.scanIdentifier())
 
 	// Signature
 	info.ParamsInPoint = s.OnParameters()
@@ -847,13 +847,13 @@ func (s *source) OnParameters() []dao.FuncParams {
 				}
 
 				s.nextCh()
-				identifierOrType := s.scanIdentifiers()
+				identifierOrType := s.scanIdentifier()
 
 				switch s.ch {
 				case '.':
 					// Qualified 類型
 					s.nextCh()
-					typeName := s.scanIdentifiers()
+					typeName := s.scanIdentifier()
 					fullName := fmt.Sprintf("%s.%s", identifierOrType, typeName)
 					info := dao.NewTypeInfoQualifiedIdent()
 					info.SetName(fullName)

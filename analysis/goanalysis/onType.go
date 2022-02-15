@@ -3,7 +3,6 @@ package goanalysis
 import (
 	"codeanalysis/analysis/dao"
 	"fmt"
-	"strings"
 )
 
 // StructType    = "struct" "{" { FieldDecl ";" } "}" .
@@ -30,80 +29,144 @@ func (s *source) OnStructType() *dao.TypeInfoStruct {
 }
 
 func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
-	unknowData := []string{}
+
+	var lineCommon string
+	isCommonLine := false
+
+	// 從 struct{'\n' <- 這邊開始解析
 	for {
+		// 換行處理
+		if s.ch == '\n' {
+			s.nextCh()
+
+			// 註解重製判斷
+			if !isCommonLine && lineCommon != "" {
+				lineCommon = ""
+			}
+
+			// 每行需要重製的資料
+			isCommonLine = false
+			continue
+		} else if s.ch == '}' {
+			s.nextCh()
+			break
+		}
+
 		s.toNextCh()
 
 		// 判斷整行註解
 		if s.CheckCommon() {
-			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+			lineCommon += s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+			isCommonLine = true
+			continue
 		} else {
+			isCommonLine = false
+		}
 
-			if s.buf[s.r+1] == '}' {
-				s.nextTargetToken('}')
-				break
+		var tmpVarInfos []*dao.VarInfo
+		nextCh := s.buf[s.r+1]
+		if nextCh == '}' {
+			s.nextCh()
+			break
+		}
+
+		if nextCh == '*' {
+			// 解析 EmbeddedField = *TypeName 格式
+			varInfo := s.scanEmbeddedField()
+			// 判斷到多個引藏宣告
+			if _, exist := info.VarInfos[varInfo.GetName()]; exist {
+				panic("EmbeddedField Error")
 			}
 
-			var name string
-			var tmpVarInfos []*dao.VarInfo
-			nextIdx := s.nextIdx()
+			info.VarInfos[varInfo.GetName()] = varInfo
+			tmpVarInfos = append(tmpVarInfos, varInfo)
+		} else {
+			s.nextCh()
 
-			// 解析變數名稱
-			if !(s.buf[nextIdx] == '\n') {
-				s.next()
-				name = strings.TrimSpace(s.rangeStr())
-
-				// 宣告語法糖
-				if s.buf[s.r-1] == ',' {
-					unknowData = append(unknowData, name[:len(name)-1])
-					continue
-				}
-			}
-
-			// 清除格式空格
+			names := s.scanIdentifiers()
+			fmt.Println(names)
 			s.toNextCh()
+			if len(names) == 0 {
+				// 解析錯誤
+				panic("")
 
-			// 解析變數型態
-			contextInfo := s.OnDeclarationsType()
-			if len(unknowData) > 0 {
-				for _, nameData := range unknowData {
-					varInfo := dao.NewVarInfo(nameData)
-					varInfo.TypeInfo = contextInfo
-					info.VarInfos[nameData] = varInfo
+			} else if len(names) == 1 {
+				// 單一名稱
+				if s.ch == ' ' {
+					// 解析 IdentifierList Type 格式
+					varInfo := dao.NewVarInfo(names[0])
+					varInfo.TypeInfo = s.OnDeclarationsType()
+					info.VarInfos[varInfo.GetName()] = varInfo
+					tmpVarInfos = append(tmpVarInfos, varInfo)
+				} else if s.ch == '.' {
+					// 解析 EmbeddedField = QualifiedIdent 格式
+					// 無指標隱藏宣告
+					s.nextCh()
+					typeName := s.scanIdentifier()
+					fullName := fmt.Sprintf("%s.%s", names[0], typeName)
+					quaInfo := dao.NewTypeInfoQualifiedIdent()
+					quaInfo.SetName(fullName)
+					quaInfo.ImportLink, quaInfo.ContentTypeInfo = s.PackageInfo.GetPackageType(names[0], typeName)
+
+					varInfo := dao.NewVarInfo("_")
+					varInfo.TypeInfo = quaInfo
+
+					// 判斷到多個引藏宣告
+					if _, exist := info.VarInfos[varInfo.GetName()]; exist {
+						panic("EmbeddedField Error")
+					}
+
+					info.VarInfos[varInfo.GetName()] = varInfo
 					tmpVarInfos = append(tmpVarInfos, varInfo)
 				}
 			} else {
-				varInfo := dao.NewVarInfo(name)
-				varInfo.TypeInfo = contextInfo
-				info.VarInfos[name] = varInfo
-				tmpVarInfos = append(tmpVarInfos, varInfo)
-
-			}
-			unknowData = make([]string, 0)
-			s.toNextCh()
-			for s.ch == ' ' {
-				if string(s.buf[s.r+1:s.r+3]) == "//" {
-					common := s.OnComments("//")
-					for _, varInfo := range tmpVarInfos {
-						varInfo.Common = common
-					}
-				} else if s.buf[s.r+1] == '`' {
-					if len(tmpVarInfos) != 1 {
-						panic("")
-					}
-					s.next()
-					tag := s.rangeStr()
-					tmpVarInfos[0].Tag = tag
-					// tmpStrLit = append(tmpStrLit, s.OnJsonTag())
-					s.toNextCh()
+				// 解析 EmbeddedField = identifier, identifier type 格式
+				contextInfo := s.OnDeclarationsType()
+				for _, name := range names {
+					varInfo := dao.NewVarInfo(name)
+					varInfo.TypeInfo = contextInfo
+					info.VarInfos[varInfo.GetName()] = varInfo
+					tmpVarInfos = append(tmpVarInfos, varInfo)
 				}
 			}
 		}
 
-		// if s.buf[s.r+1] == '}' {
-		// 	s.nextTargetToken('}')
-		// 	break
-		// }
+		// 解析 Tag, Common
+		if s.ch != '\n' {
+			s.toNextCh()
+
+			// 解析 Tag 格式
+			if s.buf[s.r+1] == '`' {
+				if len(tmpVarInfos) != 1 {
+					panic("")
+				}
+
+				s.nextCh()
+				tag := s.scanStringLit('`')
+				tmpVarInfos[0].Tag = tag
+				// tmpStrLit = append(tmpStrLit, s.OnJsonTag())
+				s.toNextCh()
+			}
+
+			// 解析後注解
+			if s.CheckCommon() {
+				backCommon := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+				if lineCommon == "" {
+					lineCommon = backCommon
+				}
+
+			}
+
+			// 註解回填到指定變數說明上
+			if lineCommon != "" && len(tmpVarInfos) > 0 {
+				tmpVarInfos[0].Common = lineCommon
+				lineCommon = ""
+			}
+
+			if s.ch != '\n' {
+				panic("struct 解析錯誤")
+			}
+		}
 	}
 }
 
@@ -128,7 +191,7 @@ func (s *source) OnQualifiedIdentType() *dao.TypeInfoQualifiedIdent {
 	s.nextToken()
 	packageName := s.rangeStr()
 	s.nextCh()
-	typeName := s.scanIdentifiers()
+	typeName := s.scanIdentifier()
 	fullName := fmt.Sprintf("%s.%s", packageName, typeName)
 
 	info.SetName(fullName)
@@ -258,7 +321,7 @@ func (s *source) OnMapType() dao.ITypeInfo {
 func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 	s.nextCh()
 
-	typeName := s.scanIdentifiers()
+	typeName := s.scanIdentifier()
 	info := dao.NewTypeInfoInterface()
 	info.SetTypeName(typeName)
 
@@ -285,7 +348,7 @@ func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 
 			// 解析 interface 方法
 			s.nextCh()
-			name := s.scanIdentifiers()
+			name := s.scanIdentifier()
 			switch s.ch {
 			case '(':
 				// 解析 MathodSpec

@@ -53,9 +53,11 @@ func (s *source) scanNumber() *dao.Expressions {
 	return info
 }
 
+//  _"string"
 func (s *source) scanStringLit(strToken rune) string {
 	var ch rune
 	offset := s.r
+	s.nextCh()
 	for {
 
 		ch = s.ch
@@ -80,38 +82,30 @@ func (s *source) scanStringLit(strToken rune) string {
 // 起始位置 _"stringcontext"
 // 起始位置 _`stringcontext`
 func (s *source) scanString() *dao.Expressions {
-	var ch rune
-	s.nextCh()
-	offset := s.r
 
 	s.nextCh()
-	for {
-
-		ch = s.ch
-		if ch == '\n' || ch < 0 { // 字串格式錯誤
-			panic("")
-		}
-
-		s.nextCh()
-		if ch == '"' { // 字串結束
-			break
-		}
-
-		if ch == '\\' { //跳脫符號
-			s.nextCh()
-		}
-	}
-
-	value := string(s.buf[offset:s.r])
 	baseInfo := dao.BaseTypeInfo["string"]
-	baseInfo.SetName(value)
+	baseInfo.SetName(s.scanStringLit(s.ch))
 
 	info := dao.NewExpressions()
 	info.Objs = append(info.Objs, baseInfo)
 	return info
 }
 
-func (s *source) scanIdentifiers() string {
+func (s *source) scanIdentifiers() []string {
+	var names []string
+	for {
+		names = append(names, s.scanIdentifier())
+		if s.ch != ',' {
+			break
+		}
+		s.nextCh()
+		s.nextCh()
+	}
+	return names
+}
+
+func (s *source) scanIdentifier() string {
 	offset := s.r
 	for {
 		if util.IsLetter(s.ch) || util.IsDecimal(s.ch) || s.ch == '_' {
@@ -139,4 +133,11 @@ func (s *source) scanExpression() string {
 	}
 
 	return string(s.buf[offset:s.r])
+}
+
+// 解析隱藏宣告
+func (s *source) scanEmbeddedField() *dao.VarInfo {
+	info := dao.NewVarInfo("_")
+	info.TypeInfo = s.OnDeclarationsType()
+	return info
 }
