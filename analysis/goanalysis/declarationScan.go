@@ -599,9 +599,8 @@ func (s *source) TypeSpec() dao.ITypeInfo {
 	var typeInfo *dao.TypeInfo
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
-	if name == "ITheme" {
-		fmt.Println("")
-	}
+
+	s.toNextCh()
 	if s.buf[s.r+1] == '=' {
 		s.next()
 		s.toNextCh()
@@ -732,8 +731,7 @@ func (s *source) FunctionDeclarations() {
 	info.SetName(s.scanIdentifier())
 
 	// Signature
-	info.ParamsInPoint = s.OnParameters()
-	info.ParamsOutPoint = s.OnDeclarationsResult()
+	info.ParamsInPoint, info.ParamsOutPoint = s.onSignature()
 
 	// FunctionBody
 	info.Body = s.funcBodyBlock()
@@ -757,13 +755,9 @@ func (s *source) MethodDeclarations() {
 	s.nextCh()
 	name := s.scanIdentifier()
 	info.SetName(name)
-	if name == "registerByCallback" {
-		fmt.Println("")
-	}
 
 	// Signature
-	info.ParamsInPoint = s.OnParameters()
-	info.ParamsOutPoint = s.OnDeclarationsResult()
+	info.ParamsInPoint, info.ParamsOutPoint = s.onSignature()
 
 	// FunctionBody
 	info.Body = s.funcBodyBlock()
@@ -771,9 +765,29 @@ func (s *source) MethodDeclarations() {
 }
 
 // func 名稱
-func (s *source) OnFuncName() string {
-	s.nextToken()
-	return strings.TrimSpace(s.rangeStr())
+func (s *source) onSignature() (paramsInPoint, paramsOutPoint []dao.FuncParams) {
+	paramsInPoint = s.OnParameters()
+
+	// 遇到換行符號提早結束
+	if s.isOnNewlineSymbol() {
+		return
+	}
+
+	// result 前一定會有空白
+	if s.ch != ' ' {
+		return
+	}
+	// 調整格式
+	// 用於判斷 func()		{} 格式
+	nextCh := s.buf[s.r+1]
+	if nextCh == ' ' || nextCh == '\t' {
+		s.toNextCh()
+	}
+
+	if !s.CheckCommon() {
+		paramsOutPoint = s.OnDeclarationsResult()
+	}
+	return
 }
 
 // 處理 func 多參數資料
@@ -976,8 +990,8 @@ func (s *source) OnParameters() []dao.FuncParams {
 // func 輸出參數
 func (s *source) OnDeclarationsResult() []dao.FuncParams {
 	params := []dao.FuncParams{}
-
 	nextCh := s.buf[s.r+1]
+
 	// 判斷無 result
 	// ',' 用於判斷 func() (func(), error) 格式
 	// '{' 用於判斷 func() {} 格式

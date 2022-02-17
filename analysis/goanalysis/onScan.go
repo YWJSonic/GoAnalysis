@@ -134,18 +134,36 @@ func (s *source) scanExpressionList() []string {
 
 func (s *source) scanExpression() string {
 	offset := s.r
-	endToken := map[rune]struct{}{
-		']':  {},
-		')':  {},
-		'\n': {},
-	}
-	for {
-		if _, ok := endToken[s.ch]; ok {
-			break
-		}
-		s.nextCh()
-	}
+	var scanDone bool
+	endTokenQueue := []rune{'\n'}
 
+	for !scanDone {
+		s.next()
+		if s.ch == '\n' {
+			if s.buf[s.r-1] == '{' {
+				endTokenQueue = append(endTokenQueue, '}')
+				continue
+			} else if s.buf[s.r-1] == '(' {
+				endTokenQueue = append(endTokenQueue, ')')
+				continue
+			}
+			if len(endTokenQueue) > 2 && s.buf[s.r-1] == ',' {
+				if rune(s.buf[s.r-2]) == endTokenQueue[len(endTokenQueue)-1] {
+					endTokenQueue = endTokenQueue[:len(endTokenQueue)-1]
+				}
+
+			} else if len(endTokenQueue) > 1 {
+				if rune(s.buf[s.r-1]) == endTokenQueue[len(endTokenQueue)-1] {
+					endTokenQueue = endTokenQueue[:len(endTokenQueue)-1]
+				}
+
+			}
+
+			if len(endTokenQueue) == 1 {
+				scanDone = true
+			}
+		}
+	}
 	return string(s.buf[offset:s.r])
 }
 

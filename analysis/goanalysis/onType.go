@@ -385,13 +385,8 @@ func (s *source) OnFuncType() *dao.TypeInfoFunction {
 	info := dao.NewTypeInfoFunction()
 	info.SetTypeName("func")
 	s.nextToken()
-	info.ParamsInPoint = s.OnParameters()
-	info.ParamsOutPoint = s.OnDeclarationsResult()
 
-	if s.CheckCommon() {
-		common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
-		info.Common = common
-	}
+	info.ParamsInPoint, info.ParamsOutPoint = s.onSignature()
 
 	return info
 }
