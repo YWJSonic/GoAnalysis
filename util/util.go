@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"codeanalysis/analysis/constant"
 	"io/ioutil"
 	"unicode"
 	"unicode/utf8"
@@ -38,3 +39,11 @@ func IsDigit(ch rune) bool {
 func Lower(ch rune) rune     { return ('a' - 'A') | ch } // returns lower-case ch iff ch is ASCII letter
 func IsDecimal(ch rune) bool { return '0' <= ch && ch <= '9' }
 func IsHex(ch rune) bool     { return '0' <= ch && ch <= '9' || 'a' <= Lower(ch) && Lower(ch) <= 'f' }
+func IsToken(ch rune) bool {
+	for _, token := range constant.TokenLit {
+		if rune(token) == ch {
+			return true
+		}
+	}
+	return false
+}

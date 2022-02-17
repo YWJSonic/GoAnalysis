@@ -80,13 +80,15 @@ func (s *source) importSpec() *dao.ImportInfo {
 		// 不明格式可能是 gopls 作用
 		if len(name) > 3 && name[:3] == "go-" {
 			newName = name[3:]
+		} else if len(name) > 3 && name[len(name)-3:] == ".go" {
+			newName = name[:len(name)-3]
 		} else {
 			newName = name
 		}
 	}
 
 	if name == "" {
-		fmt.Println("")
+		panic("import name error")
 	}
 	// 根據預設名稱取得 package 關聯資料
 	packageInfo, _ = Instants.LoadOrStoryPackage(path, dao.NewPackageInfo())
@@ -111,7 +113,6 @@ func (s *source) ConstantDeclarations() {
 
 	if s.buf[s.r+1] == '(' {
 		if s.buf[s.r+2] == ')' {
-			fmt.Println(":: const () ::")
 			return
 		}
 		s.nextCh()
@@ -332,7 +333,6 @@ func (s *source) VariableDeclarations() {
 
 	if s.buf[s.r+1] == '(' {
 		if s.buf[s.r+2] == ')' {
-			fmt.Println(":: var () ::")
 			return
 		}
 		s.nextCh()
@@ -381,19 +381,22 @@ func (s *source) VarSpec() []*dao.VarInfo {
 
 	if s.buf[s.r+1] == '=' {
 		s.next()
-		exps := s.OnVariableExpression()
+		// exps := s.OnVariableExpression()
+		exps := s.scanExpressionList()
 		for idx, info := range infos {
+			// info.Expressions = exps[idx]
 			info.Expressions = exps[idx]
 		}
 
 	} else {
 		typeInfo := s.OnDeclarationsType()
-		var exps []*dao.Expressions
+		// var exps []*dao.Expressions
+		var exps []string
 		// 指定初始化
 		if s.buf[s.r+1] == '=' {
 			s.next()
 			// 解析表達式
-			exps = s.OnVariableExpression()
+			exps = s.scanExpressionList()
 
 		}
 		// 默認初始化
@@ -481,12 +484,12 @@ func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
 	baseInfo := dao.BaseTypeInfo["string"]
 	infos = append(infos, baseInfo)
 	toNext := false
+	endSymble := '\n'
 	for {
 		s.nextCh()
-		switch s.ch {
-		case ',', '\n':
+		if s.ch == endSymble {
 			toNext = true
-		case ' ':
+		} else if s.ch == ' ' {
 			if s.CheckCommon() {
 				toNext = true
 			}
@@ -574,9 +577,6 @@ func (s *source) TypeDeclarations() []dao.ITypeInfo {
 			}
 
 			info := s.TypeSpec()
-			if info.GetName() == "" {
-				fmt.Println("")
-			}
 			s.PackageInfo.AllTypeInfos[info.GetName()] = info
 			infos = append(infos, info)
 			s.toNextCh()
@@ -584,9 +584,6 @@ func (s *source) TypeDeclarations() []dao.ITypeInfo {
 	} else {
 		s.toNextCh()
 		info := s.TypeSpec()
-		if info.GetName() == "" {
-			fmt.Println("")
-		}
 		s.PackageInfo.AllTypeInfos[info.GetName()] = info
 		infos = append(infos, info)
 	}
@@ -616,9 +613,6 @@ func (s *source) TypeSpec() dao.ITypeInfo {
 	} else {
 		s.toNextCh()
 		info := dao.NewTypeDef()
-		if name == "Gc_OpenByEcSiteReq" {
-			fmt.Println("")
-		}
 		info.SetName(name)
 		info.ContentTypeInfo = s.OnDeclarationsType()
 		typeInfo = info
@@ -659,7 +653,7 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 		}
 
 	case '<': // OutPutChanelType
-		s.onChannelType()
+		s.OnChannelType()
 	case '.': // short ArranType
 		info = s.onShortArrayType()
 	default:
@@ -677,7 +671,7 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 				if tmpStr == "struct" {
 					info = s.OnStructType()
 				} else if tmpStr == "chan" {
-					info = s.onChannelType()
+					info = s.OnChannelType()
 				} else if tmpStr == "interface" {
 					info = s.OnInterfaceType()
 				} else {
@@ -708,7 +702,7 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 				case "struct":
 					info = s.OnStructType()
 				case "chan":
-					info = s.onChannelType()
+					info = s.OnChannelType()
 				default:
 					if s.buf[nextTokenIdx] == '.' {
 						info = s.OnQualifiedIdentType()
@@ -761,7 +755,11 @@ func (s *source) MethodDeclarations() {
 
 	// MethodName
 	s.nextCh()
-	info.SetName(s.scanIdentifier())
+	name := s.scanIdentifier()
+	info.SetName(name)
+	if name == "registerByCallback" {
+		fmt.Println("")
+	}
 
 	// Signature
 	info.ParamsInPoint = s.OnParameters()
@@ -786,144 +784,192 @@ func (s *source) OnFuncName() string {
  */
 func (s *source) OnParameters() []dao.FuncParams {
 	strLit := []dao.FuncParams{}
-	nextCh := rune(s.buf[s.r+1])
+	// nextCh := rune(s.buf[s.r+1])
+	isCommonLine := false     // 前一行是否為註解
+	lineCommon := ""          // 註解內文
+	istype := false           // 匿名參數
+	identifiers := []string{} // 紀錄存文字 identifier *token 可判斷為類型所以不用儲存
 
-	// 無參數
-	if nextCh == ')' {
-		s.next()
-		return strLit
+	// 確認 identifiers 資料型態後呼叫
+	clearIdentifiers := func(info dao.ITypeInfo) {
+		if info == nil {
+			// 格式為匿名宣告
+			for _, identifier := range identifiers {
+				if info, ok := dao.BaseTypeInfo[identifier]; ok {
+					params := dao.NewFuncParams()
+					params.SetName("_")
+					params.ContentTypeInfo = info
+					strLit = append(strLit, params)
+				} else {
+					info := s.PackageInfo.GetType(identifier)
+					params := dao.NewFuncParams()
+					params.SetName("_")
+					params.ContentTypeInfo = info
+					strLit = append(strLit, params)
+				}
+			}
+			identifiers = []string{}
+		} else {
+			// 格式為多重宣告
+			for _, identifier := range identifiers {
+				params := dao.NewFuncParams()
+				params.SetName(identifier)
+				params.ContentTypeInfo = info
+				strLit = append(strLit, params)
+			}
+			identifiers = []string{}
+		}
 	}
 
 	// 解析 ParameterList
-	istype := false // 匿名參數
 	for {
 
-		// 解析 ParameterDecl
-		identifiers := []string{}
-		if istype {
-			// 匿名參數解析
-			info := s.OnDeclarationsType()
-			params := dao.NewFuncParams()
-			params.SetName("_")
-			params.ContentTypeInfo = info
-			strLit = append(strLit, params)
-
-		} else {
-			// 第一次處理與多名稱宣告解析
-			parameterDeclDone := false // 多名稱宣告是否完成
-			for !parameterDeclDone && !istype {
-
-				// 提前判斷到隱藏宣告
-				if !util.IsLetter(nextCh) && !util.IsDecimal(nextCh) && s.ch != '_' {
-					// 處理未解析完成的資料
-					if len(identifiers) > 0 {
-						for _, identifier := range identifiers {
-							// 基礎類型
-							info, ok := dao.BaseTypeInfo[identifier]
-							if !ok {
-								// 自定義類型
-								info = s.PackageInfo.GetType(identifier)
-								if info == nil {
-									panic("")
-								}
-							}
-
-							params := dao.NewFuncParams()
-							params.SetName("_")
-							params.ContentTypeInfo = info
-							strLit = append(strLit, params)
-
-						}
-					}
-
-					info := s.OnDeclarationsType()
-					params := dao.NewFuncParams()
-					params.SetName("_")
-					params.ContentTypeInfo = info
-					strLit = append(strLit, params)
-					istype = true
-					parameterDeclDone = true
-					continue
-				}
-
-				s.nextCh()
-				identifierOrType := s.scanIdentifier()
-
-				switch s.ch {
-				case '.':
-					// Qualified 類型
-					s.nextCh()
-					typeName := s.scanIdentifier()
-					fullName := fmt.Sprintf("%s.%s", identifierOrType, typeName)
-					info := dao.NewTypeInfoQualifiedIdent()
-					info.SetName(fullName)
-					info.ImportLink, info.ContentTypeInfo = s.PackageInfo.GetPackageType(identifierOrType, typeName)
-
-					params := dao.NewFuncParams()
-					params.SetName("_")
-					params.ContentTypeInfo = info
-					strLit = append(strLit, params)
-					istype = true
-
-				default:
-					// 多重隱藏宣告 基礎類型
-					info, ok := dao.BaseTypeInfo[identifierOrType]
-					if ok {
-						params := dao.NewFuncParams()
-						params.SetName("_")
-						params.ContentTypeInfo = info
-						strLit = append(strLit, params)
-						istype = true
-					} else {
-						identifiers = append(identifiers, identifierOrType)
-					}
-				}
-
-				// 結束判斷
-				if s.ch != ',' {
-					// 多重宣告
-					if len(identifiers) > 0 {
-						// 多重隱藏宣告 自定義類型
-						if s.ch == ')' {
-							// (int, float) 類型解析
-							info := s.PackageInfo.GetType(identifierOrType)
-							if info == nil {
-								panic("")
-							}
-							params := dao.NewFuncParams()
-							params.SetName("_")
-							params.ContentTypeInfo = info
-							strLit = append(strLit, params)
-
-						} else {
-							// (a, b Type) 類型解析
-							info := s.OnDeclarationsType()
-							for _, identifier := range identifiers {
-								params := dao.NewFuncParams()
-								params.SetName(identifier)
-								params.ContentTypeInfo = info
-								strLit = append(strLit, params)
-							}
-						}
-					}
-
-					parameterDeclDone = true
-				} else {
-					s.next()
-					nextCh = rune(s.buf[s.r+1])
-				}
-			}
-		}
-
-		if s.ch == ',' {
+		// 換行處理
+		if s.isOnNewlineSymbol() {
 			s.nextCh()
+
+			// 註解重製判斷
+			if !isCommonLine && lineCommon != "" {
+				lineCommon = ""
+			}
+
+			// 每行需要重製的資料
+			isCommonLine = false
+			continue
+		} else if s.ch == ',' {
+			s.nextCh()
+			continue
 		} else if s.ch == ')' {
+			clearIdentifiers(nil)
 			s.nextCh()
 			break
 		}
 
-	}
+		// 排除空格
+		if s.ch == ' ' || s.ch == '\t' {
+			s.toNextCh()
+		}
 
+		// 判斷整行註解
+		if s.CheckCommon() {
+			lineCommon += s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+			isCommonLine = true
+			continue
+		} else {
+			isCommonLine = false
+		}
+
+		// ParameterDecl
+		nextCh := rune(s.buf[s.r+1])
+
+		// 無參數 或 格式條整
+		if nextCh == ')' || nextCh == '\n' {
+			s.nextCh()
+			continue
+		}
+
+		// 解析 匿名參數
+		// 一個匿名全部都匿名
+		if istype || util.IsToken(nextCh) {
+			info := s.OnDeclarationsType()
+			params := dao.NewFuncParams()
+			params.SetName("_")
+			params.ContentTypeInfo = info
+			istype = true
+			clearIdentifiers(nil)
+			strLit = append(strLit, params)
+			continue
+		}
+
+		// 還無法判斷 name 或非 token 開頭的 type
+		s.nextCh()
+		nameOrType := s.scanIdentifier()
+
+		// 判斷區塊結束, 資料為 type
+		if s.ch == ',' || s.ch == ')' {
+			// 匿名參數 or 多重參數
+			identifiers = append(identifiers, nameOrType)
+
+		} else {
+			if util.IsToken(s.ch) {
+				if s.ch == '.' {
+					// Qualified 類型
+					s.nextCh()
+					typeName := s.scanIdentifier()
+					fullName := fmt.Sprintf("%s.%s", nameOrType, typeName)
+					info := dao.NewTypeInfoQualifiedIdent()
+					info.SetName(fullName)
+					info.ImportLink, info.ContentTypeInfo = s.PackageInfo.GetPackageType(nameOrType, typeName)
+
+					params := dao.NewFuncParams()
+					params.SetName("_")
+					params.ContentTypeInfo = info
+					istype = true
+					strLit = append(strLit, params)
+				} else {
+					info := s.OnTypeSwitch(nameOrType)
+					params := dao.NewFuncParams()
+					params.SetName("_")
+					params.ContentTypeInfo = info
+					istype = true
+					clearIdentifiers(nil)
+					strLit = append(strLit, params)
+				}
+			} else if s.ch == ' ' {
+				if nameOrType == "chan" {
+					info := s.OnTypeSwitch(nameOrType)
+					params := dao.NewFuncParams()
+					params.SetName("_")
+					params.ContentTypeInfo = info
+					istype = true
+					clearIdentifiers(nil)
+					strLit = append(strLit, params)
+				} else {
+					// 標準參數格式
+					info := s.OnDeclarationsType()
+					params := dao.NewFuncParams()
+					params.SetName(nameOrType)
+					params.ContentTypeInfo = info
+					clearIdentifiers(info)
+					strLit = append(strLit, params)
+				}
+			}
+		}
+
+		// 結束判斷
+		// if s.ch != ',' {
+		// 	// 多重宣告
+		// 	if len(identifiers) > 0 {
+		// 		// 多重隱藏宣告 自定義類型
+		// 		if s.ch == ')' {
+		// 			// (int, float) 類型解析
+		// 			info := s.PackageInfo.GetType(identifierOrType)
+		// 			if info == nil {
+		// 				panic("")
+		// 			}
+		// 			params := dao.NewFuncParams()
+		// 			params.SetName("_")
+		// 			params.ContentTypeInfo = info
+		// 			strLit = append(strLit, params)
+
+		// 		} else {
+		// 			// (a, b Type) 類型解析
+		// 			info := s.OnDeclarationsType()
+		// 			for _, identifier := range identifiers {
+		// 				params := dao.NewFuncParams()
+		// 				params.SetName(identifier)
+		// 				params.ContentTypeInfo = info
+		// 				strLit = append(strLit, params)
+		// 			}
+		// 		}
+		// 	}
+
+		// 	parameterDeclDone = true
+		// } else {
+		// 	s.next()
+		// 	// nextCh = rune(s.buf[s.r+1])
+		// }
+	}
 	return strLit
 }
 
@@ -933,7 +979,10 @@ func (s *source) OnDeclarationsResult() []dao.FuncParams {
 
 	nextCh := s.buf[s.r+1]
 	// 判斷無 result
-	if s.ch == '\n' || nextCh == '{' {
+	// ',' 用於判斷 func() (func(), error) 格式
+	// '{' 用於判斷 func() {} 格式
+	// ')' 用於判斷 func(func()) () 兩個 '))' 格式
+	if s.ch == '\n' || s.ch == ',' || s.ch == ')' || nextCh == '{' {
 		return params
 	}
 

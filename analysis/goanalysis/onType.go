@@ -17,14 +17,19 @@ func (s *source) OnStructType() *dao.TypeInfoStruct {
 	info.SetTypeName("struct")
 	s.nextToken()
 	if s.buf[s.r+1] == '}' {
-		s.next()
+		s.nextCh()
+		s.nextCh()
 		return info
 	}
 	s.nextCh()
 
+	// TODO
+	// 會出現兩個不同結尾 須調整
 	// FieldDecl
 	s.OnFieldDecl(info)
-
+	if s.ch == '}' {
+		panic("struct error")
+	}
 	return info
 }
 
@@ -36,9 +41,8 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 	// 從 struct{'\n' <- 這邊開始解析
 	for {
 		// 換行處理
-		if s.ch == '\n' {
+		if s.isOnNewlineSymbol() {
 			s.nextCh()
-
 			// 註解重製判斷
 			if !isCommonLine && lineCommon != "" {
 				lineCommon = ""
@@ -67,6 +71,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 		nextCh := s.buf[s.r+1]
 		if nextCh == '}' {
 			s.nextCh()
+			s.nextCh()
 			break
 		}
 
@@ -74,30 +79,42 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 			// 解析 EmbeddedField = *TypeName 格式
 			varInfo := s.scanEmbeddedField()
 			// 判斷到多個引藏宣告
-			if _, exist := info.VarInfos[varInfo.GetName()]; exist {
+			embeddedFieldName := varInfo.GetName() + varInfo.TypeInfo.GetTypeName()
+			if _, exist := info.VarInfos[embeddedFieldName]; exist {
 				panic("EmbeddedField Error")
 			}
 
-			info.VarInfos[varInfo.GetName()] = varInfo
+			info.VarInfos[embeddedFieldName] = varInfo
 			tmpVarInfos = append(tmpVarInfos, varInfo)
 		} else {
 			s.nextCh()
 
 			names := s.scanIdentifiers()
-			fmt.Println(names)
 			s.toNextCh()
 			if len(names) == 0 {
 				// 解析錯誤
 				panic("")
 
 			} else if len(names) == 1 {
-				// 單一名稱
 				if s.ch == ' ' {
+					// 單一名稱
 					// 解析 IdentifierList Type 格式
-					varInfo := dao.NewVarInfo(names[0])
-					varInfo.TypeInfo = s.OnDeclarationsType()
-					info.VarInfos[varInfo.GetName()] = varInfo
-					tmpVarInfos = append(tmpVarInfos, varInfo)
+
+					if s.CheckCommon() {
+						// 無指標隱藏宣告 後續接到註解
+						varInfo := dao.NewVarInfo("_")
+						varInfo.TypeInfo = s.PackageInfo.GetType(names[0])
+						info.VarInfos[varInfo.GetName()] = varInfo
+						tmpVarInfos = append(tmpVarInfos, varInfo)
+
+					} else {
+						// 正常宣告
+						varInfo := dao.NewVarInfo(names[0])
+						varInfo.TypeInfo = s.OnDeclarationsType()
+						info.VarInfos[varInfo.GetName()] = varInfo
+						tmpVarInfos = append(tmpVarInfos, varInfo)
+					}
+
 				} else if s.ch == '.' {
 					// 解析 EmbeddedField = QualifiedIdent 格式
 					// 無指標隱藏宣告
@@ -131,8 +148,9 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 			}
 		}
 
+		// 處理不同的結束格式
 		// 解析 Tag, Common
-		if s.ch != '\n' {
+		if !s.isOnNewlineSymbol() {
 			s.toNextCh()
 
 			// 解析 Tag 格式
@@ -145,7 +163,9 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 				tag := s.scanStringLit('`')
 				tmpVarInfos[0].Tag = tag
 				// tmpStrLit = append(tmpStrLit, s.OnJsonTag())
-				s.toNextCh()
+				if !s.isOnNewlineSymbol() {
+					s.toNextCh()
+				}
 			}
 
 			// 解析後注解
@@ -163,7 +183,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 				lineCommon = ""
 			}
 
-			if s.ch != '\n' {
+			if !s.isOnNewlineSymbol() {
 				panic("struct 解析錯誤")
 			}
 		}
@@ -241,56 +261,25 @@ func (s *source) OnArrayType() *dao.TypeInfoArray {
 	return info
 }
 
-func (s *source) onChannelType() *dao.TypeInfoChannel {
-
+func (s *source) OnChannelType() *dao.TypeInfoChannel {
 	info := dao.NewTypeInfoChannel()
 	if s.buf[s.r+1] == '<' { // 單出
-		s.next()
-		info.SetName(s.rangeStr())
+		s.nextCh()
+		s.nextCh()
 		info.FlowType = 1
 
-	} else {
-		s.next()
+	}
 
-		info.SetName(s.rangeStr())
-
-		// channel 方向
-		if info.GetName() == "chan" { // 雙向
-			info.FlowType = 0
-
-		} else { // 單入
-			info.FlowType = 2
-
-		}
+	s.nextCh()
+	info.SetName(s.scanIdentifier())
+	if s.ch == '<' {
+		s.nextCh()
+		s.nextCh()
+		info.FlowType = 2
 	}
 
 	info.ContentTypeInfo = s.OnDeclarationsType()
 	return info
-}
-
-// 處理 channel 類型
-// ( "chan" | "chan" "<-" | "<-" "chan" ) ElementType .
-/* 進入指標應當只在
- * _chan
- * r="_"
- * _chan<-
- * r="_"
- * _<-chan
- * r="_"
- */
-func (s *source) OnChannelType() string {
-	str := ""
-	if s.buf[s.r+1] == '<' { // 單出
-		s.next()
-		str = s.rangeStr()
-
-	} else {
-		s.next()
-		str = s.rangeStr()
-	}
-
-	// str = str + " " + s.OnType()
-	return str
 }
 
 // 處理 map 類型
@@ -324,7 +313,11 @@ func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 	typeName := s.scanIdentifier()
 	info := dao.NewTypeInfoInterface()
 	info.SetTypeName(typeName)
+	info.MatchInfos = s.onMethodSpec()
 
+	return info
+}
+func (s *source) onMethodSpec() (matchInfos []dao.ITypeInfo) {
 	if s.ch == '{' {
 		s.nextCh()
 		s.nextCh()
@@ -351,25 +344,27 @@ func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 			name := s.scanIdentifier()
 			switch s.ch {
 			case '(':
+				if name == "UpdateGame29Paradise" {
+					fmt.Print("UpdateGame29Paradise")
+				}
 				// 解析 MathodSpec
 				matchInfo := dao.NewFuncInfo()
 				matchInfo.SetName(name)
 				matchInfo.ParamsInPoint = s.OnParameters()
 				matchInfo.ParamsOutPoint = s.OnDeclarationsResult()
-				info.MatchInfos = append(info.MatchInfos, matchInfo)
+				matchInfos = append(matchInfos, matchInfo)
 
 			case '\n':
 				// 解析 InterfaceTypeName
 				iInfo := s.PackageInfo.GetType(name)
-				info.MatchInfos = append(info.MatchInfos, iInfo)
+				matchInfos = append(matchInfos, iInfo)
 			}
 
 			s.toNextCh()
 		}
 		s.nextCh()
 	}
-
-	return info
+	return
 }
 
 // ========== Func 類別宣告  ============
@@ -437,6 +432,81 @@ func (s *source) OnComments(commentType string) (str string) {
 		}
 	} else {
 		panic("OnComments Error")
+	}
+	return
+}
+
+// type switch ===============================
+
+func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
+	fmt.Println("key:", key, "s.ch:", s.ch, "s.r+-10:", s.buf[s.r-10:s.r+10])
+	switch key {
+	case "*":
+		pointInfo := dao.NewTypeInfoPointer()
+		pointInfo.SetTypeName("*")
+		pointInfo.ContentTypeInfo = s.OnDeclarationsType()
+		info = pointInfo
+	case "struct":
+		structInfo := dao.NewTypeInfoStruct()
+		structInfo.SetTypeName("struct")
+		if s.buf[s.r+1] == '}' {
+			s.nextCh()
+			s.nextCh()
+		} else {
+			s.nextCh()
+			// FieldDecl
+			s.OnFieldDecl(structInfo)
+		}
+		info = structInfo
+
+	case "[":
+		if s.buf[s.r+1] == ']' {
+			// slice
+			s.nextCh()
+			sliceInfo := dao.NewTypeInfoSlice()
+			sliceInfo.SetTypeName("slice")
+			sliceInfo.ContentTypeInfo = s.OnDeclarationsType()
+			info = sliceInfo
+		} else {
+			// array
+			s.nextCh()
+			arrayInfo := dao.NewTypeInfoArray()
+			arrayInfo.SetTypeName("array")
+			arrayInfo.Size = s.scanExpression()
+			arrayInfo.ContentTypeInfo = s.OnDeclarationsType()
+			info = arrayInfo
+		}
+	case "chan":
+		chanInfo := dao.NewTypeInfoChannel()
+		chanInfo.SetName(key)
+		if s.ch == '<' {
+			s.nextCh()
+			s.nextCh()
+			chanInfo.FlowType = 2
+		}
+
+		chanInfo.ContentTypeInfo = s.OnDeclarationsType()
+		info = chanInfo
+	case "func":
+		funcInfo := dao.NewTypeInfoFunction()
+		funcInfo.ParamsInPoint = s.OnParameters()
+		funcInfo.ParamsOutPoint = s.OnDeclarationsResult()
+		info = funcInfo
+	case "interface":
+		interfaceInfo := dao.NewTypeInfoInterface()
+		interfaceInfo.SetTypeName(key)
+		interfaceInfo.MatchInfos = s.onMethodSpec()
+		info = interfaceInfo
+
+	case "map":
+		mapInfo := dao.NewTypeInfoMap()
+		mapInfo.SetTypeName(key)
+		mapInfo.KeyType = s.OnDeclarationsType()
+		if s.ch != ']' {
+			s.nextCh()
+		}
+		mapInfo.ValueType = s.OnDeclarationsType()
+		info = mapInfo
 	}
 	return
 }

@@ -80,10 +80,10 @@ func (self *PackageInfo) ExistType(typeName string) bool {
 
 func (self *PackageInfo) GetType(typeName string) ITypeInfo {
 	if typeName == "" {
-		fmt.Println("")
+		panic("typeName empty")
 	}
 	if self == nil {
-		panic("")
+		panic("type not find")
 	}
 	typeInfo, ok := self.AllTypeInfos[typeName]
 	if !ok {

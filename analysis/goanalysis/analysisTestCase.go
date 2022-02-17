@@ -4,15 +4,36 @@ import (
 	wwe "codeanalysis/load/project/goloader"
 	"fmt"
 	"sync"
+	"time"
 )
 
-func (self As) M3() (*wwe.GoFileNode, *wwe.GoFileNode) {
+type Feature2 struct {
+	SetMockWebsocketServer func(websocketResponseMap map[string][]byte)
+	Run                    func(wwe.ANAT1)
+}
+
+type Feature3 struct {
+	SetMockWebsocketServer func(websocketResponseMap map[string][]byte)
+	Run                    func(wwe.ANAT1)
+}
+
+func (self As) M32(
+	struct{},
+	struct {
+		t int
+		s struct{}
+		i wwe.ANAT1
+	},
+) (a, b *wwe.GoFileNode, c, d int) {
 	self.WWe += 1
+	return &wwe.GoFileNode{}, &wwe.GoFileNode{}, 0, 0
+}
+func M3(chan chan<- int) (*wwe.GoFileNode, *wwe.GoFileNode) {
 	return &wwe.GoFileNode{}, &wwe.GoFileNode{}
 }
 
 type Gs = Ws
-type Ws = As
+type Ws = []As
 
 type (
 	t1 [1024]byte
@@ -30,10 +51,6 @@ type (
 	}
 	// t9 t1
 )
-
-func (Ws) wm5(Bs, [1238]byte, float64, interface{}) (success bool) {
-	return
-}
 
 func (As) m5(Bs, [1238]byte, float64, interface{}) (success bool) {
 	return
@@ -110,7 +127,11 @@ var (
 type G16Options struct {
 	writeFlow chan *wwe.ANAT1 // 提供使用者發布訊息的通道
 	ww        chan<- string
+
+	// f
 	// w2w             chan string
+
+	s, b, a, d      string            // 123
 	writeFlowBackup <-chan *wwe.ANAT1 // 暫存publish失敗的訊息，若重新連線成功再次發送
 	writeEnd        chan struct{}     // 用於停止 publish() 生命週期
 	shutdownChan    chan struct{}     // graceful shutdown 信號
@@ -120,11 +141,11 @@ type G16Options struct {
 
 	// read contains the portion of the map's contents that are safe for
 	// concurrent access (with or without mu held).
-	Antes            []wwe.GoFileNode `json:"antes"`            // 底注
-	MinCoins         []wwe.GoFileNode `json:"minCoins"`         // 最低金額
-	Rounds           []wwe.GoFileNode `json:"rounds"`           // 局數
-	DisabledPatterns []wwe.GoFileNode `json:"disabledPatterns"` // 缺少的獎項
-	BirdCatchCounts  []wwe.GoFileNode `json:"birdCatchCounts"`  // 抓鳥牌型
+	wwe.GoFileNode   `protobuf:"bytes,1,rep,name=ecSiteID,proto3" json:"ecSiteID,omitempty"` // 底注
+	MinCoins         []wwe.GoFileNode                                                        `json:"minCoins"`         // 最低金額
+	Rounds           []wwe.GoFileNode                                                        `json:"rounds"`           // 局數
+	DisabledPatterns []wwe.GoFileNode                                                        `json:"disabledPatterns"` // 缺少的獎項
+	BirdCatchCounts  []wwe.GoFileNode                                                        `json:"birdCatchCounts"`  // 抓鳥牌型
 }
 
 type Feature struct {
@@ -266,6 +287,36 @@ func analysisType(code []byte) (str string) {
 	tokenList := findToken(code)
 	fmt.Println(tokenList)
 	return
+}
+
+type GRedisAdapater interface {
+	WW3()
+	HGet(key, field string, dw int) (string, error)
+	HGetAll(key string) (map[string]string, error)
+	HMSet(key string, values ...interface{}) (bool, error)
+	HDel(key string, fields ...string) (int64, error)
+
+	Del(keys string) (int64, error)
+
+	UpdateTotalBet(key string, playerBet map[string]string) error
+	CreateGameRecordId(now time.Time) string
+	Nw1(
+		string,
+		string,
+		int64,
+	) string
+	Nw2(
+		string,
+		string,
+		int64) string
+	UpdateGame29Paradise(
+		// fe
+		ecSiteId string, gameId string, themeId string,
+		memberIncomeOfWheel,
+		memberOutcomeOfWheel,
+		memberIncomeOfBanker,
+		memberOutcomeOfBanker float64,
+	) error
 }
 
 func findToken(code []byte) (tokenIndexList []int) {

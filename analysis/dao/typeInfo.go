@@ -161,6 +161,10 @@ type TypeInfoQualifiedIdent struct {
 	ContentTypeInfo ITypeInfo   // 指定該包的 type
 }
 
+func (self *TypeInfoQualifiedIdent) GetTypeName() string {
+	return self.name
+}
+
 func NewTypeInfoQualifiedIdent() *TypeInfoQualifiedIdent {
 	return &TypeInfoQualifiedIdent{}
 }

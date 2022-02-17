@@ -118,6 +118,20 @@ func (s *source) scanIdentifier() string {
 	return string(s.buf[offset:s.r])
 }
 
+func (s *source) scanExpressionList() []string {
+	var expressions []string
+	for {
+		expressions = append(expressions, s.scanExpression())
+		if s.ch != ',' {
+			break
+		}
+		s.nextCh()
+		s.nextCh()
+	}
+
+	return expressions
+}
+
 func (s *source) scanExpression() string {
 	offset := s.r
 	endToken := map[rune]struct{}{
@@ -133,6 +147,77 @@ func (s *source) scanExpression() string {
 	}
 
 	return string(s.buf[offset:s.r])
+}
+
+// PrimaryExpr =
+// 	Operand |
+// 	Conversion |
+// 	MethodExpr |
+// 	PrimaryExpr Selector |
+// 	PrimaryExpr Index |
+// 	PrimaryExpr Slice |
+// 	PrimaryExpr TypeAssertion |
+// 	PrimaryExpr Arguments .
+//
+// Operand     = Literal | OperandName | "(" Expression ")" .
+// Literal     = BasicLit | CompositeLit | FunctionLit .
+// BasicLit    = int_lit | float_lit | imaginary_lit | rune_lit | string_lit .
+// OperandName = identifier | QualifiedIdent .
+//
+// QualifiedIdent = PackageName "." identifier .
+//
+// Conversion = Type "(" Expression [ "," ] ")" .
+// scan PrimaryExpr
+func (s *source) scanPrimaryExpr() string {
+	var primaryExpr string
+	switch s.ch {
+	case '.':
+		// selector, typeAssertion
+		primaryExpr = s.scanPrimaryExpr_Selector()
+		primaryExpr = s.scanPrimaryExpr_TypeAssertion()
+	case '[':
+		// index, slice
+		primaryExpr = s.scanPrimaryExpr_Index()
+		primaryExpr = s.scanPrimaryExpr_Slice()
+	case '(':
+		// Operand->Expression,
+		primaryExpr = s.scanExpression()
+		primaryExpr = s.scanPrimaryExpr_Arguments()
+	default:
+		primaryExpr = s.scanIdentifier()
+
+		switch s.ch {
+		case '.':
+			// Operand->OperandName->QualifiedIdent
+		}
+
+	}
+	return primaryExpr
+}
+
+func (s *source) scanPrimaryExpr_Selector() string {
+	var primaryExpr string
+	return primaryExpr
+}
+
+func (s *source) scanPrimaryExpr_Index() string {
+	var primaryExpr string
+	return primaryExpr
+}
+
+func (s *source) scanPrimaryExpr_Slice() string {
+	var primaryExpr string
+	return primaryExpr
+}
+
+func (s *source) scanPrimaryExpr_TypeAssertion() string {
+	var primaryExpr string
+	return primaryExpr
+}
+
+func (s *source) scanPrimaryExpr_Arguments() string {
+	var primaryExpr string
+	return primaryExpr
 }
 
 // 解析隱藏宣告

@@ -7,6 +7,7 @@ import (
 	wwe "codeanalysis/load/project/goloader"
 	"codeanalysis/util"
 	"fmt"
+	"strings"
 )
 
 var Instants *dao.ProjectInfo
@@ -38,18 +39,35 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 	for len(childs) > 0 {
 		currentChild, childs = childs[0], childs[1:]
 		if currentChild.FileType != "go" {
+			// go 檔以外的往下執行
 			GoAnalysisSpaceFirst(currentChild)
 		} else if currentChild.FileType == "go" { // 檔案節點
-			PackageInfo, ok := Instants.LoadOrStoryPackage(node.Path(), dao.NewPackageInfoByNode(currentChild))
+
+			// 檔案路徑與 import 路徑無法批配
+			// 未讀取 go.mod 檔
+			// main 檔層級路徑待確認
+			if node.Path() == Instants.ProjectRoot.Path() {
+				// panic("node is go file")
+			}
+			idx := strings.Index(node.Path(), Instants.ProjectRoot.Path())
+			pwd := node.Path()
+			if idx == 0 {
+				pwd = pwd[len(Instants.ProjectRoot.Path()):]
+				pwd = Instants.ModuleName + pwd
+			} else if idx > 0 {
+				panic("path root error")
+			}
+
+			// 確認是否有已生成的資料
+			PackageInfo, ok := Instants.LoadOrStoryPackage(pwd, dao.NewPackageInfoByNode(currentChild))
 			if ok {
 				PackageInfo.CurrentFileNodes = currentChild
 			}
 			// 讀檔
 			code := util.ReadFile(PackageInfo.CurrentFileNodes.Path())
+
 			// 檔案分析
-			fmt.Println("------------------------")
 			AnalysisStyle2(PackageInfo, code)
-			fmt.Println("------------------------")
 			PackageInfo.CurrentFileNodes = nil
 		}
 	}
@@ -113,6 +131,10 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	s := source{
 		buf:         buf.Bytes(),
 		PackageInfo: packageInfo,
+	}
+
+	if s.PackageInfo.CurrentFileNodes.Path() == "/home/yang/Desktop/GameBackend/gameservice/parties/party1/example/flow_trace.go" {
+		fmt.Println("")
 	}
 
 	s.start()

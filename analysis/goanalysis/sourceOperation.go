@@ -235,3 +235,10 @@ func (s *source) toFirstNextTarget(targets []byte) {
 		}
 	}
 }
+
+func (s *source) isOnNewlineSymbol() bool {
+	if s.ch == '\n' || (s.ch == '\r' && s.buf[s.r+1] == '\n') {
+		return true
+	}
+	return false
+}

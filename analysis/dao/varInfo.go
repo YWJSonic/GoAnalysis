@@ -2,8 +2,9 @@ package dao
 
 type VarInfo struct {
 	PointBase
-	TypeInfo    ITypeInfo
-	Expressions *Expressions
+	TypeInfo ITypeInfo
+	// Expressions *Expressions
+	Expressions string // 暫代
 	Tag         string
 	Common      string
 }

@@ -12,8 +12,8 @@ import (
 
 func TestGolandAnalysis(t *testing.T) {
 	// go http.ListenAndServe("0.0.0.0:6060", nil)
-	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/gamemaster")
-	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
+	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/gameservice/")
+	goanalysis.Instants = dao.NewProjectInfo("GameService", projectRootNode)
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 	fmt.Println(goanalysis.Instants)
 }
