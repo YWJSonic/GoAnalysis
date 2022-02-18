@@ -67,7 +67,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 			isCommonLine = false
 		}
 
-		var tmpVarInfos []*dao.VarInfo
+		var tmpVarInfos []*dao.VarInfo // 此區塊宣告的參數
 		nextCh := s.buf[s.r+1]
 		if nextCh == '}' {
 			s.nextCh()
@@ -76,21 +76,20 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 		}
 
 		if nextCh == '*' {
-			// 解析 EmbeddedField = *TypeName 格式
+			// 解析隱藏參數 (struct{ *TypeName}) 格式
 			varInfo := s.scanEmbeddedField()
-			// 判斷到多個引藏宣告
-			embeddedFieldName := varInfo.GetName() + varInfo.TypeInfo.GetTypeName()
-			if _, exist := info.VarInfos[embeddedFieldName]; exist {
-				panic("EmbeddedField Error")
-			}
-
-			info.VarInfos[embeddedFieldName] = varInfo
+			info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 			tmpVarInfos = append(tmpVarInfos, varInfo)
 		} else {
 			s.nextCh()
 
 			names := s.scanIdentifiers()
-			s.toNextCh()
+
+			// 調整 (struct{ xxx\n}), (struct{ xxx\t\tType}) 格式
+			if !s.isOnNewlineSymbol() {
+				s.toNextCh()
+			}
+
 			if len(names) == 0 {
 				// 解析錯誤
 				panic("")
@@ -100,11 +99,21 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 					// 單一名稱
 					// 解析 IdentifierList Type 格式
 
-					if s.CheckCommon() {
+					nextCh = s.buf[s.r+1]
+					if nextCh == '`' {
+						// 解析 (XXX    `json:""`) 格式
+						// 無指標隱藏宣告 後續接到 Tag
+						varInfo := dao.NewVarInfo("_")
+						varInfo.TypeInfo = s.PackageInfo.GetType(names[0])
+						info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
+						tmpVarInfos = append(tmpVarInfos, varInfo)
+
+					} else if s.CheckCommon() {
+						// 解析 (XXX    //) 格式
 						// 無指標隱藏宣告 後續接到註解
 						varInfo := dao.NewVarInfo("_")
 						varInfo.TypeInfo = s.PackageInfo.GetType(names[0])
-						info.VarInfos[varInfo.GetName()] = varInfo
+						info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 						tmpVarInfos = append(tmpVarInfos, varInfo)
 
 					} else {
@@ -127,13 +136,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 
 					varInfo := dao.NewVarInfo("_")
 					varInfo.TypeInfo = quaInfo
-
-					// 判斷到多個引藏宣告
-					if _, exist := info.VarInfos[varInfo.GetName()]; exist {
-						panic("EmbeddedField Error")
-					}
-
-					info.VarInfos[varInfo.GetName()] = varInfo
+					info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 					tmpVarInfos = append(tmpVarInfos, varInfo)
 				}
 			} else {
@@ -220,7 +223,7 @@ func (s *source) OnQualifiedIdentType() *dao.TypeInfoQualifiedIdent {
 	return info
 }
 
-func (s *source) OnSliceType(endTag byte) *dao.TypeInfoSlice {
+func (s *source) OnSliceType() *dao.TypeInfoSlice {
 	info := dao.NewTypeInfoSlice()
 	info.SetTypeName("slice")
 	s.nextCh()
@@ -256,7 +259,7 @@ func (s *source) OnArrayType() *dao.TypeInfoArray {
 
 	// ArrayLength
 	s.nextCh()
-	info.Size = s.scanExpression()
+	info.Size = s.scanExpression(']')
 	info.ContentTypeInfo = s.OnDeclarationsType()
 	return info
 }
@@ -350,8 +353,10 @@ func (s *source) onMethodSpec() (matchInfos []dao.ITypeInfo) {
 				// 解析 MathodSpec
 				matchInfo := dao.NewFuncInfo()
 				matchInfo.SetName(name)
-				matchInfo.ParamsInPoint = s.OnParameters()
-				matchInfo.ParamsOutPoint = s.OnDeclarationsResult()
+				if name == "Publish" {
+					fmt.Println("")
+				}
+				matchInfo.ParamsInPoint, matchInfo.ParamsOutPoint = s.onSignature()
 				matchInfos = append(matchInfos, matchInfo)
 
 			case '\n':
@@ -434,7 +439,6 @@ func (s *source) OnComments(commentType string) (str string) {
 // type switch ===============================
 
 func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
-	fmt.Println("key:", key, "s.ch:", s.ch, "s.r+-10:", s.buf[s.r-10:s.r+10])
 	switch key {
 	case "*":
 		pointInfo := dao.NewTypeInfoPointer()
@@ -467,7 +471,7 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 			s.nextCh()
 			arrayInfo := dao.NewTypeInfoArray()
 			arrayInfo.SetTypeName("array")
-			arrayInfo.Size = s.scanExpression()
+			arrayInfo.Size = s.scanExpression('\n')
 			arrayInfo.ContentTypeInfo = s.OnDeclarationsType()
 			info = arrayInfo
 		}

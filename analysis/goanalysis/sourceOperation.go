@@ -83,21 +83,17 @@ func (s *source) toNextToken() rune {
 
 // 跳至下一個 ' ' or '\n'
 // return isLineEnd
-func (s *source) next() bool {
+func (s *source) next() {
 	s.b = s.r + 1
 	for {
 		s.r++
 		if s.checkEnd() {
-			return true
+			return
 		}
 
-		if s.buf[s.r] == ' ' || s.buf[s.r] == '\n' {
+		if s.buf[s.r] == ' ' || s.isOnNewlineSymbol() {
 			s.ch = rune(s.buf[s.r])
-			if s.ch == '\n' {
-				return true
-			} else {
-				return false
-			}
+			return
 		}
 	}
 }
@@ -237,7 +233,7 @@ func (s *source) toFirstNextTarget(targets []byte) {
 }
 
 func (s *source) isOnNewlineSymbol() bool {
-	if s.ch == '\n' || (s.ch == '\r' && s.buf[s.r+1] == '\n') {
+	if s.buf[s.r] == '\n' || (s.buf[s.r] == '\r' && s.buf[s.r+1] == '\n') {
 		return true
 	}
 	return false

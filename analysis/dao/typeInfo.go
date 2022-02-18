@@ -38,8 +38,10 @@ func NewTypeDef() *TypeInfo {
 // struct 類型
 type TypeInfoStruct struct {
 	PointBase
-	VarInfos  map[string]*VarInfo
-	FuncPoint map[string]*FuncInfo
+
+	ImplicitlyVarInfos []*VarInfo // 隱藏式宣告參數
+	VarInfos           map[string]*VarInfo
+	FuncPoint          map[string]*FuncInfo
 }
 
 func (self *TypeInfoStruct) GetTypeName() string {

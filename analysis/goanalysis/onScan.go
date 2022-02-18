@@ -121,7 +121,7 @@ func (s *source) scanIdentifier() string {
 func (s *source) scanExpressionList() []string {
 	var expressions []string
 	for {
-		expressions = append(expressions, s.scanExpression())
+		expressions = append(expressions, s.scanExpression('\n'))
 		if s.ch != ',' {
 			break
 		}
@@ -132,14 +132,16 @@ func (s *source) scanExpressionList() []string {
 	return expressions
 }
 
-func (s *source) scanExpression() string {
+func (s *source) scanExpression(endTag rune) string {
 	offset := s.r
 	var scanDone bool
-	endTokenQueue := []rune{'\n'}
+	endTokenQueue := []rune{endTag}
 
 	for !scanDone {
-		s.next()
-		if s.ch == '\n' {
+		// s.next()
+		s.nextCh()
+
+		if s.ch == endTag {
 			if s.buf[s.r-1] == '{' {
 				endTokenQueue = append(endTokenQueue, '}')
 				continue
@@ -199,7 +201,7 @@ func (s *source) scanPrimaryExpr() string {
 		primaryExpr = s.scanPrimaryExpr_Slice()
 	case '(':
 		// Operand->Expression,
-		primaryExpr = s.scanExpression()
+		primaryExpr = s.scanExpression('\n')
 		primaryExpr = s.scanPrimaryExpr_Arguments()
 	default:
 		primaryExpr = s.scanIdentifier()

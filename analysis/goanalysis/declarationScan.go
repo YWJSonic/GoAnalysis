@@ -124,7 +124,7 @@ func (s *source) ConstantDeclarations() {
 			} else {
 				constInfos := s.ConstSpec()
 				if len(constInfos) > 1 {
-					panic("")
+					panic("empty constInfos error")
 				}
 				if constInfos[0].TypeInfo == nil && len(infos) > 0 {
 					for _, constInfo := range constInfos {
@@ -152,12 +152,13 @@ func (s *source) ConstantDeclarations() {
 func (s *source) ConstSpec() []*dao.ConstInfo {
 	infos := s.ConstantIdentifierList()
 
-	if s.ch != '\n' { // 判斷區塊未結束
+	if !s.isOnNewlineSymbol() { // 判斷區塊未結束
 		s.toNextCh()
 
 		// 確認下個區塊類型
 		nextCh := rune(s.buf[s.r+1])
 		if nextCh == '=' { // 隱藏型態 初始化
+			// 解析  (xx = yy), (xx, xx, xx = yy) 格式
 			s.next()
 
 			// 解析表達式
@@ -175,6 +176,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			}
 
 		} else if s.CheckCommon() {
+			// 解析 (xx, xx, xx //)格式
 			// 解析註解
 			common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			for _, info := range infos {
@@ -190,8 +192,11 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 				info.TypeInfo = typeInfo
 				info.Expressions = exps[idx]
 			}
+
 		}
 
+	} else {
+		s.toNextCh()
 	}
 
 	return infos
@@ -340,7 +345,11 @@ func (s *source) VariableDeclarations() {
 		for {
 			s.toNextCh()
 			for _, info := range s.VarSpec() {
-				s.PackageInfo.AllVarInfos[info.GetName()] = info
+				if info.GetName() == "_" {
+					s.PackageInfo.ImplicitlyVarOrConstInfos = append(s.PackageInfo.ImplicitlyVarOrConstInfos, info)
+				} else {
+					s.PackageInfo.AllVarInfos[info.GetName()] = info
+				}
 			}
 			s.toNextCh()
 			if s.buf[s.r+1] == ')' {
@@ -350,7 +359,11 @@ func (s *source) VariableDeclarations() {
 		}
 	} else {
 		for _, info := range s.VarSpec() {
-			s.PackageInfo.AllVarInfos[info.GetName()] = info
+			if info.GetName() == "_" {
+				s.PackageInfo.ImplicitlyVarOrConstInfos = append(s.PackageInfo.ImplicitlyVarOrConstInfos, info)
+			} else {
+				s.PackageInfo.AllVarInfos[info.GetName()] = info
+			}
 		}
 	}
 }
@@ -392,12 +405,14 @@ func (s *source) VarSpec() []*dao.VarInfo {
 		typeInfo := s.OnDeclarationsType()
 		// var exps []*dao.Expressions
 		var exps []string
-		// 指定初始化
-		if s.buf[s.r+1] == '=' {
-			s.next()
-			// 解析表達式
-			exps = s.scanExpressionList()
+		if s.checkEnd() {
+			// 指定初始化
+			if s.buf[s.r+1] == '=' {
+				s.next()
+				// 解析表達式
+				exps = s.scanExpressionList()
 
+			}
 		}
 		// 默認初始化
 
@@ -613,6 +628,9 @@ func (s *source) TypeSpec() dao.ITypeInfo {
 		s.toNextCh()
 		info := dao.NewTypeDef()
 		info.SetName(name)
+		if name == "CheatMockData" {
+			fmt.Println("")
+		}
 		info.ContentTypeInfo = s.OnDeclarationsType()
 		typeInfo = info
 	}
@@ -646,7 +664,7 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 		info = s.onPointType()
 	case '[': // ArrayType, SliceType
 		if s.buf[s.r+2] == ']' { // slice type
-			info = s.OnSliceType('\n')
+			info = s.OnSliceType()
 		} else { // array type
 			info = s.OnArrayType()
 		}
@@ -1000,7 +1018,7 @@ func (s *source) OnDeclarationsResult() []dao.FuncParams {
 		return params
 	}
 
-	if nextCh == '\t' {
+	if nextCh == '\t' || nextCh == ' ' {
 		s.toNextCh()
 		nextCh = s.buf[s.r+1]
 	}

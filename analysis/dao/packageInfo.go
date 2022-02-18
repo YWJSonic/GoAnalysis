@@ -32,11 +32,13 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 type PackageInfo struct {
 	PointBase
 	CurrentFileNodes FileDataNode
-	AllTypeInfos     map[string]ITypeInfo
-	AllVarInfos      map[string]ITypeInfo
-	AllConstInfos    map[string]ITypeInfo
-	AllFuncInfo      map[string]*FuncInfo
-	AllImportLink    map[string]*ImportInfo // <path, *ImportInfo>
+
+	ImplicitlyVarOrConstInfos []ITypeInfo // 隱藏式宣告參數 var or const
+	AllTypeInfos              map[string]ITypeInfo
+	AllVarInfos               map[string]ITypeInfo
+	AllConstInfos             map[string]ITypeInfo
+	AllFuncInfo               map[string]*FuncInfo
+	AllImportLink             map[string]*ImportInfo // <path, *ImportInfo>
 }
 
 func (self *PackageInfo) GetPackage(packageName string) *ImportInfo {
