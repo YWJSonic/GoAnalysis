@@ -12,10 +12,23 @@ import (
 
 func TestGolandAnalysis(t *testing.T) {
 	// go http.ListenAndServe("0.0.0.0:6060", nil)
-	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/scheduler")
-	goanalysis.Instants = dao.NewProjectInfo("gitlab.geax.io/demeter/backend/scheduler", projectRootNode)
+	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/roomservice")
+
+	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
+
+	// 解析 go.mod
+	for _, child := range projectRootNode.Childes {
+		if child.Name() == "go.mod" {
+			goanalysis.GoAnalysisGoMod(child)
+			break
+		}
+	}
+
+	// 解析專案
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
-	rebuildCode()
+
+	// 測試輸出
+	// rebuildCode()
 }
 
 func rebuildCode() {

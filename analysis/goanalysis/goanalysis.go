@@ -52,7 +52,7 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 			pwd := node.Path()
 			if idx == 0 {
 				pwd = pwd[len(Instants.ProjectRoot.Path()):]
-				pwd = Instants.ModuleName + pwd
+				pwd = Instants.ModuleInfo.ModuleName + pwd
 			} else if idx > 0 {
 				panic("path root error")
 			}
@@ -170,19 +170,4 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 			}
 		}
 	}
-	// for name, info := range s.PackageInfo.AllImportLink {
-	// 	fmt.Println(name, info.Path)
-	// }
-	// for name, info := range s.PackageInfo.AllConstInfos {
-	// 	fmt.Println(name, info.GetTypeName())
-	// }
-	// for name, info := range s.PackageInfo.AllVarInfos {
-	// 	fmt.Println(name, info.GetTypeName())
-	// }
-	// for name, info := range s.PackageInfo.AllTypeInfos {
-	// 	fmt.Println(name, info.GetTypeName())
-	// }
-	// for name, info := range s.PackageInfo.AllFuncInfo {
-	// 	fmt.Println(name, info.GetTypeName())
-	// }
 }

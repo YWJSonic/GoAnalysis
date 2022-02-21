@@ -4,13 +4,12 @@ import (
 	"codeanalysis/load/project/goloader"
 )
 
-func NewProjectInfo(moduleName string, node *goloader.GoFileNode) *ProjectInfo {
+func NewProjectInfo(node *goloader.GoFileNode) *ProjectInfo {
 	info := &ProjectInfo{
 		AllPackageMap: make(map[string]*PackageInfo),
 		// AllStructMap:     make(map[string]*StructInfo),
 		// AllPublicFuncMap: make(map[string]*FuncInfo),
 	}
-	info.ModuleName = moduleName
 	info.name = node.Path()
 	info.ProjectRoot = node
 	return info
@@ -18,10 +17,9 @@ func NewProjectInfo(moduleName string, node *goloader.GoFileNode) *ProjectInfo {
 
 type ProjectInfo struct {
 	PointBase
-	ModuleName    string
+	ModuleInfo    *ModuleInfo
 	ProjectRoot   FileDataNode
-	AllPackageMap map[string]*PackageInfo // <packagePath, *PackageInfo>
-
+	AllPackageMap map[string]*PackageInfo // 內部實做 package <packagePath, *PackageInfo>
 }
 
 // 讀寫此 package 關連資料

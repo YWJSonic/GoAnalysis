@@ -31,6 +31,7 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 // Package 節點
 type PackageInfo struct {
 	PointBase
+	PackageVersion   string
 	CurrentFileNodes FileDataNode
 
 	ImplicitlyVarOrConstInfos []ITypeInfo // 隱藏式宣告參數 var or const
