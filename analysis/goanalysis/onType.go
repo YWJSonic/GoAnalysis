@@ -104,7 +104,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 						// 解析 (XXX    `json:""`) 格式
 						// 無指標隱藏宣告 後續接到 Tag
 						varInfo := dao.NewVarInfo("_")
-						varInfo.TypeInfo = s.PackageInfo.GetType(names[0])
+						varInfo.ContentTypeInfo = s.PackageInfo.GetType(names[0])
 						info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 						tmpVarInfos = append(tmpVarInfos, varInfo)
 
@@ -112,14 +112,14 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 						// 解析 (XXX    //) 格式
 						// 無指標隱藏宣告 後續接到註解
 						varInfo := dao.NewVarInfo("_")
-						varInfo.TypeInfo = s.PackageInfo.GetType(names[0])
+						varInfo.ContentTypeInfo = s.PackageInfo.GetType(names[0])
 						info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 						tmpVarInfos = append(tmpVarInfos, varInfo)
 
 					} else {
 						// 正常宣告
 						varInfo := dao.NewVarInfo(names[0])
-						varInfo.TypeInfo = s.OnDeclarationsType()
+						varInfo.ContentTypeInfo = s.OnDeclarationsType()
 						info.VarInfos[varInfo.GetName()] = varInfo
 						tmpVarInfos = append(tmpVarInfos, varInfo)
 					}
@@ -135,7 +135,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 					quaInfo.ImportLink, quaInfo.ContentTypeInfo = s.PackageInfo.GetPackageType(names[0], typeName)
 
 					varInfo := dao.NewVarInfo("_")
-					varInfo.TypeInfo = quaInfo
+					varInfo.ContentTypeInfo = quaInfo
 					info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 					tmpVarInfos = append(tmpVarInfos, varInfo)
 				}
@@ -144,7 +144,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 				contextInfo := s.OnDeclarationsType()
 				for _, name := range names {
 					varInfo := dao.NewVarInfo(name)
-					varInfo.TypeInfo = contextInfo
+					varInfo.ContentTypeInfo = contextInfo
 					info.VarInfos[varInfo.GetName()] = varInfo
 					tmpVarInfos = append(tmpVarInfos, varInfo)
 				}
@@ -197,7 +197,7 @@ func (s *source) onPointType() *dao.TypeInfoPointer {
 	s.nextCh()
 
 	info := dao.NewTypeInfoPointer()
-	info.SetTypeName("*")
+	info.SetTypeName("point")
 	info.ContentTypeInfo = s.OnDeclarationsType()
 	return info
 }
@@ -232,7 +232,7 @@ func (s *source) OnSliceType() *dao.TypeInfoSlice {
 	return info
 }
 
-func (s *source) onShortArrayType() *dao.TypeInfoSlice {
+func (s *source) onShortSliceType() *dao.TypeInfoSlice {
 	info := dao.NewTypeInfoSlice()
 	info.SetTypeName("slice")
 	if string(s.buf[s.r+1:s.r+4]) == "..." {
@@ -266,6 +266,7 @@ func (s *source) OnArrayType() *dao.TypeInfoArray {
 
 func (s *source) OnChannelType() *dao.TypeInfoChannel {
 	info := dao.NewTypeInfoChannel()
+	info.SetTypeName("chan")
 	if s.buf[s.r+1] == '<' { // 單出
 		s.nextCh()
 		s.nextCh()
@@ -313,9 +314,9 @@ func (s *source) OnMapType() dao.ITypeInfo {
 func (s *source) OnInterfaceType() *dao.TypeInfoInterface {
 	s.nextCh()
 
-	typeName := s.scanIdentifier()
+	s.scanIdentifier()
 	info := dao.NewTypeInfoInterface()
-	info.SetTypeName(typeName)
+	info.SetTypeName("interface")
 	info.MatchInfos = s.onMethodSpec()
 
 	return info
@@ -442,7 +443,7 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 	switch key {
 	case "*":
 		pointInfo := dao.NewTypeInfoPointer()
-		pointInfo.SetTypeName("*")
+		pointInfo.SetTypeName("point")
 		pointInfo.ContentTypeInfo = s.OnDeclarationsType()
 		info = pointInfo
 	case "struct":
@@ -477,7 +478,7 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 		}
 	case "chan":
 		chanInfo := dao.NewTypeInfoChannel()
-		chanInfo.SetName(key)
+		chanInfo.SetName("chan")
 		if s.ch == '<' {
 			s.nextCh()
 			s.nextCh()
@@ -488,18 +489,20 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 		info = chanInfo
 	case "func":
 		funcInfo := dao.NewTypeInfoFunction()
-		funcInfo.ParamsInPoint = s.OnParameters()
-		funcInfo.ParamsOutPoint = s.OnDeclarationsResult()
+		funcInfo.SetTypeName("func")
+		funcInfo.ParamsInPoint, funcInfo.ParamsOutPoint = s.onSignature()
+		// funcInfo.ParamsInPoint = s.OnParameters()
+		// funcInfo.ParamsOutPoint = s.OnDeclarationsResult()
 		info = funcInfo
 	case "interface":
 		interfaceInfo := dao.NewTypeInfoInterface()
-		interfaceInfo.SetTypeName(key)
+		interfaceInfo.SetTypeName("interface")
 		interfaceInfo.MatchInfos = s.onMethodSpec()
 		info = interfaceInfo
 
 	case "map":
 		mapInfo := dao.NewTypeInfoMap()
-		mapInfo.SetTypeName(key)
+		mapInfo.SetTypeName("map")
 		mapInfo.KeyType = s.OnDeclarationsType()
 		if s.ch != ']' {
 			s.nextCh()

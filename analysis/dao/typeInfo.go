@@ -1,6 +1,9 @@
 package dao
 
-import "fmt"
+import (
+	"codeanalysis/analysis/constant"
+	"fmt"
+)
 
 // Type declarations 類型聲明結構
 
@@ -41,7 +44,7 @@ type TypeInfoStruct struct {
 
 	ImplicitlyVarInfos []*VarInfo // 隱藏式宣告參數
 	VarInfos           map[string]*VarInfo
-	FuncPoint          map[string]*FuncInfo
+	// FuncPoint          map[string]*FuncInfo
 }
 
 func (self *TypeInfoStruct) GetTypeName() string {
@@ -49,8 +52,8 @@ func (self *TypeInfoStruct) GetTypeName() string {
 }
 func NewTypeInfoStruct() *TypeInfoStruct {
 	return &TypeInfoStruct{
-		VarInfos:  make(map[string]*VarInfo),
-		FuncPoint: make(map[string]*FuncInfo),
+		VarInfos: make(map[string]*VarInfo),
+		// FuncPoint: make(map[string]*FuncInfo),
 	}
 }
 
@@ -144,21 +147,25 @@ func NewTypeInfoChannel() *TypeInfoChannel {
 // 數值基礎類型
 type TypeInfoNumeric struct {
 	PointBase
+	RefBase
 }
 
 // string 類型
 type TypeInfoString struct {
 	PointBase
+	RefBase
 }
 
 // bool 類型
 type TypeInfoBool struct {
 	PointBase
+	RefBase
 }
 
 // package.A 類型
 type TypeInfoQualifiedIdent struct {
 	PointBase
+	RefBase
 	ImportLink      *ImportInfo // 指定的 import package
 	ContentTypeInfo ITypeInfo   // 指定該包的 type
 }
@@ -173,24 +180,24 @@ func NewTypeInfoQualifiedIdent() *TypeInfoQualifiedIdent {
 
 // 基礎類型表
 var BaseTypeInfo map[string]ITypeInfo = map[string]ITypeInfo{
-	"bool":       &TypeInfoBool{PointBase: PointBase{typeName: "bool"}},
-	"byte":       &TypeInfoNumeric{PointBase: PointBase{typeName: "byte"}},
-	"complex64":  &TypeInfoNumeric{PointBase: PointBase{typeName: "complex64"}},
-	"complex128": &TypeInfoNumeric{PointBase: PointBase{typeName: "complex128"}},
-	"float32":    &TypeInfoNumeric{PointBase: PointBase{typeName: "float32"}},
-	"float64":    &TypeInfoNumeric{PointBase: PointBase{typeName: "float64"}},
-	"int":        &TypeInfoNumeric{PointBase: PointBase{typeName: "int"}},
-	"int8":       &TypeInfoNumeric{PointBase: PointBase{typeName: "int8"}},
-	"int16":      &TypeInfoNumeric{PointBase: PointBase{typeName: "int16"}},
-	"int32":      &TypeInfoNumeric{PointBase: PointBase{typeName: "int32"}},
-	"int64":      &TypeInfoNumeric{PointBase: PointBase{typeName: "int64"}},
-	"uint":       &TypeInfoNumeric{PointBase: PointBase{typeName: "uint"}},
-	"uint8":      &TypeInfoNumeric{PointBase: PointBase{typeName: "uint8"}},
-	"uint16":     &TypeInfoNumeric{PointBase: PointBase{typeName: "uint16"}},
-	"uint32":     &TypeInfoNumeric{PointBase: PointBase{typeName: "uint32"}},
-	"uint64":     &TypeInfoNumeric{PointBase: PointBase{typeName: "uint64"}},
-	"uintptr":    &TypeInfoNumeric{PointBase: PointBase{typeName: "uintptr"}},
-	"error":      &TypeInfoStruct{PointBase: PointBase{typeName: "error"}},
-	"string":     &TypeInfoString{PointBase: PointBase{typeName: "string"}},
-	"rune":       &TypeInfoString{PointBase: PointBase{typeName: "rune"}},
+	"bool":       &TypeInfoBool{PointBase: PointBase{typeName: "bool"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"byte":       &TypeInfoNumeric{PointBase: PointBase{typeName: "byte"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"complex64":  &TypeInfoNumeric{PointBase: PointBase{typeName: "complex64"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"complex128": &TypeInfoNumeric{PointBase: PointBase{typeName: "complex128"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"float32":    &TypeInfoNumeric{PointBase: PointBase{typeName: "float32"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"float64":    &TypeInfoNumeric{PointBase: PointBase{typeName: "float64"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"int":        &TypeInfoNumeric{PointBase: PointBase{typeName: "int"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"int8":       &TypeInfoNumeric{PointBase: PointBase{typeName: "int8"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"int16":      &TypeInfoNumeric{PointBase: PointBase{typeName: "int16"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"int32":      &TypeInfoNumeric{PointBase: PointBase{typeName: "int32"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"int64":      &TypeInfoNumeric{PointBase: PointBase{typeName: "int64"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"uint":       &TypeInfoNumeric{PointBase: PointBase{typeName: "uint"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"uint8":      &TypeInfoNumeric{PointBase: PointBase{typeName: "uint8"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"uint16":     &TypeInfoNumeric{PointBase: PointBase{typeName: "uint16"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"uint32":     &TypeInfoNumeric{PointBase: PointBase{typeName: "uint32"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"uint64":     &TypeInfoNumeric{PointBase: PointBase{typeName: "uint64"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"uintptr":    &TypeInfoNumeric{PointBase: PointBase{typeName: "uintptr"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	// "error":      &TypeInfoStruct{PointBase: PointBase{typeName: "error"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"string": &TypeInfoString{PointBase: PointBase{typeName: "string"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"rune":   &TypeInfoString{PointBase: PointBase{typeName: "rune"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
 }

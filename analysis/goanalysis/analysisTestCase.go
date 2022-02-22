@@ -17,7 +17,9 @@ type Feature3 struct {
 	Run                    func(wwe.ANAT1)
 }
 
-func (self As) M32(
+type GSA int
+
+func (self GSA) M32(
 	struct{},
 	struct {
 		t int
@@ -25,7 +27,7 @@ func (self As) M32(
 		i wwe.ANAT1
 	},
 ) (a, b *wwe.GoFileNode, c, d int) {
-	self.WWe += 1
+	self += 1
 	return &wwe.GoFileNode{}, &wwe.GoFileNode{}, 0, 0
 }
 func M3(chan chan<- int) (*wwe.GoFileNode, *wwe.GoFileNode) {

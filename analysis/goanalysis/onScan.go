@@ -243,6 +243,6 @@ func (s *source) scanPrimaryExpr_Arguments() string {
 // 解析隱藏宣告
 func (s *source) scanEmbeddedField() *dao.VarInfo {
 	info := dao.NewVarInfo("_")
-	info.TypeInfo = s.OnDeclarationsType()
+	info.ContentTypeInfo = s.OnDeclarationsType()
 	return info
 }

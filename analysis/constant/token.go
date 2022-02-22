@@ -1,5 +1,14 @@
 package constant
 
+import "codeanalysis/types"
+
+const (
+	From_Golang        types.TypeFrom = 0 // go 系統自帶
+	From_Local         types.TypeFrom = 1 // 專案實做
+	From_Local_Package types.TypeFrom = 2 // 專案其他 package 實做
+	From_Vendor        types.TypeFrom = 3 // 外部引用
+)
+
 const (
 	_    token = iota
 	_EOF       // EOF

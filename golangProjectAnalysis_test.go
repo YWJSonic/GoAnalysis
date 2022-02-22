@@ -12,7 +12,7 @@ import (
 
 func TestGolandAnalysis(t *testing.T) {
 	// go http.ListenAndServe("0.0.0.0:6060", nil)
-	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/roomservice")
+	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/gamemaster")
 
 	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
 
@@ -27,12 +27,14 @@ func TestGolandAnalysis(t *testing.T) {
 	// 解析專案
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 
+	fmt.Println(goanalysis.Instants.Output())
+
 	// 測試輸出
 	// rebuildCode()
 }
 
 func rebuildCode() {
-	for key, packageInfo := range goanalysis.Instants.AllPackageMap {
+	for key, packageInfo := range goanalysis.Instants.LocalPackageMap {
 		fmt.Println("== Package", packageInfo.GetName(), " ==========================", key)
 
 		fmt.Println("========= Import Link =============")
@@ -54,11 +56,11 @@ func rebuildCode() {
 			switch info := constInfo.ContentTypeInfo.(type) {
 			case *dao.TypeInfoStruct:
 				for varKey, varInfo := range info.VarInfos {
-					fmt.Println("\t", varKey, "\t\t", varInfo.TypeInfo.GetTypeName())
+					fmt.Println("\t", varKey, "\t\t", varInfo.ContentTypeInfo.GetTypeName())
 				}
-				for funcKey, funcInfo := range info.FuncPoint {
-					fmt.Println("\t", funcKey, "\t\t", funcInfo.GetName())
-				}
+				// for funcKey, funcInfo := range info.FuncPoint {
+				// 	fmt.Println("\t", funcKey, "\t\t", funcInfo.GetName())
+				// }
 			}
 		}
 		fmt.Println("========= Func =============")

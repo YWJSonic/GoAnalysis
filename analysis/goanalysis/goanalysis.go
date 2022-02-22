@@ -2,6 +2,7 @@ package goanalysis
 
 import (
 	"bytes"
+	"codeanalysis/analysis/constant"
 	"codeanalysis/analysis/dao"
 	_ "codeanalysis/load/project/goloader"
 	wwe "codeanalysis/load/project/goloader"
@@ -58,7 +59,7 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 			}
 
 			// 確認是否有已生成的資料
-			PackageInfo, ok := Instants.LoadOrStoryPackage(pwd, dao.NewPackageInfoByNode(currentChild))
+			PackageInfo, ok := Instants.LoadOrStoryPackage(constant.From_Local, pwd, dao.NewPackageInfoByNode(currentChild))
 			if ok {
 				PackageInfo.CurrentFileNodes = currentChild
 			}

@@ -1,6 +1,7 @@
 package goanalysis
 
 import (
+	"codeanalysis/analysis/constant"
 	"codeanalysis/analysis/dao"
 	"codeanalysis/util"
 
@@ -71,6 +72,16 @@ func (s *source) importSpec() *dao.ImportInfo {
 	// 解析 路徑
 	path = strings.TrimSpace(s.rangeStr())
 
+	// 判斷來源
+	packageType := constant.From_Golang
+	if Instants.ModuleInfo.IsLocalPackage(path) {
+		packageType = constant.From_Local
+
+	} else if Instants.ModuleInfo.IsVendorPackage(path) {
+		packageType = constant.From_Vendor
+
+	}
+
 	// 解析 預設名稱
 	splitStr := strings.Split(path, "/")
 	name = splitStr[len(splitStr)-1]
@@ -91,7 +102,7 @@ func (s *source) importSpec() *dao.ImportInfo {
 		panic("import name error")
 	}
 	// 根據預設名稱取得 package 關聯資料
-	packageInfo, _ = Instants.LoadOrStoryPackage(path, dao.NewPackageInfo())
+	packageInfo, _ = Instants.LoadOrStoryPackage(packageType, path, dao.NewPackageInfo())
 	importInfo := dao.NewImportLink()
 	importInfo.NewName = newName
 	importInfo.ImportMod = importMod
@@ -126,9 +137,9 @@ func (s *source) ConstantDeclarations() {
 				if len(constInfos) > 1 {
 					panic("empty constInfos error")
 				}
-				if constInfos[0].TypeInfo == nil && len(infos) > 0 {
+				if constInfos[0].ContentTypeInfo == nil && len(infos) > 0 {
 					for _, constInfo := range constInfos {
-						constInfo.TypeInfo = infos[len(infos)-1].TypeInfo
+						constInfo.ContentTypeInfo = infos[len(infos)-1].ContentTypeInfo
 					}
 				}
 				infos = append(infos, constInfos...)
@@ -189,7 +200,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			exps := s.OnConstantExpression()
 			for idx, info := range infos {
 
-				info.TypeInfo = typeInfo
+				info.ContentTypeInfo = typeInfo
 				info.Expressions = exps[idx]
 			}
 
@@ -419,7 +430,7 @@ func (s *source) VarSpec() []*dao.VarInfo {
 		// 建立關聯
 		for idx, info := range infos {
 			// 指定型別
-			info.TypeInfo = typeInfo
+			info.ContentTypeInfo = typeInfo
 
 			// 關聯 表達式內容
 			if len(exps) > idx {
@@ -628,9 +639,6 @@ func (s *source) TypeSpec() dao.ITypeInfo {
 		s.toNextCh()
 		info := dao.NewTypeDef()
 		info.SetName(name)
-		if name == "CheatMockData" {
-			fmt.Println("")
-		}
 		info.ContentTypeInfo = s.OnDeclarationsType()
 		typeInfo = info
 	}
@@ -672,7 +680,7 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 	case '<': // OutPutChanelType
 		s.OnChannelType()
 	case '.': // short ArranType
-		info = s.onShortArrayType()
+		info = s.onShortSliceType()
 	default:
 		nextEndIdx := s.nextIdx()
 		nextTokenIdx := s.nextTokenIdx()
@@ -967,40 +975,6 @@ func (s *source) OnParameters() []dao.FuncParams {
 				}
 			}
 		}
-
-		// 結束判斷
-		// if s.ch != ',' {
-		// 	// 多重宣告
-		// 	if len(identifiers) > 0 {
-		// 		// 多重隱藏宣告 自定義類型
-		// 		if s.ch == ')' {
-		// 			// (int, float) 類型解析
-		// 			info := s.PackageInfo.GetType(identifierOrType)
-		// 			if info == nil {
-		// 				panic("")
-		// 			}
-		// 			params := dao.NewFuncParams()
-		// 			params.SetName("_")
-		// 			params.ContentTypeInfo = info
-		// 			strLit = append(strLit, params)
-
-		// 		} else {
-		// 			// (a, b Type) 類型解析
-		// 			info := s.OnDeclarationsType()
-		// 			for _, identifier := range identifiers {
-		// 				params := dao.NewFuncParams()
-		// 				params.SetName(identifier)
-		// 				params.ContentTypeInfo = info
-		// 				strLit = append(strLit, params)
-		// 			}
-		// 		}
-		// 	}
-
-		// 	parameterDeclDone = true
-		// } else {
-		// 	s.next()
-		// 	// nextCh = rune(s.buf[s.r+1])
-		// }
 	}
 	return strLit
 }
