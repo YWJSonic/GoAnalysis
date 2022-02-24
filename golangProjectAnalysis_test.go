@@ -12,7 +12,7 @@ import (
 
 func TestGolandAnalysis(t *testing.T) {
 	// go http.ListenAndServe("0.0.0.0:6060", nil)
-	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/gamemaster")
+	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GoAnalysis")
 
 	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
 
@@ -27,7 +27,11 @@ func TestGolandAnalysis(t *testing.T) {
 	// 解析專案
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 
-	fmt.Println(goanalysis.Instants.Output())
+	// data, _ := json.Marshal(goanalysis.Instants)
+
+	// ioutil.WriteFile("./log.json", data, 0666)
+	// fmt.Println(string(data))
+	// fmt.Println(goanalysis.Instants.Output())
 
 	// 測試輸出
 	// rebuildCode()

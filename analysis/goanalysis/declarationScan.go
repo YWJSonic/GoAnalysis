@@ -173,7 +173,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			s.next()
 
 			// 解析表達式
-			exps := s.OnConstantExpression()
+			exps := s.scanExpressionList()
 			for idx, info := range infos {
 				info.Expressions = exps[idx]
 			}
@@ -197,9 +197,9 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			// 一般初始化流程
 			typeInfo := s.OnDeclarationsType()
 			s.next()
-			exps := s.OnConstantExpression()
-			for idx, info := range infos {
 
+			exps := s.scanExpressionList()
+			for idx, info := range infos {
 				info.ContentTypeInfo = typeInfo
 				info.Expressions = exps[idx]
 			}
@@ -239,103 +239,6 @@ func (s *source) ConstantIdentifierList() []*dao.ConstInfo {
 		name := s.scanIdentifier()
 		info := dao.NewConstInfo(name)
 		infos = append(infos, info)
-	}
-
-	return infos
-}
-
-// const a, b, c = Expression, Expression, Expression
-
-// 解析表達式
-//
-// @param dao.ITypeInfo	表達式型別
-// @param int			表達是數量
-//
-// @return []string 表達式內容
-func (s *source) OnConstantExpression() []*dao.Expressions {
-
-	var infos []*dao.Expressions
-
-	for {
-		info := dao.NewExpressions()
-		info.Objs = s.OnConstantExpressionMath()
-		infos = append(infos, info)
-		if s.ch != ',' {
-			break
-		}
-		s.toNextCh()
-	}
-
-	return infos
-}
-
-// 解析 算式陣列
-func (s *source) OnConstantExpressionMath() []dao.ITypeInfo {
-	var infos []dao.ITypeInfo
-	// 暫時不解析隱藏宣告
-	baseInfo := dao.BaseTypeInfo["string"]
-	infos = append(infos, baseInfo)
-	toNext := false
-	for {
-		s.nextCh()
-		switch s.ch {
-		case ',', '\n':
-			toNext = true
-		case ' ':
-			if s.CheckCommon() {
-				toNext = true
-			}
-		}
-		if toNext {
-			break
-		}
-
-	}
-	// 後續補完此解析
-	return infos
-
-	// 解析流程
-	s.toNextCh()
-	ch := rune(s.buf[s.r+1])
-
-	if util.IsDecimal(ch) || ch == '.' && util.IsDecimal(rune(s.buf[s.r+2])) {
-		info := s.scanNumber()
-		infos = append(infos, info)
-
-		// s.toNextCh()
-		switch s.ch {
-		case ',':
-			break
-
-		case ' ':
-			s.nextCh()
-			switch s.ch {
-			case '+':
-				// s.nextCh()
-				infos = append(infos, s.OnConstantExpressionMath()...)
-			}
-		case '/':
-			infos = append(infos, s.OnConstantExpressionMath()...)
-		}
-
-	} else if ch == '"' {
-
-		info := s.scanString()
-		infos = append(infos, info)
-
-		switch s.ch {
-		case ',':
-			break
-
-		case ' ':
-			s.nextCh()
-			switch s.ch {
-			case '+':
-				s.nextCh()
-				infos = append(infos, s.OnConstantExpressionMath()...)
-			}
-
-		}
 	}
 
 	return infos
@@ -401,6 +304,9 @@ func (s *source) VarSpec() []*dao.VarInfo {
 	}
 
 	infos = s.VariableIdentifierList()
+	if infos[0].GetName() == "evtMap" {
+		fmt.Println("")
+	}
 	s.toNextCh()
 
 	if s.buf[s.r+1] == '=' {
@@ -475,101 +381,6 @@ func (s *source) VariableIdentifierList() []*dao.VarInfo {
 		name := s.rangeStr()
 		info := dao.NewVarInfo(name)
 		infos = append(infos, info)
-	}
-
-	return infos
-}
-
-// 解析表達式
-//
-// @param dao.ITypeInfo	表達式型別
-// @param int			表達是數量
-//
-// @return []string 表達式內容
-func (s *source) OnVariableExpression() []*dao.Expressions {
-
-	var infos []*dao.Expressions
-
-	for {
-		info := dao.NewExpressions()
-		info.Objs = s.OnVariableExpressionMath()
-		infos = append(infos, info)
-		if s.ch != ',' {
-			break
-		}
-		s.toNextCh()
-	}
-
-	return infos
-}
-
-// 解析 算式陣列
-func (s *source) OnVariableExpressionMath() []dao.ITypeInfo {
-	var infos []dao.ITypeInfo
-	// 暫時不解析隱藏宣告
-	baseInfo := dao.BaseTypeInfo["string"]
-	infos = append(infos, baseInfo)
-	toNext := false
-	endSymble := '\n'
-	for {
-		s.nextCh()
-		if s.ch == endSymble {
-			toNext = true
-		} else if s.ch == ' ' {
-			if s.CheckCommon() {
-				toNext = true
-			}
-		}
-		if toNext {
-			break
-		}
-
-	}
-	// 後續補完解析
-	return infos
-
-	// 解析流程
-	s.toNextCh()
-	ch := rune(s.buf[s.r+1])
-
-	if util.IsDecimal(ch) || ch == '.' && util.IsDecimal(rune(s.buf[s.r+2])) {
-		info := s.scanNumber()
-		infos = append(infos, info)
-
-		// s.toNextCh()
-		switch s.ch {
-		case ',':
-			break
-
-		case ' ':
-			s.nextCh()
-			switch s.ch {
-			case '+':
-				// s.nextCh()
-				infos = append(infos, s.OnConstantExpressionMath()...)
-			}
-		case '/':
-			infos = append(infos, s.OnConstantExpressionMath()...)
-		}
-
-	} else if ch == '"' {
-
-		info := s.scanString()
-		infos = append(infos, info)
-
-		switch s.ch {
-		case ',':
-			break
-
-		case ' ':
-			s.nextCh()
-			switch s.ch {
-			case '+':
-				s.nextCh()
-				infos = append(infos, s.OnConstantExpressionMath()...)
-			}
-
-		}
 	}
 
 	return infos

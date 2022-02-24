@@ -89,9 +89,9 @@ type LitKind uint8
 //           and floating-point numbers, having a single ImagLit does
 //           not represent the literal kind well anymore. Remove it?
 const (
-	IntLit   LitKind = iota
-	FloatLit int     = 5
-	ImagLit  string  = "3"
+	IntLit LitKind = iota
+	FloatLit
+	ImagLit
 	RuneLit
 	StringLit
 )

@@ -1,14 +1,16 @@
 package dao
 
 type ConstInfo struct {
-	PointBase
+	TypeBase
 	ContentTypeInfo ITypeInfo
-	Expressions     *Expressions
+	Expressions     string
 	Common          string
 }
 
 func NewConstInfo(name string) *ConstInfo {
-	info := &ConstInfo{}
-	info.name = name
+	info := &ConstInfo{
+		TypeBase: NewPointBase(),
+	}
+	info.SetName(name)
 	return info
 }

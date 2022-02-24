@@ -1,7 +1,7 @@
 package dao
 
 type VarInfo struct {
-	PointBase
+	TypeBase
 	ContentTypeInfo ITypeInfo
 	// Expressions *Expressions
 	Expressions string // 暫代
@@ -10,7 +10,9 @@ type VarInfo struct {
 }
 
 func NewVarInfo(name string) *VarInfo {
-	info := &VarInfo{}
-	info.name = name
+	info := &VarInfo{
+		TypeBase: NewPointBase(),
+	}
+	info.SetName(name)
 	return info
 }

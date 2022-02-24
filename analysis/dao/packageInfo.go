@@ -7,6 +7,7 @@ import (
 
 func NewPackageInfo() *PackageInfo {
 	info := &PackageInfo{
+		TypeBase:      NewPointBase(),
 		AllTypeInfos:  make(map[string]ITypeInfo),
 		AllVarInfos:   make(map[string]ITypeInfo),
 		AllConstInfos: make(map[string]ITypeInfo),
@@ -18,11 +19,13 @@ func NewPackageInfo() *PackageInfo {
 
 func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 	info := &PackageInfo{
-		AllTypeInfos:  make(map[string]ITypeInfo),
-		AllVarInfos:   make(map[string]ITypeInfo),
-		AllConstInfos: make(map[string]ITypeInfo),
-		AllFuncInfo:   make(map[string]*FuncInfo),
-		AllImportLink: make(map[string]*ImportInfo),
+		TypeBase:                  NewPointBase(),
+		ImplicitlyVarOrConstInfos: make([]ITypeInfo, 0),
+		AllTypeInfos:              make(map[string]ITypeInfo),
+		AllVarInfos:               make(map[string]ITypeInfo),
+		AllConstInfos:             make(map[string]ITypeInfo),
+		AllFuncInfo:               make(map[string]*FuncInfo),
+		AllImportLink:             make(map[string]*ImportInfo),
 	}
 	info.CurrentFileNodes = node
 	return info
@@ -30,9 +33,9 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 
 // Package 節點
 type PackageInfo struct {
-	PointBase
+	TypeBase
 	PackageVersion   string
-	CurrentFileNodes FileDataNode
+	CurrentFileNodes FileDataNode `json:"-"`
 
 	ImplicitlyVarOrConstInfos []ITypeInfo // 隱藏式宣告參數 var or const
 	AllTypeInfos              map[string]ITypeInfo

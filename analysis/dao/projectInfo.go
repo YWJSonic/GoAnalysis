@@ -8,19 +8,20 @@ import (
 
 func NewProjectInfo(node *goloader.GoFileNode) *ProjectInfo {
 	info := &ProjectInfo{
+		TypeBase:         NewPointBase(),
 		LocalPackageMap:  make(map[string]*PackageInfo),
 		VendorPackageMap: make(map[string]*PackageInfo),
 		GolangPackageMap: make(map[string]*PackageInfo),
 	}
-	info.name = node.Path()
+	info.SetName(node.Path())
 	info.ProjectRoot = node
 	return info
 }
 
 type ProjectInfo struct {
-	PointBase
+	TypeBase
 	ModuleInfo       *ModuleInfo
-	ProjectRoot      FileDataNode
+	ProjectRoot      FileDataNode            `json:"-"`
 	LocalPackageMap  map[string]*PackageInfo // 內部實做 package <packagePath, *PackageInfo>
 	VendorPackageMap map[string]*PackageInfo // 外部引用 package <packagePath, *PackageInfo>
 	GolangPackageMap map[string]*PackageInfo // 系統自帶 package <packagePath, *PackageInfo>

@@ -213,6 +213,11 @@ func (s *source) OnQualifiedIdentType() *dao.TypeInfoQualifiedIdent {
 
 	s.nextToken()
 	packageName := s.rangeStr()
+	s.onQualifiedIdentifier(packageName, info)
+	return info
+}
+
+func (s *source) onQualifiedIdentifier(packageName string, info *dao.TypeInfoQualifiedIdent) {
 	s.nextCh()
 	typeName := s.scanIdentifier()
 	fullName := fmt.Sprintf("%s.%s", packageName, typeName)
@@ -220,7 +225,6 @@ func (s *source) OnQualifiedIdentType() *dao.TypeInfoQualifiedIdent {
 	info.SetName(fullName)
 	link, iItype := s.PackageInfo.GetPackageType(packageName, typeName)
 	info.ImportLink, info.ContentTypeInfo = link, iItype
-	return info
 }
 
 func (s *source) OnSliceType() *dao.TypeInfoSlice {
@@ -259,7 +263,7 @@ func (s *source) OnArrayType() *dao.TypeInfoArray {
 
 	// ArrayLength
 	s.nextCh()
-	info.Size = s.scanExpression(']')
+	info.Size = s.onScanExpression(']')
 	info.ContentTypeInfo = s.OnDeclarationsType()
 	return info
 }
@@ -472,7 +476,7 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 			s.nextCh()
 			arrayInfo := dao.NewTypeInfoArray()
 			arrayInfo.SetTypeName("array")
-			arrayInfo.Size = s.scanExpression('\n')
+			arrayInfo.Size = s.onScanExpression('\n')
 			arrayInfo.ContentTypeInfo = s.OnDeclarationsType()
 			info = arrayInfo
 		}

@@ -8,7 +8,7 @@ func NewImportLink() *ImportInfo {
 
 // Package 關聯(import 資料)
 type ImportInfo struct {
-	Package   *PackageInfo
+	Package   *PackageInfo `json:"-"`
 	Path      string
 	NewName   string // 使用一般引入方式
 	ImportMod string // 包引入方式定義, 一般使用： "", 隱藏式: ".", 只限初始化: "_"

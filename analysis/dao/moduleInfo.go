@@ -3,9 +3,9 @@ package dao
 import "strings"
 
 type ModuleInfo struct {
-	ModuleName       string // module 名稱
-	GoVersion        string // go 最低版本
-	CurrentFileNodes FileDataNode
+	ModuleName       string       // module 名稱
+	GoVersion        string       // go 最低版本
+	CurrentFileNodes FileDataNode `json:"-"`
 
 	VendorMap map[string]struct{} // 外部參考 package <packagePath, *PackageInfo>
 }

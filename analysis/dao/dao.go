@@ -1,35 +1,47 @@
 package dao
 
-import "codeanalysis/types"
+import (
+	"codeanalysis/types"
+)
 
 // 通用檔案節點
 type FileDataNode interface {
 	Path() string
 	Name() string
 }
+type TypeBase interface {
+	GetName() string
+	SetName(name string)
+	GetTypeName() string
+	SetTypeName(typeName string)
+}
 
 // 全指標共用基底
 
 // 名稱 基礎物件
 type PointBase struct {
-	name     string
-	typeName string
+	Name     string
+	TypeName string
 }
 
 func (self *PointBase) GetName() string {
-	return self.name
+	return self.Name
 }
 
 func (self *PointBase) SetName(name string) {
-	self.name = name
+	self.Name = name
 }
 
 func (self *PointBase) GetTypeName() string {
-	return self.typeName
+	return self.TypeName
 }
 
 func (self *PointBase) SetTypeName(typeName string) {
-	self.typeName = typeName
+	self.TypeName = typeName
+}
+
+func NewPointBase() *PointBase {
+	return &PointBase{}
 }
 
 // 資料來源 基礎物件
