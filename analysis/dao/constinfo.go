@@ -3,7 +3,7 @@ package dao
 type ConstInfo struct {
 	TypeBase
 	ContentTypeInfo ITypeInfo
-	Expression      *Expression
+	Expression      string //*Expression
 	Common          string
 }
 

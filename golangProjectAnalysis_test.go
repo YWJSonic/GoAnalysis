@@ -4,7 +4,9 @@ import (
 	"codeanalysis/analysis/dao"
 	"codeanalysis/analysis/goanalysis"
 	"codeanalysis/load/project/goloader"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"testing"
 
 	_ "net/http/pprof"
@@ -27,11 +29,11 @@ func TestGolandAnalysis(t *testing.T) {
 	// 解析專案
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 
-	// data, _ := json.Marshal(goanalysis.Instants)
+	data, _ := json.Marshal(goanalysis.Instants)
 
-	// ioutil.WriteFile("./log.json", data, 0666)
-	// fmt.Println(string(data))
-	// fmt.Println(goanalysis.Instants.Output())
+	ioutil.WriteFile("./log.json", data, 0666)
+	fmt.Println(string(data))
+	fmt.Println(goanalysis.Instants.Output())
 
 	// 測試輸出
 	// rebuildCode()
