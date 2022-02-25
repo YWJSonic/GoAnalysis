@@ -1,6 +1,9 @@
 package goanalysis
 
-import "codeanalysis/analysis/constant"
+import (
+	"codeanalysis/analysis/constant"
+	"codeanalysis/util"
+)
 
 // 索引開始
 func (s *source) start() {
@@ -237,4 +240,29 @@ func (s *source) isOnNewlineSymbol() bool {
 		return true
 	}
 	return false
+}
+
+// 判斷是否為數字, 並回傳進制單位
+//
+// @return bool		使否為數字
+// @return uint8	進制單位
+func (s *source) isInt_lit() (bool, constant.IntLiteType) {
+	if !util.IsDecimal(s.ch) {
+		return false, constant.IntLiteType_None
+	}
+
+	nextCh := rune(s.buf[s.r+1])
+	switch nextCh {
+	case 'b', 'B':
+		return true, constant.IntLiteType_Binary
+
+	case 'o', 'O':
+		return true, constant.IntLiteType_Octal
+
+	case 'x', 'X':
+		return true, constant.IntLiteType_Hex
+
+	default:
+		return true, constant.IntLiteType_Decimal
+	}
 }

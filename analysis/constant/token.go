@@ -83,7 +83,7 @@ const (
 	Defer = _Defer
 )
 
-type LitKind uint8
+type LitKind = uint8
 
 // TODO(gri) With the 'i' (imaginary) suffix now permitted on integer
 //           and floating-point numbers, having a single ImagLit does
@@ -94,6 +94,16 @@ const (
 	ImagLit
 	RuneLit
 	StringLit
+)
+
+type IntLiteType = uint8
+
+const (
+	IntLiteType_None    IntLiteType = iota // 不是數字
+	IntLiteType_Binary                     // 2進制
+	IntLiteType_Octal                      // 8進制
+	IntLiteType_Decimal                    // 10進制
+	IntLiteType_Hex                        // 16進制
 )
 
 type token = uint

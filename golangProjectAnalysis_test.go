@@ -47,11 +47,11 @@ func rebuildCode() {
 		}
 		fmt.Println("========= Const =============")
 		for constKey, constInfo := range packageInfo.AllConstInfos {
-			fmt.Println("const", constKey, constInfo.(*dao.ConstInfo).Expressions)
+			fmt.Println("const", constKey, constInfo.(*dao.ConstInfo).Expression)
 		}
 		fmt.Println("========= Var =============")
 		for varKey, varInfo := range packageInfo.AllVarInfos {
-			fmt.Println("var", varKey, varInfo.(*dao.VarInfo).Expressions)
+			fmt.Println("var", varKey, varInfo.(*dao.VarInfo).Expression)
 		}
 		fmt.Println("========= Type =============")
 		for typeKey, typeInfo := range packageInfo.AllTypeInfos {

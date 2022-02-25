@@ -4,6 +4,35 @@ import (
 	"codeanalysis/analysis/dao"
 )
 
+func (s *source) scanExpressionList() []string {
+	var expressions []string
+	s.nextCh()
+	for {
+		expressions = append(expressions, s.onFakeExpression('\n'))
+		if s.ch != ',' {
+			break
+		}
+		s.nextCh()
+		s.nextCh()
+	}
+
+	return expressions
+}
+func (s *source) scanConstExpressionList() []*dao.Expression {
+	var expressions []*dao.Expression
+	s.nextCh()
+	for {
+		expressions = append(expressions, s.onScanConstExpression('\n'))
+		if s.ch != ',' {
+			break
+		}
+		s.nextCh()
+		s.nextCh()
+	}
+
+	return expressions
+}
+
 func (s *source) onFakeExpression(endTag rune) string {
 	offset := s.r
 	var scanDone bool
@@ -44,69 +73,42 @@ func (s *source) onFakeExpression(endTag rune) string {
 	return string(s.buf[offset:s.r])
 }
 
-func (s *source) onScanArrayLengthExpression(endTag rune) *dao.Expressions {
-	var expInfo = &dao.Expressions{}
+func (s *source) onScanArrayLengthExpression(endTag rune) *dao.Expression {
+	var expInfo = &dao.Expression{}
+	if isInt, _ := s.isInt_lit(); isInt {
+		s.scanIdentifier()
+		expInfo.ConstantType = dao.BaseTypeInfo["int"]
 
+	} else {
+		identifierOrType := s.scanIdentifier()
+		if s.ch == endTag {
+			expInfo.ConstantType = s.PackageInfo.GetType(identifierOrType)
+
+		} else if s.ch == '.' {
+			qualifiedInfo := dao.NewTypeInfoQualifiedIdent()
+			s.onQualifiedIdentifier(identifierOrType, qualifiedInfo)
+			expInfo.ConstantType = qualifiedInfo
+		}
+	}
 	return expInfo
 }
 
-func (s *source) onScanExpression(endTag rune) string {
-	return ""
+func (s *source) onScanConstExpression(endTag rune) *dao.Expression {
+	var expInfo = &dao.Expression{}
+	if isInt, _ := s.isInt_lit(); isInt {
+		s.scanIdentifier()
+		expInfo.ConstantType = dao.BaseTypeInfo["int"]
+
+	} else {
+		identifierOrType := s.scanIdentifier()
+		if s.ch == endTag {
+			expInfo.ConstantType = s.PackageInfo.GetType(identifierOrType)
+
+		} else if s.ch == '.' {
+			qualifiedInfo := dao.NewTypeInfoQualifiedIdent()
+			s.onQualifiedIdentifier(identifierOrType, qualifiedInfo)
+			expInfo.ConstantType = qualifiedInfo
+		}
+	}
+	return expInfo
 }
-
-// func (s *source) onScanExpression(endTag rune) *dao.Expressions {
-// 	var expInfo = &dao.Expressions{}
-// 	var scanDone bool
-// 	var identifier string
-// 	for !scanDone {
-
-// 		if util.IsDecimal(s.ch) {
-// 			// 開頭為數字
-// 			identifier = s.scanIdentifier()
-
-// 		} else if util.IsLetter(s.ch) {
-// 			// 開頭為字串
-// 			identifier = s.scanIdentifier()
-
-// 			qualifiedInfo := dao.NewTypeInfoQualifiedIdent()
-// 			s.onQualifiedIdentifier(identifier, qualifiedInfo)
-
-// 		} else if util.IsToken(s.ch) {
-// 			// 開頭為符號
-
-// 			switch s.ch {
-// 			case '&':
-
-// 				if util.IsLetter(rune(s.buf[s.r+1])) {
-// 					// point type
-// 					pointTypeInfo := dao.NewTypeInfoPointer()
-// 					pointTypeInfo.ContentTypeInfo = s.OnDeclarationsType()
-// 					switch ctInfo:= pointTypeInfo.ContentTypeInfo.(type){
-// 					case *dao.TypeInfoQualifiedIdent:
-// 						ctInfo.ContentTypeInfo
-
-// 					}
-// 					expInfo.ConstantType = pointTypeInfo
-// 					expInfo.ConstantTypes = append(expInfo.ConstantTypes, pointTypeInfo)
-// 					s.funcBodyBlock()
-// 				}
-
-// 			case '+':
-// 			case '-':
-// 			case '!':
-// 			case '^':
-// 			case '*':
-// 			case '<':
-
-// 			}
-
-// 			identifier = s.scanIdentifier()
-
-// 		}
-
-// 		scanDone = true
-// 		fmt.Println(identifier)
-// 	}
-
-// 	return expInfo
-// }

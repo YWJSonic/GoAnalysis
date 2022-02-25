@@ -173,9 +173,9 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			s.next()
 
 			// 解析表達式
-			exps := s.scanExpressionList()
+			exps := s.scanConstExpressionList()
 			for idx, info := range infos {
-				info.Expressions = exps[idx]
+				info.Expression = exps[idx]
 			}
 
 			// 解析註解
@@ -198,10 +198,10 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			typeInfo := s.OnDeclarationsType()
 			s.next()
 
-			exps := s.scanExpressionList()
+			exps := s.scanConstExpressionList()
 			for idx, info := range infos {
 				info.ContentTypeInfo = typeInfo
-				info.Expressions = exps[idx]
+				info.Expression = exps[idx]
 			}
 
 		}
@@ -314,13 +314,11 @@ func (s *source) VarSpec() []*dao.VarInfo {
 		// exps := s.OnVariableExpression()
 		exps := s.scanExpressionList()
 		for idx, info := range infos {
-			// info.Expressions = exps[idx]
-			info.Expressions = exps[idx]
+			info.Expression = exps[idx]
 		}
 
 	} else {
 		typeInfo := s.OnDeclarationsType()
-		// var exps []*dao.Expressions
 		var exps []string
 		if s.checkEnd() {
 			// 指定初始化
@@ -340,7 +338,7 @@ func (s *source) VarSpec() []*dao.VarInfo {
 
 			// 關聯 表達式內容
 			if len(exps) > idx {
-				info.Expressions = exps[idx]
+				info.Expression = exps[idx]
 			}
 		}
 	}

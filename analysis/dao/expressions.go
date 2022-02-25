@@ -1,19 +1,16 @@
 package dao
 
-type Expressions struct {
-	TypeBase
+type Expression struct {
 	ConstantType ITypeInfo // 表達式最終類型
 	IExpressionContant
 }
 
-func NewExpressions() *Expressions {
-	return &Expressions{
-		TypeBase: NewPointBase(),
-	}
+func NewExpression() *Expression {
+	return &Expression{}
 }
 
 type IExpressionContant interface{}
-type ExpressionsArray struct {
+type ExpressionArray struct {
 }
 
 // type LiteralValue struct {
@@ -21,6 +18,6 @@ type ExpressionsArray struct {
 // }
 
 // type ElementList struct {
-// 	Key   *Expressions
-// 	Value *Expressions
+// 	Key   *Expression
+// 	Value *Expression
 // }

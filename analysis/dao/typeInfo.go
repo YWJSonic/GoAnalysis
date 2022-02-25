@@ -207,6 +207,7 @@ var BaseTypeInfo map[string]ITypeInfo = map[string]ITypeInfo{
 	"float64":    &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "float64"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
 	"int":        &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
 	"int8":       &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int8"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
+	"iota":       &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
 	"int16":      &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int16"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
 	"int32":      &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int32"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
 	"int64":      &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int64"}, RefBase: RefBase{TypeFrom: constant.From_Golang}},
