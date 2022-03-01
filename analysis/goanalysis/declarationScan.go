@@ -130,7 +130,7 @@ func (s *source) ConstantDeclarations() {
 
 		for {
 			s.toNextCh()
-			if s.CheckCommon() {
+			if s.checkCommon() {
 				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			} else {
 				constInfos := s.ConstSpec()
@@ -178,15 +178,19 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 				info.Expression = exps[idx]
 			}
 
+			if s.ch == ' ' {
+				s.toNextCh()
+			}
+
 			// 解析註解
-			if s.CheckCommon() {
+			if s.checkCommon() {
 				common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 				for _, info := range infos {
 					info.Common = common
 				}
 			}
 
-		} else if s.CheckCommon() {
+		} else if s.checkCommon() {
 			// 解析 (xx, xx, xx //)格式
 			// 解析註解
 			common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
@@ -304,9 +308,6 @@ func (s *source) VarSpec() []*dao.VarInfo {
 	}
 
 	infos = s.VariableIdentifierList()
-	if infos[0].GetName() == "evtMap" {
-		fmt.Println("")
-	}
 	s.toNextCh()
 
 	if s.buf[s.r+1] == '=' {
@@ -342,7 +343,7 @@ func (s *source) VarSpec() []*dao.VarInfo {
 		}
 	}
 
-	if s.CheckCommon() {
+	if s.checkCommon() {
 		common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		for _, info := range infos {
 			info.Common = common
@@ -373,7 +374,6 @@ func (s *source) VariableIdentifierList() []*dao.VarInfo {
 		}
 
 	} else { // 單一參數初始化
-
 		s.next()
 		name := s.rangeStr()
 		info := dao.NewVarInfo(name)
@@ -405,7 +405,7 @@ func (s *source) TypeDeclarations() []dao.ITypeInfo {
 				break
 			}
 
-			if s.CheckCommon() {
+			if s.checkCommon() {
 				s.nextTargetToken('\n')
 				continue
 			}
@@ -486,7 +486,7 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 		}
 
 	case '<': // OutPutChanelType
-		s.OnChannelType()
+		info = s.OnChannelType()
 	case '.': // short ArranType
 		info = s.onShortSliceType()
 	default:
@@ -618,7 +618,7 @@ func (s *source) onSignature() (paramsInPoint, paramsOutPoint []dao.FuncParams) 
 		s.toNextCh()
 	}
 
-	if !s.CheckCommon() {
+	if !s.checkCommon() {
 		paramsOutPoint = s.OnDeclarationsResult()
 	}
 	return
@@ -699,7 +699,7 @@ func (s *source) OnParameters() []dao.FuncParams {
 		}
 
 		// 判斷整行註解
-		if s.CheckCommon() {
+		if s.checkCommon() {
 			lineCommon += s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			isCommonLine = true
 			continue
@@ -868,24 +868,4 @@ func (s *source) funcBodyBlock() string {
 	}
 	s.nextCh()
 	return string(s.buf[offset:s.r])
-}
-
-// 確認後續是否為註解
-// 指標指定位置 _//
-// r="_"
-func (s *source) CheckCommon() bool {
-	if s.r+1 == s.e {
-		return false
-	}
-
-	if s.buf[s.r+1] != '/' {
-		return false
-	}
-
-	previrwCh := string(s.buf[s.r+1 : s.r+3])
-	if previrwCh != "//" && previrwCh != "/*" {
-		return false
-	}
-
-	return true
 }

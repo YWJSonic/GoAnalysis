@@ -59,7 +59,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 		s.toNextCh()
 
 		// 判斷整行註解
-		if s.CheckCommon() {
+		if s.checkCommon() {
 			lineCommon += s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			isCommonLine = true
 			continue
@@ -108,7 +108,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 						info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 						tmpVarInfos = append(tmpVarInfos, varInfo)
 
-					} else if s.CheckCommon() {
+					} else if s.checkCommon() {
 						// 解析 (XXX    //) 格式
 						// 無指標隱藏宣告 後續接到註解
 						varInfo := dao.NewVarInfo("_")
@@ -172,7 +172,7 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 			}
 
 			// 解析後注解
-			if s.CheckCommon() {
+			if s.checkCommon() {
 				backCommon := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 				if lineCommon == "" {
 					lineCommon = backCommon
@@ -342,7 +342,7 @@ func (s *source) onMethodSpec() (matchInfos []dao.ITypeInfo) {
 			}
 
 			// 解析註解
-			if s.CheckCommon() {
+			if s.checkCommon() {
 				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 				s.toNextCh()
 				continue
@@ -353,15 +353,9 @@ func (s *source) onMethodSpec() (matchInfos []dao.ITypeInfo) {
 			name := s.scanIdentifier()
 			switch s.ch {
 			case '(':
-				if name == "UpdateGame29Paradise" {
-					fmt.Print("UpdateGame29Paradise")
-				}
 				// 解析 MathodSpec
 				matchInfo := dao.NewFuncInfo()
 				matchInfo.SetName(name)
-				if name == "Publish" {
-					fmt.Println("")
-				}
 				matchInfo.ParamsInPoint, matchInfo.ParamsOutPoint = s.onSignature()
 				matchInfos = append(matchInfos, matchInfo)
 

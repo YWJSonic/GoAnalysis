@@ -29,11 +29,13 @@ func TestGolandAnalysis(t *testing.T) {
 	// 解析專案
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 
-	data, _ := json.Marshal(goanalysis.Instants)
+	data, err := json.Marshal(goanalysis.Instants)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	ioutil.WriteFile("./log.json", data, 0666)
 	fmt.Println(string(data))
-	fmt.Println(goanalysis.Instants.Output())
 
 	// 測試輸出
 	// rebuildCode()

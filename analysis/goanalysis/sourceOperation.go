@@ -266,3 +266,187 @@ func (s *source) isInt_lit() (bool, constant.IntLiteType) {
 		return true, constant.IntLiteType_Decimal
 	}
 }
+
+// 確認後續是否為註解
+// 指標指定位置 _//
+// r="_"
+func (s *source) checkCommon() bool {
+	if s.r+1 == s.e {
+		return false
+	}
+
+	if s.buf[s.r+1] != '/' {
+		return false
+	}
+
+	previrwCh := string(s.buf[s.r+1 : s.r+3])
+	if previrwCh != "//" && previrwCh != "/*" {
+		return false
+	}
+
+	return true
+}
+
+func (s *source) checkBinary_op() (constant.Operator, int, bool) {
+	// "||", "&&", "==", "!=", "<", "<=", ">", ">=", "+", "-", ",", "^", "*", "/", "%", "<<", ">>", "&", "&^"
+	previrwCh1 := s.buf[s.r+1]
+	previrwCh2 := s.buf[s.r+2]
+	switch previrwCh1 {
+	case '+':
+		return constant.Add, 1, true
+	case '-':
+		return constant.Sub, 1, true
+	case '^':
+		return constant.Xor, 1, true
+	case '*':
+		return constant.Mul, 1, true
+	case '/':
+		return constant.Div, 1, true
+	case '%':
+		return constant.Rem, 1, true
+	case '!':
+		if previrwCh2 == '=' {
+			return constant.Neq, 2, true
+		}
+	case '=':
+		if previrwCh2 == '=' {
+			return constant.Eql, 2, true
+		}
+	case '|':
+		if previrwCh2 == '|' {
+			return constant.OrOr, 2, true
+		} else {
+			return constant.Or, 1, true
+		}
+	case '<':
+		switch previrwCh2 {
+		case '=':
+			return constant.Leq, 2, true
+		case '<':
+			return constant.Shl, 2, true
+		}
+		return constant.Lss, 1, true
+	case '>':
+		switch previrwCh2 {
+		case '=':
+			return constant.Geq, 2, true
+		case '>':
+			return constant.Shr, 2, true
+		}
+		return constant.Gtr, 1, true
+
+	case '&':
+		switch previrwCh2 {
+		case '&':
+			return constant.AndAnd, 2, true
+		case '^':
+			return constant.AndNot, 2, true
+		}
+		return constant.And, 1, true
+	}
+
+	return 0, 0, false
+}
+
+func (s *source) checkRel_op() (constant.Operator, int, bool) {
+	// "==" | "!=" | "<" | "<=" | ">" | ">=" .
+	previrwCh1 := s.buf[s.r+1]
+	previrwCh2 := s.buf[s.r+2]
+	switch previrwCh1 {
+	case '!':
+		if previrwCh2 == '=' {
+			return constant.Neq, 2, true
+		}
+	case '=':
+		if previrwCh2 == '=' {
+			return constant.Eql, 2, true
+		}
+	case '<':
+		switch previrwCh2 {
+		case '=':
+			return constant.Leq, 2, true
+		}
+		return constant.Lss, 1, true
+	case '>':
+		switch previrwCh2 {
+		case '=':
+			return constant.Geq, 2, true
+		}
+		return constant.Gtr, 1, true
+	}
+
+	return 0, 0, false
+}
+
+func (s *source) checAdd_op() (constant.Operator, int, bool) {
+	//  "+" | "-" | "|" | "^"
+	previrwCh1 := s.buf[s.r+1]
+	switch previrwCh1 {
+	case '+':
+		return constant.Add, 1, true
+	case '-':
+		return constant.Sub, 1, true
+	case '|':
+		return constant.Or, 1, true
+	case '^':
+		return constant.Xor, 1, true
+	}
+	return 0, 0, false
+}
+
+func (s *source) checMul_op() (constant.Operator, int, bool) {
+	// "*" | "/" | "%" | "<<" | ">>" | "&" | "&^"
+	previrwCh1 := s.buf[s.r+1]
+	previrwCh2 := s.buf[s.r+2]
+	switch previrwCh1 {
+	case '*':
+		return constant.Mul, 1, true
+	case '/':
+		return constant.Div, 1, true
+	case '%':
+		return constant.Rem, 1, true
+	case '<':
+		if previrwCh2 == '<' {
+			return constant.Shl, 2, true
+		}
+	case '>':
+		if previrwCh2 == '>' {
+			return constant.Shr, 2, true
+		}
+	case '&':
+		switch previrwCh2 {
+		case '&':
+			return constant.AndAnd, 2, true
+		case '^':
+			return constant.AndNot, 2, true
+		}
+	}
+
+	return 0, 0, false
+}
+
+func (s *source) checUnary_op() (constant.Operator, int, bool) {
+	// "+" | "-" | "!" | "^" | "*" | "&" | "<-"
+	previrwCh1 := s.buf[s.r+1]
+	previrwCh2 := s.buf[s.r+2]
+	switch previrwCh1 {
+	case '+':
+		return constant.Add, 1, true
+	case '-':
+		return constant.Sub, 1, true
+	case '!':
+		return constant.Not, 1, true
+	case '^':
+		return constant.Xor, 1, true
+	case '*':
+		return constant.Mul, 1, true
+	case '<':
+		if previrwCh2 == '-' {
+			return constant.Recv, 2, true
+		}
+	case '&':
+		return constant.And, 1, true
+	}
+
+	return 0, 0, false
+}

@@ -136,12 +136,13 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	s.start()
 	for {
 		s.toNextCh()
+
 		if s.r+1 == s.e {
 			break
 		}
 
 		// 最外層註解
-		if s.CheckCommon() {
+		if s.checkCommon() {
 			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		} else {
 

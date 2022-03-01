@@ -31,7 +31,7 @@ func GoAnalysisGoMod(node *wwe.GoFileNode) {
 		}
 
 		// 最外層註解
-		if s.CheckCommon() {
+		if s.checkCommon() {
 			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		} else {
 
@@ -108,7 +108,7 @@ func GoAnalysisGoMod(node *wwe.GoFileNode) {
 						packageInfo.SetName("")
 						moduleInfo.VendorMap[path] = struct{}{}
 
-						if s.CheckCommon() {
+						if s.checkCommon() {
 							s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 						}
 					}

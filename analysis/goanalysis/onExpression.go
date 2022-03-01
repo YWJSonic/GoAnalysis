@@ -4,25 +4,26 @@ import (
 	"codeanalysis/analysis/dao"
 )
 
+// func (s *source) scanExpressionList() []string {
+// 	var expressions []string
+// 	s.nextCh()
+// 	for {
+// 		expressions = append(expressions, s.onFakeExpression('\n'))
+// 		if s.ch != ',' {
+// 			break
+// 		}
+// 		s.nextCh()
+// 		s.nextCh()
+// 	}
+
+// 	return expressions
+// }
+
 func (s *source) scanExpressionList() []string {
 	var expressions []string
 	s.nextCh()
 	for {
-		expressions = append(expressions, s.onFakeExpression('\n'))
-		if s.ch != ',' {
-			break
-		}
-		s.nextCh()
-		s.nextCh()
-	}
-
-	return expressions
-}
-func (s *source) scanConstExpressionList() []*dao.Expression {
-	var expressions []*dao.Expression
-	s.nextCh()
-	for {
-		expressions = append(expressions, s.onScanConstExpression('\n'))
+		expressions = append(expressions, s.onScanConstExpression())
 		if s.ch != ',' {
 			break
 		}
@@ -61,7 +62,7 @@ func (s *source) onFakeExpression(endTag rune) string {
 
 			}
 
-			if s.CheckCommon() {
+			if s.checkCommon() {
 				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			}
 
@@ -93,22 +94,36 @@ func (s *source) onScanArrayLengthExpression(endTag rune) *dao.Expression {
 	return expInfo
 }
 
-func (s *source) onScanConstExpression(endTag rune) *dao.Expression {
-	var expInfo = &dao.Expression{}
-	if isInt, _ := s.isInt_lit(); isInt {
-		s.scanIdentifier()
-		expInfo.ConstantType = dao.BaseTypeInfo["int"]
+func (s *source) onScanConstExpression() string {
+	var expInfo string
+	var endTag = []rune{',', '\n', ' ', '\t'}
+	var scanDone = false
+	var offset = s.r
 
-	} else {
-		identifierOrType := s.scanIdentifier()
-		if s.ch == endTag {
-			expInfo.ConstantType = s.PackageInfo.GetType(identifierOrType)
+	for !scanDone {
+		s.nextCh()
 
-		} else if s.ch == '.' {
-			qualifiedInfo := dao.NewTypeInfoQualifiedIdent()
-			s.onQualifiedIdentifier(identifierOrType, qualifiedInfo)
-			expInfo.ConstantType = qualifiedInfo
+		for _, tag := range endTag {
+			if tag == s.ch {
+
+				if s.ch == ' ' {
+					if s.buf[s.r+1] == ' ' {
+						scanDone = true
+					} else if s.checkCommon() {
+						scanDone = true
+					} else if _, oplen, isop := s.checkBinary_op(); isop {
+						for i := 0; i < oplen; i++ {
+							s.nextCh()
+						}
+					}
+
+				} else {
+					scanDone = true
+				}
+			}
 		}
 	}
+
+	expInfo = string(s.buf[offset:s.r])
 	return expInfo
 }

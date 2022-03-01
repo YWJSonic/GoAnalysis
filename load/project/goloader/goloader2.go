@@ -71,7 +71,6 @@ func loop(path string, dirs []os.FileInfo, depth int, option Option) (findDirs, 
 		if isSkip {
 			continue
 		}
-		// fmt.Printf("%s- %s\n", tab, dirName)
 
 		newPath = filepath.Join(path, dirName)
 		files, err := ioutil.ReadDir(newPath)
