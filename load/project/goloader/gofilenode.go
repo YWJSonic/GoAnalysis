@@ -8,9 +8,9 @@ type ANAT1 struct {
 type GoFileNode struct {
 	path     string
 	FileType string
-	file     os.FileInfo
-	parent   *GoFileNode
-	Childes  []*GoFileNode
+	file     os.FileInfo   `json:"-"`
+	parent   *GoFileNode   `json:"-"`
+	Childes  []*GoFileNode `json:"-"`
 }
 
 func (self *GoFileNode) Path() string {

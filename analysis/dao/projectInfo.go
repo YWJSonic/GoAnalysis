@@ -23,8 +23,8 @@ type ProjectInfo struct {
 	ModuleInfo       *ModuleInfo
 	ProjectRoot      FileDataNode            `json:"-"`
 	LocalPackageMap  map[string]*PackageInfo // 內部實做 package <packagePath, *PackageInfo>
-	VendorPackageMap map[string]*PackageInfo // 外部引用 package <packagePath, *PackageInfo>
-	GolangPackageMap map[string]*PackageInfo // 系統自帶 package <packagePath, *PackageInfo>
+	VendorPackageMap map[string]*PackageInfo `json:"-"` // 外部引用 package <packagePath, *PackageInfo>
+	GolangPackageMap map[string]*PackageInfo `json:"-"` // 系統自帶 package <packagePath, *PackageInfo>
 }
 
 // 讀寫此 package 關連資料

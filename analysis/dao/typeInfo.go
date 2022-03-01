@@ -49,9 +49,6 @@ type TypeInfoStruct struct {
 	// FuncPoint          map[string]*FuncInfo
 }
 
-func (self *TypeInfoStruct) GetTypeName() string {
-	return self.GetName()
-}
 func NewTypeInfoStruct() *TypeInfoStruct {
 	return &TypeInfoStruct{
 		TypeBase: NewPointBase(),
@@ -64,10 +61,6 @@ func NewTypeInfoStruct() *TypeInfoStruct {
 type TypeInfoPointer struct {
 	TypeBase
 	ContentTypeInfo ITypeInfo
-}
-
-func (self *TypeInfoPointer) GetTypeName() string {
-	return fmt.Sprintf("*%s", self.ContentTypeInfo.GetTypeName())
 }
 
 func NewTypeInfoPointer() *TypeInfoPointer {
@@ -109,7 +102,7 @@ type TypeInfoSlice struct {
 }
 
 func (self *TypeInfoSlice) GetTypeName() string {
-	return fmt.Sprintf("[]%s", self.ContentTypeInfo.GetTypeName())
+	return "[]"
 }
 
 func NewTypeInfoSlice() *TypeInfoSlice {
@@ -126,7 +119,7 @@ type TypeInfoArray struct {
 }
 
 func (self *TypeInfoArray) GetTypeName() string {
-	return fmt.Sprintf("[%s]%s", self.Size, self.ContentTypeInfo.GetTypeName())
+	return fmt.Sprintf("[%s]", self.Size)
 }
 
 func NewTypeInfoArray() *TypeInfoArray {
@@ -183,7 +176,7 @@ type TypeInfoBool struct {
 type TypeInfoQualifiedIdent struct {
 	TypeBase
 	RefBase
-	ImportLink      *ImportInfo // 指定的 import package
+	ImportLink      *ImportInfo `json:"-"` // 指定的 import package
 	ContentTypeInfo ITypeInfo   // 指定該包的 type
 }
 
