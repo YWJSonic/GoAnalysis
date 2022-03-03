@@ -7,6 +7,10 @@ type ConstInfo struct {
 	Common          string
 }
 
+func (self *ConstInfo) GetTypeBase() TypeBase {
+	return self.TypeBase
+}
+
 func NewConstInfo(name string) *ConstInfo {
 	info := &ConstInfo{
 		TypeBase: NewPointBase(),

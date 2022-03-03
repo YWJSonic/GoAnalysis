@@ -14,6 +14,8 @@ type TypeBase interface {
 	SetName(name string)
 	GetTypeName() string
 	SetTypeName(typeName string)
+	SetGoPath(goPath string)
+	SetTypeFrom(from types.TypeFrom)
 }
 
 // 全指標共用基底
@@ -22,6 +24,8 @@ type TypeBase interface {
 type PointBase struct {
 	Name     string
 	TypeName string
+	TypeFrom types.TypeFrom
+	GoPath   string
 }
 
 func (self *PointBase) GetName() string {
@@ -40,11 +44,14 @@ func (self *PointBase) SetTypeName(typeName string) {
 	self.TypeName = typeName
 }
 
-func NewPointBase() *PointBase {
-	return &PointBase{}
+func (self *PointBase) SetGoPath(goPath string) {
+	self.GoPath = goPath
 }
 
-// 資料來源 基礎物件
-type RefBase struct {
-	TypeFrom types.TypeFrom
+func (self *PointBase) SetTypeFrom(from types.TypeFrom) {
+	self.TypeFrom = from
+}
+
+func NewPointBase() *PointBase {
+	return &PointBase{}
 }

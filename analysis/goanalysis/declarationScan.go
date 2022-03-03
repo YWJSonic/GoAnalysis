@@ -47,7 +47,7 @@ func (s *source) ImportDeclarations() {
 	}
 
 	for _, link := range packageLinks {
-		s.PackageInfo.AllImportLink[link.Path] = link
+		s.PackageInfo.AllImportLink[link.Package.GoPath] = link
 	}
 }
 
@@ -93,6 +93,8 @@ func (s *source) importSpec() *dao.ImportInfo {
 			newName = name[3:]
 		} else if len(name) > 3 && name[len(name)-3:] == ".go" {
 			newName = name[:len(name)-3]
+		} else if len(name) > 1 && name[0] == 'v' && util.IsDecimal(rune(name[1])) {
+			newName = splitStr[len(splitStr)-2]
 		} else {
 			newName = name
 		}
@@ -104,9 +106,9 @@ func (s *source) importSpec() *dao.ImportInfo {
 	// 根據預設名稱取得 package 關聯資料
 	packageInfo, _ = Instants.LoadOrStoryPackage(packageType, path, dao.NewPackageInfo())
 	importInfo := dao.NewImportLink()
+	importInfo.SetGoPath(s.PackageInfo.GoPath)
 	importInfo.NewName = newName
 	importInfo.ImportMod = importMod
-	importInfo.Path = path
 	importInfo.Package = packageInfo
 	return importInfo
 }
@@ -155,6 +157,7 @@ func (s *source) ConstantDeclarations() {
 		infos = append(infos, constInfos...)
 	}
 	for _, info := range infos {
+		info.SetGoPath(s.PackageInfo.GoPath)
 		s.PackageInfo.AllConstInfos[info.GetName()] = info
 	}
 }
@@ -263,6 +266,7 @@ func (s *source) VariableDeclarations() {
 		for {
 			s.toNextCh()
 			for _, info := range s.VarSpec() {
+				info.SetGoPath(s.PackageInfo.GoPath)
 				if info.GetName() == "_" {
 					s.PackageInfo.ImplicitlyVarOrConstInfos = append(s.PackageInfo.ImplicitlyVarOrConstInfos, info)
 				} else {
@@ -277,6 +281,7 @@ func (s *source) VariableDeclarations() {
 		}
 	} else {
 		for _, info := range s.VarSpec() {
+			info.SetGoPath(s.PackageInfo.GoPath)
 			if info.GetName() == "_" {
 				s.PackageInfo.ImplicitlyVarOrConstInfos = append(s.PackageInfo.ImplicitlyVarOrConstInfos, info)
 			} else {
@@ -394,8 +399,8 @@ func (s *source) VariableIdentifierList() []*dao.VarInfo {
 // 解析宣告區塊
 //
 // @return []dao.ITypeInfo 宣告內容
-func (s *source) TypeDeclarations() []dao.ITypeInfo {
-	infos := []dao.ITypeInfo{}
+func (s *source) TypeDeclarations() []*dao.TypeInfo {
+	infos := []*dao.TypeInfo{}
 	if s.buf[s.r+1] == '(' {
 		s.nextCh()
 		s.toNextCh()
@@ -429,10 +434,14 @@ func (s *source) TypeDeclarations() []dao.ITypeInfo {
 // TypeDef = identifier Type .
 // ex: _type t1 string
 // r="_"
-func (s *source) TypeSpec() dao.ITypeInfo {
+func (s *source) TypeSpec() *dao.TypeInfo {
 	var typeInfo *dao.TypeInfo
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
+
+	if name == "ImportInfo" {
+		fmt.Println("")
+	}
 
 	s.toNextCh()
 	if s.buf[s.r+1] == '=' {
@@ -465,6 +474,7 @@ func (s *source) TypeSpec() dao.ITypeInfo {
 		}
 
 	}
+	typeInfo.SetGoPath(s.PackageInfo.GoPath)
 	return typeInfo
 }
 

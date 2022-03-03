@@ -138,6 +138,14 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 					varInfo.ContentTypeInfo = quaInfo
 					info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
 					tmpVarInfos = append(tmpVarInfos, varInfo)
+				} else if s.ch == '\n' {
+					// 解析 (XXX\n) 格式
+					// 無指標隱藏宣告 後續換行
+					varInfo := dao.NewVarInfo("_")
+					varInfo.ContentTypeInfo = s.PackageInfo.GetType(names[0])
+					info.ImplicitlyVarInfos = append(info.ImplicitlyVarInfos, varInfo)
+					tmpVarInfos = append(tmpVarInfos, varInfo)
+
 				}
 			} else {
 				// 解析 EmbeddedField = identifier, identifier type 格式

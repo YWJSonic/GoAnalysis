@@ -19,8 +19,8 @@ func NewProjectInfo(node *goloader.GoFileNode) *ProjectInfo {
 }
 
 type ProjectInfo struct {
-	TypeBase
-	ModuleInfo       *ModuleInfo
+	TypeBase         `json:"-"`
+	ModuleInfo       *ModuleInfo             `json:"-"`
 	ProjectRoot      FileDataNode            `json:"-"`
 	LocalPackageMap  map[string]*PackageInfo // 內部實做 package <packagePath, *PackageInfo>
 	VendorPackageMap map[string]*PackageInfo `json:"-"` // 外部引用 package <packagePath, *PackageInfo>
@@ -36,6 +36,7 @@ type ProjectInfo struct {
 // @return bool			是否已存在資料
 func (self *ProjectInfo) LoadOrStoryPackage(packageType types.TypeFrom, pwd string, info *PackageInfo) (*PackageInfo, bool) {
 
+	info.GoPath = pwd
 	switch packageType {
 	case constant.From_Golang:
 		if packageInfo, ok := self.GolangPackageMap[pwd]; ok {

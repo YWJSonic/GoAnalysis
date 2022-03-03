@@ -1,16 +1,18 @@
 package dao
 
 import (
+	"codeanalysis/analysis/constant"
 	"codeanalysis/load/project/goloader"
+	"encoding/json"
 	"fmt"
 )
 
 func NewPackageInfo() *PackageInfo {
 	info := &PackageInfo{
 		TypeBase:      NewPointBase(),
-		AllTypeInfos:  make(map[string]ITypeInfo),
-		AllVarInfos:   make(map[string]ITypeInfo),
-		AllConstInfos: make(map[string]ITypeInfo),
+		AllTypeInfos:  make(map[string]*TypeInfo),
+		AllVarInfos:   make(map[string]*VarInfo),
+		AllConstInfos: make(map[string]*ConstInfo),
 		AllFuncInfo:   make(map[string]*FuncInfo),
 		AllImportLink: make(map[string]*ImportInfo),
 	}
@@ -21,9 +23,9 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 	info := &PackageInfo{
 		TypeBase:                  NewPointBase(),
 		ImplicitlyVarOrConstInfos: make([]ITypeInfo, 0),
-		AllTypeInfos:              make(map[string]ITypeInfo),
-		AllVarInfos:               make(map[string]ITypeInfo),
-		AllConstInfos:             make(map[string]ITypeInfo),
+		AllTypeInfos:              make(map[string]*TypeInfo),
+		AllVarInfos:               make(map[string]*VarInfo),
+		AllConstInfos:             make(map[string]*ConstInfo),
 		AllFuncInfo:               make(map[string]*FuncInfo),
 		AllImportLink:             make(map[string]*ImportInfo),
 	}
@@ -35,14 +37,34 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 type PackageInfo struct {
 	TypeBase
 	PackageVersion   string
+	GoPath           string
 	CurrentFileNodes FileDataNode `json:"-"`
 
 	ImplicitlyVarOrConstInfos []ITypeInfo // 隱藏式宣告參數 var or const
-	AllTypeInfos              map[string]ITypeInfo
-	AllVarInfos               map[string]ITypeInfo
-	AllConstInfos             map[string]ITypeInfo
+	AllTypeInfos              map[string]*TypeInfo
+	AllVarInfos               map[string]*VarInfo
+	AllConstInfos             map[string]*ConstInfo
 	AllFuncInfo               map[string]*FuncInfo
 	AllImportLink             map[string]*ImportInfo // <path, *ImportInfo>
+}
+
+func (self *PackageInfo) UnmarshalJSON(b []byte) error {
+	tmp := struct {
+		TypeBase
+		PackageVersion string
+		AllTypeInfos   map[string]*TypeInfo
+	}{}
+
+	err := json.Unmarshal(b, &tmp)
+	if err != nil {
+		return err
+	}
+
+	self.TypeBase = tmp.TypeBase
+	self.PackageVersion = tmp.PackageVersion
+	self.AllTypeInfos = tmp.AllTypeInfos
+
+	return nil
 }
 
 func (self *PackageInfo) GetPackage(packageName string) *ImportInfo {
@@ -56,6 +78,7 @@ func (self *PackageInfo) GetPackage(packageName string) *ImportInfo {
 	// packageName 與 path 不同
 	// import 未重新命名
 	importLink := NewImportLink()
+	// importLink.SetGoPath(self.GoPath)
 	importLink.NewName = packageName
 	self.AllImportLink[fmt.Sprintf("%s_%s", "unknow", packageName)] = importLink
 	return importLink
@@ -91,12 +114,15 @@ func (self *PackageInfo) GetType(typeName string) ITypeInfo {
 	if self == nil {
 		panic("type not find")
 	}
-	typeInfo, ok := self.AllTypeInfos[typeName]
+	iTypeInfo, ok := self.AllTypeInfos[typeName]
 	if !ok {
-		typeInfo = NewTypeDef()
-		typeInfo.SetName(typeName)
-		self.AllTypeInfos[typeName] = typeInfo
+		typeinfo := NewTypeDef()
+		typeinfo.SetGoPath(self.GoPath)
+		typeinfo.SetTypeFrom(constant.From_Local)
+		typeinfo.SetName(typeName)
+		self.AllTypeInfos[typeName] = typeinfo
+		iTypeInfo = typeinfo
 	}
 
-	return typeInfo
+	return iTypeInfo
 }

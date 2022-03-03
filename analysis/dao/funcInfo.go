@@ -7,7 +7,11 @@ type FuncInfo struct {
 	Receiver       FuncParams   // 篩選器
 	ParamsInPoint  []FuncParams // 輸入參數
 	ParamsOutPoint []FuncParams // 輸出參數
-	Body           string       // 方法內文 *尚未解析
+	Body           string       `json:"-"` // 方法內文 *尚未解析
+}
+
+func (self *FuncInfo) GetTypeBase() TypeBase {
+	return self.TypeBase
 }
 
 func (self *FuncInfo) Print() string {

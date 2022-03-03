@@ -9,6 +9,10 @@ type VarInfo struct {
 	Common     string
 }
 
+func (self *VarInfo) GetTypeBase() TypeBase {
+	return self.TypeBase
+}
+
 func NewVarInfo(name string) *VarInfo {
 	info := &VarInfo{
 		TypeBase: NewPointBase(),
