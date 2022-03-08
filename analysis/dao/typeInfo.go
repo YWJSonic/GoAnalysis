@@ -287,7 +287,7 @@ var BaseTypeInfo map[string]ITypeInfo = map[string]ITypeInfo{
 	"uint32":     &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "uint32", TypeFrom: constant.From_Golang}},
 	"uint64":     &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "uint64", TypeFrom: constant.From_Golang}},
 	"uintptr":    &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "uintptr", TypeFrom: constant.From_Golang}},
-	// "error":      &TypeInfoStruct{TypeBase: TypeBase{typeName: "error",TypeFrom: constant.From_Golang}},
-	"string": &TypeInfoString{TypeBase: &PointBase{TypeName: "string", TypeFrom: constant.From_Golang}},
-	"rune":   &TypeInfoString{TypeBase: &PointBase{TypeName: "rune", TypeFrom: constant.From_Golang}},
+	"error":      &TypeInfoStruct{TypeBase: &PointBase{TypeName: "error", TypeFrom: constant.From_Golang}},
+	"string":     &TypeInfoString{TypeBase: &PointBase{TypeName: "string", TypeFrom: constant.From_Golang}},
+	"rune":       &TypeInfoString{TypeBase: &PointBase{TypeName: "rune", TypeFrom: constant.From_Golang}},
 }

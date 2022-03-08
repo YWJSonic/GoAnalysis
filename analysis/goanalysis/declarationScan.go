@@ -106,7 +106,7 @@ func (s *source) importSpec() *dao.ImportInfo {
 	// 根據預設名稱取得 package 關聯資料
 	packageInfo, _ = Instants.LoadOrStoryPackage(packageType, path, deferInfo)
 	importInfo := dao.NewImportLink()
-	importInfo.SetGoPath(s.PackageInfo.GoPath)
+	// importInfo.SetGoPath(s.PackageInfo.GoPath)
 	importInfo.NewName = newName
 	importInfo.ImportMod = importMod
 	importInfo.Package = packageInfo
