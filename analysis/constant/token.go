@@ -8,6 +8,10 @@ const (
 	From_Local_Package types.TypeFrom = 2 // 專案其他 package 實做
 	From_Vendor        types.TypeFrom = 3 // 外部引用
 )
+const (
+	DefType_Def  string = "Def"
+	DefType_Decl string = "Decl"
+)
 
 const (
 	_    token = iota

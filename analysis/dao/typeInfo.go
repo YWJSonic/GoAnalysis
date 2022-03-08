@@ -49,7 +49,7 @@ func (self *TypeInfo) GetTypeName() string {
 func NewTypeAliasDecl() *TypeInfo {
 	return &TypeInfo{
 		TypeBase: NewPointBase(),
-		DefType:  "Decl",
+		DefType:  constant.DefType_Decl,
 	}
 }
 
@@ -57,7 +57,7 @@ func NewTypeAliasDecl() *TypeInfo {
 func NewTypeDef() *TypeInfo {
 	return &TypeInfo{
 		TypeBase: NewPointBase(),
-		DefType:  "Def",
+		DefType:  constant.DefType_Def,
 	}
 }
 

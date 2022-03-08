@@ -85,6 +85,8 @@ func (s *source) importSpec() *dao.ImportInfo {
 	// 解析 預設名稱
 	splitStr := strings.Split(path, "/")
 	name = splitStr[len(splitStr)-1]
+	deferInfo := dao.NewPackageInfo()
+	deferInfo.SetName(name)
 
 	// 需要再次定義, 其他模式下的關聯名稱
 	if importMod != "" || newName == "" {
@@ -98,13 +100,11 @@ func (s *source) importSpec() *dao.ImportInfo {
 		} else {
 			newName = name
 		}
+		deferInfo.SetName(newName)
 	}
 
-	if name == "" {
-		panic("import name error")
-	}
 	// 根據預設名稱取得 package 關聯資料
-	packageInfo, _ = Instants.LoadOrStoryPackage(packageType, path, dao.NewPackageInfo())
+	packageInfo, _ = Instants.LoadOrStoryPackage(packageType, path, deferInfo)
 	importInfo := dao.NewImportLink()
 	importInfo.SetGoPath(s.PackageInfo.GoPath)
 	importInfo.NewName = newName
@@ -463,16 +463,8 @@ func (s *source) TypeSpec() *dao.TypeInfo {
 	isExist := s.PackageInfo.ExistType(typeInfo.GetName())
 	if isExist {
 		info := s.PackageInfo.GetType(name).(*dao.TypeInfo)
-		switch typeInfo.DefType {
-		case "Decl":
-			info.DefType = typeInfo.DefType
-			info.ContentTypeInfo = typeInfo.ContentTypeInfo
-
-		case "Def":
-			info.DefType = typeInfo.DefType
-			info.ContentTypeInfo = typeInfo.ContentTypeInfo
-		}
-
+		info.DefType = typeInfo.DefType
+		info.ContentTypeInfo = typeInfo.ContentTypeInfo
 	}
 	typeInfo.SetGoPath(s.PackageInfo.GoPath)
 	return typeInfo
