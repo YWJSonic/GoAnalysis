@@ -5,9 +5,6 @@ import (
 	"codeanalysis/analysis/goanalysis"
 	"codeanalysis/graphics"
 	"codeanalysis/load/project/goloader"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 )
 
 func main() {
@@ -16,7 +13,7 @@ func main() {
 
 func RunAnalysis() {
 	// go http.ListenAndServe("0.0.0.0:6060", nil)
-	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/gamemaster")
+	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/gameservice")
 
 	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
 
@@ -32,10 +29,9 @@ func RunAnalysis() {
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
 	graphics.OutputPlantUmlGraphics(goanalysis.Instants)
 
-	data, err := json.Marshal(goanalysis.Instants)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	ioutil.WriteFile("./log.json", data, 0666)
+	// data, err := json.Marshal(goanalysis.Instants)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// ioutil.WriteFile("./log.json", data, 0666)
 }

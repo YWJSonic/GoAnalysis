@@ -37,7 +37,7 @@ var disableLineKeyword = map[string]struct{}{
 
 type PlaneUml struct {
 	context  []string
-	packages []*dao.PackageSpace
+	packages []*dao.NameSpace
 	line     map[string]struct{}
 	data     *ansdao.ProjectInfo
 }
@@ -61,29 +61,25 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 	}
 
 	// 初始化圖形資料
-	inc := 0xffffff / (len(allPackageMap) * 2)
-	inccolor := 0x000000
+	inc := 0xffffff / (len(allPackageMap) * 3)
+	inccolor := 0xffffff
 
 	// package 資料轉換
 	for packageName, packageInfo := range allPackageMap {
-
-		if packageName == "demeter/match" {
-			fmt.Println("")
-		}
 		// 設定 line 圖形資料
-		inccolor += inc
+		inccolor -= inc
 		color := fmt.Sprintf("#%06x", inccolor)
 
-		inccolor += inc
+		inccolor -= inc
 		lineColor := fmt.Sprintf("#%06x", inccolor)
 		lineCss := fmt.Sprintf("%s;line.%s;", lineColor, constant.LineStyle_Dashed)
 		lineType := constant.Line_Normal + ">"
 
 		// package 格式資料
-		packageSpace := &dao.PackageSpace{
-			Name:  packageName,
+		nameSpace := &dao.NameSpace{
 			Color: color,
 		}
+		nameSpace.SetName(ReplaceName(packageName))
 
 		if OutputLevel > 1 {
 			for typeName, typeInfo := range packageInfo.AllTypeInfos {
@@ -94,31 +90,31 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 				if typeInfo.DefType == anscon.DefType_Def {
 					if typeInfo.ContentTypeInfo == nil {
 						class := dao.NewTypeClass()
-						class.Name = packageInfo.GetName() + "_" + typeName
-						packageSpace.TypeList = append(packageSpace.TypeList, class)
+						class.Name = typeName
+						nameSpace.TypeList = append(nameSpace.TypeList, class)
 
 					} else {
 						switch info := typeInfo.ContentTypeInfo.(type) {
 						case *ansdao.TypeInfoStruct:
 							// struct 內物件圖形
 							class := dao.NewTypeClass()
-							class.Name = packageInfo.GetName() + "_" + typeName
+							class.Name = typeName
 							for varName, varInfo := range info.VarInfos {
 								varStr := fmt.Sprintf("\t%v %v", varInfo.ContentTypeInfo.GetTypeName(), varName)
 								class.Field = append(class.Field, varStr)
 								// struct 內物件關聯 line 圖形
-								for _, lineStr := range self.lineStrs(packageInfo.GetName(), typeName, varInfo.ContentTypeInfo) {
+								for _, lineStr := range lineStrs(nameSpace.GetName(), typeName, varInfo.ContentTypeInfo) {
 									if lineStr != "" {
 										self.line[fmt.Sprintf(lineStr, lineType, lineCss)] = struct{}{}
 									}
 								}
 							}
-							packageSpace.TypeList = append(packageSpace.TypeList, class)
+							nameSpace.TypeList = append(nameSpace.TypeList, class)
 
 						case *ansdao.TypeInfoInterface:
 
 							interfaceInfo := dao.Interface{}
-							interfaceInfo.Name = packageInfo.GetName() + "_" + typeName
+							interfaceInfo.Name = typeName
 							for _, ivarInfo := range info.MatchInfos {
 								// 接口類型
 								varInfo := ivarInfo.(*ansdao.FuncInfo)
@@ -144,9 +140,17 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 								interfaceInfo.Field = append(interfaceInfo.Field, varStr)
 							}
 
-							packageSpace.Interface = append(packageSpace.Interface, interfaceInfo)
+							nameSpace.Interface = append(nameSpace.Interface, interfaceInfo)
 						default:
-							// panic("")
+							class := dao.NewTypeClass()
+							class.Name = typeName
+							for _, lineStr := range lineStrs(nameSpace.GetName(), typeName, typeInfo.ContentTypeInfo) {
+								if lineStr != "" {
+									self.line[fmt.Sprintf(lineStr, lineType, lineCss)] = struct{}{}
+								}
+							}
+							nameSpace.TypeList = append(nameSpace.TypeList, class)
+							// fmt.Println(typeName, GetContentAllTypeName(typeInfo.ContentTypeInfo))
 
 						}
 					}
@@ -154,15 +158,15 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 				} else if typeInfo.DefType == anscon.DefType_Decl {
 					// 替換名稱 or 定義類型
 					class := dao.NewTypeClass()
-					class.Name = packageInfo.GetName() + "_" + typeName
+					class.Name = typeName
 					if typeInfo.ContentTypeInfo != nil {
-						for _, lineStr := range self.lineStrs(packageInfo.GetName(), typeName, typeInfo.ContentTypeInfo) {
+						for _, lineStr := range lineStrs(nameSpace.GetName(), typeName, typeInfo.ContentTypeInfo) {
 							if lineStr != "" {
 								self.line[fmt.Sprintf(lineStr, lineType, lineCss)] = struct{}{}
 							}
 						}
 					}
-					packageSpace.TypeList = append(packageSpace.TypeList, class)
+					nameSpace.TypeList = append(nameSpace.TypeList, class)
 
 				} else {
 					panic("")
@@ -171,10 +175,11 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 
 			for varname, varInfo := range packageInfo.AllVarInfos {
 				class := dao.NewVarClass()
-				class.Name = packageInfo.GetName() + "_" + varname
+				// class.Name = packageInfo.GetName() + "_" + varname
+				class.Name = varname
 
 				if varInfo.ContentTypeInfo != nil {
-					for _, lineStr := range self.lineStrs(packageInfo.GetName(), varname, varInfo.ContentTypeInfo) {
+					for _, lineStr := range lineStrs(nameSpace.GetName(), varname, varInfo.ContentTypeInfo) {
 						if lineStr != "" {
 							self.line[fmt.Sprintf(lineStr, lineType, lineCss)] = struct{}{}
 						}
@@ -183,7 +188,7 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 					fmt.Println("var ContentTypeInfo empty ")
 				}
 
-				packageSpace.VarList = append(packageSpace.VarList, class)
+				nameSpace.VarList = append(nameSpace.VarList, class)
 
 			}
 
@@ -195,13 +200,18 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 			}
 		}
 
-		self.packages = append(self.packages, packageSpace)
+		self.packages = append(self.packages, nameSpace)
 	}
+	self.goModCheck()
 }
 
 func (self *PlaneUml) ToString() string {
 
 	self.context = append(self.context, "@startuml")
+
+	sort.Slice(self.packages, func(i, j int) bool {
+		return self.packages[i].GetName() < self.packages[j].GetName()
+	})
 
 	for _, packageSpace := range self.packages {
 		self.context = append(self.context, packageSpace.ToString())
@@ -226,77 +236,23 @@ func (self *PlaneUml) ToString() string {
 	return contextStr
 }
 
-func (self *PlaneUml) lineStrs(packageName, startTypeName string, target ansdao.ITypeInfo) []string {
-	lineStrList := []string{}
-	if _, ok := disableLineKeyword[target.GetTypeName()]; ok {
-		return lineStrList
+func (self *PlaneUml) goModCheck() {
+	var isExist bool
+	for name := range self.data.ModuleInfo.VendorMap {
+		spacename := ReplaceName(name)
+
+		isExist = false
+		for _, spaceInfo := range self.packages {
+			if spaceInfo.GetName() == spacename {
+				isExist = true
+				break
+			}
+		}
+
+		if !isExist {
+			nameSpaceInfo := &dao.NameSpace{}
+			nameSpaceInfo.SetName(spacename)
+			self.packages = append(self.packages, nameSpaceInfo)
+		}
 	}
-
-	switch info := target.(type) {
-	case *ansdao.TypeInfoQualifiedIdent:
-		targetPackageName := info.ImportLink.Package.GetName()
-		if targetPackageName == "" {
-			targetPackageName = info.ImportLink.Package.GoPath
-		}
-
-		targetStr := fmt.Sprintf("%s_%s", targetPackageName, info.ContentTypeInfo.GetTypeName())
-		lineStr := packageName + "_" + startTypeName + " %s " + targetStr + " %s"
-		lineStrList = append(lineStrList, lineStr)
-
-	case *ansdao.TypeInfoArray:
-		lineStrList = self.lineStrs(packageName, startTypeName, info.ContentTypeInfo)
-
-	case *ansdao.TypeInfoChannel:
-		lineStrList = self.lineStrs(packageName, startTypeName, info.ContentTypeInfo)
-
-	case *ansdao.TypeInfoSlice:
-		lineStrList = self.lineStrs(packageName, startTypeName, info.ContentTypeInfo)
-
-	case *ansdao.TypeInfoPointer:
-		lineStrList = self.lineStrs(packageName, startTypeName, info.ContentTypeInfo)
-
-	case *ansdao.TypeInfoStruct:
-		if len(info.VarInfos) == 0 && len(info.ImplicitlyVarInfos) == 0 {
-			lineStr := packageName + "_" + startTypeName + " %s struct %s"
-			lineStrList = append(lineStrList, lineStr)
-		} else {
-			lineStr := packageName + "_" + startTypeName + " %s " + info.GetName() + " %s"
-			lineStrList = append(lineStrList, lineStr)
-		}
-
-	case *ansdao.TypeInfo:
-		lineStr := packageName + "_" + startTypeName + " %s " + packageName + "_" + info.GetName() + " %s"
-		lineStrList = append(lineStrList, lineStr)
-
-	case *ansdao.TypeInfoMap:
-		lineStrList = append(lineStrList, self.lineStrs(packageName, startTypeName, info.KeyType)...)
-		lineStrList = append(lineStrList, self.lineStrs(packageName, startTypeName, info.ValueType)...)
-
-	case *ansdao.TypeInfoFunction:
-
-		for _, paramsInfo := range info.ParamsInPoint {
-			lineStrList = append(lineStrList, self.lineStrs(packageName, startTypeName, paramsInfo.ContentTypeInfo)...)
-		}
-
-		for _, paramsInfo := range info.ParamsOutPoint {
-			lineStrList = append(lineStrList, self.lineStrs(packageName, startTypeName, paramsInfo.ContentTypeInfo)...)
-		}
-
-	case *ansdao.TypeInfoInterface:
-		if len(info.MatchInfos) == 0 {
-			lineStr := fmt.Sprintf("%s_%s %s interface %s", packageName, startTypeName, "%s", "%s")
-			lineStrList = append(lineStrList, lineStr)
-
-		} else {
-			lineStr := packageName + "_" + startTypeName + " %s " + packageName + "_" + info.GetName() + " %s"
-			lineStrList = append(lineStrList, lineStr)
-
-		}
-
-	case *ansdao.TypeInfoNumeric, *ansdao.TypeInfoString, *ansdao.TypeInfoBool:
-		lineStr := packageName + "_" + startTypeName + " %s " + info.GetTypeName() + " %s"
-		lineStrList = append(lineStrList, lineStr)
-	}
-
-	return lineStrList
 }

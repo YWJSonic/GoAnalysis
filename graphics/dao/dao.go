@@ -3,6 +3,7 @@ package dao
 import (
 	"codeanalysis/graphics/constant"
 	"fmt"
+	"sort"
 )
 
 // 抽象物件
@@ -11,12 +12,55 @@ type Abstract struct{}
 // 註解物件
 type Annotaion struct{}
 
-type PackageSpace struct {
-	Name      string
+type NameSpace struct {
+	name      string
 	VarList   []*UserClass
 	TypeList  []*UserClass
 	Interface []Interface
 	Color     string
+}
+
+func (self *NameSpace) GetName() string {
+	return self.name
+}
+func (self *NameSpace) SetName(name string) {
+	self.name = name
+}
+
+func (self *NameSpace) ToString() string {
+	classStr := ""
+
+	sort.Slice(self.TypeList, func(i, j int) bool {
+		return self.TypeList[i].Name < self.TypeList[j].Name
+	})
+
+	for _, v := range self.TypeList {
+		classStr += v.ToString()
+	}
+
+	interfaceStr := ""
+	for _, v := range self.Interface {
+		interfaceStr += v.ToString()
+	}
+
+	varListStr := ""
+	for _, v := range self.VarList {
+		varListStr += v.ToString()
+	}
+
+	return fmt.Sprintf("namespace %s %s{\n%s\n%s\n%s}\n", self.name, self.Color, interfaceStr, classStr, varListStr)
+}
+
+type PackageSpace struct {
+	name      string
+	VarList   []*UserClass
+	TypeList  []*UserClass
+	Interface []Interface
+	Color     string
+}
+
+func (self *PackageSpace) SetName(name string) {
+	self.name = name
 }
 
 func (self *PackageSpace) ToString() string {
@@ -36,7 +80,7 @@ func (self *PackageSpace) ToString() string {
 		varListStr += v.ToString()
 	}
 
-	return fmt.Sprintf("package %s %s{\n%s\n%s\n%s}\n", self.Name, self.Color, interfaceStr, classStr, varListStr)
+	return fmt.Sprintf("package %s %s{\n%s\n%s\n%s}\n", self.name, self.Color, interfaceStr, classStr, varListStr)
 }
 
 // 類型物件 # golang as struct
@@ -82,11 +126,15 @@ type UserClass struct {
 func (self *UserClass) ToString() string {
 
 	fieldStr := ""
-	for _, field := range self.Field {
-		fieldStr += fmt.Sprintf("\t%v\n", field)
+	if len(self.Field) > 0 {
+		fieldStr = "\n"
+		for _, field := range self.Field {
+			fieldStr += fmt.Sprintf("\t%v\n", field)
+		}
+		fieldStr += "\t"
 	}
 
-	return fmt.Sprintf("\tclass %s <<(%s,%s)>> {\n%s\t}\n", self.Name, string(self.SpotWord), self.SpotColor, fieldStr)
+	return fmt.Sprintf("\tclass %s <<(%s,%s)>> {%s}\n", self.Name, string(self.SpotWord), self.SpotColor, fieldStr)
 }
 
 func NewTypeClass() *UserClass {
