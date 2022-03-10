@@ -15,6 +15,7 @@ type Annotaion struct{}
 type NameSpace struct {
 	name      string
 	VarList   []*UserClass
+	ConstList []*UserClass
 	TypeList  []*UserClass
 	Interface []Interface
 	Color     string
@@ -48,7 +49,12 @@ func (self *NameSpace) ToString() string {
 		varListStr += v.ToString()
 	}
 
-	return fmt.Sprintf("namespace %s %s{\n%s\n%s\n%s}\n", self.name, self.Color, interfaceStr, classStr, varListStr)
+	constListStr := ""
+	for _, v := range self.ConstList {
+		constListStr += v.ToString()
+	}
+
+	return fmt.Sprintf("namespace %s %s{\n%s\n%s\n%s\n%s}\n", self.name, self.Color, interfaceStr, classStr, varListStr, constListStr)
 }
 
 type PackageSpace struct {

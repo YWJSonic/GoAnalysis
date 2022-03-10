@@ -1,9 +1,5 @@
 package goanalysis
 
-import (
-	"codeanalysis/analysis/dao"
-)
-
 // func (s *source) scanExpressionList() []string {
 // 	var expressions []string
 // 	s.nextCh()
@@ -29,6 +25,25 @@ func (s *source) scanExpressionList() []string {
 		}
 		s.nextCh()
 		s.nextCh()
+	}
+
+	return expressions
+}
+func (s *source) scanVarExpressionList() []string {
+	var expressions []string
+	s.nextCh()
+
+	if s.ch == '`' || s.ch == '"' {
+		expressions = append(expressions, s.scanStringLit(s.ch))
+	} else {
+		for {
+			expressions = append(expressions, s.onFakeExpression('\n'))
+			if s.ch != ',' {
+				break
+			}
+			s.nextCh()
+			s.nextCh()
+		}
 	}
 
 	return expressions
@@ -72,26 +87,6 @@ func (s *source) onFakeExpression(endTag rune) string {
 		}
 	}
 	return string(s.buf[offset:s.r])
-}
-
-func (s *source) onScanArrayLengthExpression(endTag rune) *dao.Expression {
-	var expInfo = &dao.Expression{}
-	if isInt, _ := s.isInt_lit(); isInt {
-		s.scanIdentifier()
-		expInfo.ConstantType = dao.BaseTypeInfo["int"]
-
-	} else {
-		identifierOrType := s.scanIdentifier()
-		if s.ch == endTag {
-			expInfo.ConstantType = s.PackageInfo.GetType(identifierOrType)
-
-		} else if s.ch == '.' {
-			qualifiedInfo := dao.NewTypeInfoQualifiedIdent()
-			s.onQualifiedIdentifier(identifierOrType, qualifiedInfo)
-			expInfo.ConstantType = qualifiedInfo
-		}
-	}
-	return expInfo
 }
 
 func (s *source) onScanConstExpression() string {

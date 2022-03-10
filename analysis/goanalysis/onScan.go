@@ -13,7 +13,7 @@ func (s *source) scanStringLit(strToken rune) string {
 	for {
 
 		ch = s.ch
-		if ch == '\n' || ch < 0 { // 字串格式錯誤
+		if (ch == '\n' && strToken == '"') || ch < 0 { // 字串格式錯誤
 			panic("")
 		}
 

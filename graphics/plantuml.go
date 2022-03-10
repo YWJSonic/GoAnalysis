@@ -34,6 +34,10 @@ var disableLineKeyword = map[string]struct{}{
 	"iota":       {},
 	"interface":  {},
 }
+var disableNamsSpace = map[string]struct{}{
+	"GameService.games": {},
+	"gitlab.geax.io":    {},
+}
 
 type PlaneUml struct {
 	context  []string
@@ -127,14 +131,19 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 									varStr += varInfo.ParamsInPoint[idx].ContentTypeInfo.GetTypeName()
 								}
 								varStr += ") "
-								for idx, count := 0, len(varInfo.ParamsOutPoint); idx < count; idx++ {
+								count := len(varInfo.ParamsOutPoint)
+								if count > 1 {
+									varStr += "("
+								}
+								for idx := 0; idx < count; idx++ {
 									if idx != 0 {
 										varStr += ","
-									} else if count > 1 {
-										varStr += "("
 									}
 
 									varStr += varInfo.ParamsOutPoint[idx].ContentTypeInfo.GetTypeName()
+								}
+								if count > 1 {
+									varStr += ")"
 								}
 
 								interfaceInfo.Field = append(interfaceInfo.Field, varStr)
@@ -192,6 +201,25 @@ func (self *PlaneUml) Start(OutputLevel uint) {
 
 			}
 
+			for constname, constInfo := range packageInfo.AllConstInfos {
+				class := dao.NewConstClass()
+				// class.Name = packageInfo.GetName() + "_" + varname
+				class.Name = constname
+
+				if constInfo.ContentTypeInfo != nil {
+					for _, lineStr := range lineStrs(nameSpace.GetName(), constname, constInfo.ContentTypeInfo) {
+						if lineStr != "" {
+							self.line[fmt.Sprintf(lineStr, lineType, lineCss)] = struct{}{}
+						}
+					}
+				} else {
+					fmt.Println("const ContentTypeInfo empty ")
+				}
+
+				nameSpace.ConstList = append(nameSpace.ConstList, class)
+
+			}
+
 		} else {
 
 			for _, ImportLink := range packageInfo.AllImportLink {
@@ -214,12 +242,16 @@ func (self *PlaneUml) ToString() string {
 	})
 
 	for _, packageSpace := range self.packages {
-		self.context = append(self.context, packageSpace.ToString())
+		if !IsDisableStr(packageSpace.GetName(), disableNamsSpace) {
+			self.context = append(self.context, packageSpace.ToString())
+		}
 	}
 
 	lineStrs := []string{}
 	for line := range self.line {
-		lineStrs = append(lineStrs, line)
+		if !IsDisableStr(line, disableNamsSpace) {
+			lineStrs = append(lineStrs, line)
+		}
 	}
 	sort.Strings(lineStrs)
 

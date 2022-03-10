@@ -150,3 +150,13 @@ func GetContentAllTypeName(target ansdao.ITypeInfo) []string {
 	}
 	return lineStrList
 }
+
+func IsDisableStr(target string, strs map[string]struct{}) bool {
+	for str := range strs {
+		if strings.Index(target, str) > -1 {
+			return true
+		}
+	}
+
+	return false
+}

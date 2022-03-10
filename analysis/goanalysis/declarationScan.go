@@ -317,7 +317,7 @@ func (s *source) VarSpec() []*dao.VarInfo {
 
 	if s.buf[s.r+1] == '=' {
 		s.next()
-		exps := s.scanExpressionList()
+		exps := s.scanVarExpressionList()
 		for idx, info := range infos {
 			info.Expression = exps[idx]
 		}
@@ -325,12 +325,12 @@ func (s *source) VarSpec() []*dao.VarInfo {
 	} else {
 		typeInfo := s.OnDeclarationsType()
 		var exps []string
-		if s.checkEnd() {
+		if !s.checkEnd() {
 			// 指定初始化
 			if s.buf[s.r+1] == '=' {
 				s.next()
 				// 解析表達式
-				exps = s.scanExpressionList()
+				exps = s.scanVarExpressionList()
 
 			}
 		}

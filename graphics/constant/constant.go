@@ -3,7 +3,7 @@ package constant
 var SportCss = map[rune]string{
 	'T': "#00FF00", // Type
 	'V': "#FF0000", // Var
-	'C': "#550000", // Const
+	'C': "#FF00FF", // Const
 }
 
 const (
