@@ -12,7 +12,7 @@ import (
 
 var Instants *dao.ProjectInfo
 
-//專案節點樹分析 廣度優先
+//專案節點樹分析 深度優先
 func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 	var childs []*wwe.GoFileNode
 
