@@ -106,7 +106,6 @@ func (s *source) importSpec() *dao.ImportInfo {
 	// 根據預設名稱取得 package 關聯資料
 	packageInfo, _ = Instants.LoadOrStoryPackage(packageType, path, deferInfo)
 	importInfo := dao.NewImportLink()
-	// importInfo.SetGoPath(s.PackageInfo.GoPath)
 	importInfo.NewName = newName
 	importInfo.ImportMod = importMod
 	importInfo.Package = packageInfo
@@ -317,33 +316,32 @@ func (s *source) VarSpec() []*dao.VarInfo {
 
 	if s.buf[s.r+1] == '=' {
 		s.next()
-		exps := s.scanVarExpressionList()
-		for idx, info := range infos {
-			info.Expression = exps[idx]
-		}
-
+		s.onVarExpressionList(infos)
 	} else {
 		typeInfo := s.OnDeclarationsType()
-		var exps []string
+		// var exps []string
+
+		// 默認初始化
+
+		// 建立關聯
+		for _, info := range infos {
+			// 指定型別
+			info.ContentTypeInfo = typeInfo
+		}
+
 		if !s.checkEnd() {
 			// 指定初始化
 			if s.buf[s.r+1] == '=' {
 				s.next()
 				// 解析表達式
-				exps = s.scanVarExpressionList()
+				// exps = s.onVarExpressionList(infos)
 
-			}
-		}
-		// 默認初始化
-
-		// 建立關聯
-		for idx, info := range infos {
-			// 指定型別
-			info.ContentTypeInfo = typeInfo
-
-			// 關聯 表達式內容
-			if len(exps) > idx {
-				info.Expression = exps[idx]
+				// for idx, info := range infos {
+				// 	// 關聯 表達式內容
+				// 	if len(exps) > idx {
+				// 		info.Expression = exps[idx]
+				// 	}
+				// }
 			}
 		}
 	}
@@ -416,15 +414,24 @@ func (s *source) TypeDeclarations() []*dao.TypeInfo {
 			}
 
 			info := s.TypeSpec()
-			s.PackageInfo.AllTypeInfos[info.GetName()] = info
 			infos = append(infos, info)
 			s.toNextCh()
 		}
 	} else {
 		s.toNextCh()
 		info := s.TypeSpec()
-		s.PackageInfo.AllTypeInfos[info.GetName()] = info
 		infos = append(infos, info)
+	}
+	for _, typeInfo := range infos {
+		if _, ok := s.PackageInfo.AllTypeInfos[typeInfo.GetName()]; ok {
+			info := s.PackageInfo.GetType(typeInfo.GetName()).(*dao.TypeInfo)
+			info.DefType = typeInfo.DefType
+			info.ContentTypeInfo = typeInfo.ContentTypeInfo
+			info.SetIsAnalysis()
+		} else {
+			typeInfo.SetIsAnalysis()
+			s.PackageInfo.AllTypeInfos[typeInfo.GetName()] = typeInfo
+		}
 	}
 	return infos
 }
@@ -438,10 +445,6 @@ func (s *source) TypeSpec() *dao.TypeInfo {
 	var typeInfo *dao.TypeInfo
 	s.next()
 	name := strings.TrimSpace(s.rangeStr())
-
-	if name == "ImportInfo" {
-		fmt.Println("")
-	}
 
 	s.toNextCh()
 	if s.buf[s.r+1] == '=' {
@@ -460,12 +463,6 @@ func (s *source) TypeSpec() *dao.TypeInfo {
 		typeInfo = info
 	}
 
-	isExist := s.PackageInfo.ExistType(typeInfo.GetName())
-	if isExist {
-		info := s.PackageInfo.GetType(name).(*dao.TypeInfo)
-		info.DefType = typeInfo.DefType
-		info.ContentTypeInfo = typeInfo.ContentTypeInfo
-	}
 	typeInfo.SetGoPath(s.PackageInfo.GoPath)
 	return typeInfo
 }
@@ -479,7 +476,8 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 	// s.nextCh()
 	switch s.buf[s.r+1] {
 	case '*': // PointerType
-		info = s.onPointType()
+		s.nextCh()
+		info = s.OnTypeSwitch(string(s.ch))
 	case '[': // ArrayType, SliceType
 		if s.buf[s.r+2] == ']' { // slice type
 			info = s.OnSliceType()
@@ -498,20 +496,19 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 		if nextEndIdx < nextTokenIdx {
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextEndIdx]))
 
+			if tmpStr == "iota" {
+				fmt.Println("")
+			}
 			baseInfo, ok := dao.BaseTypeInfo[tmpStr]
 			if ok {
 				s.next()
 				info = baseInfo
 			} else {
-				if tmpStr == "struct" {
-					info = s.OnStructType()
-				} else if tmpStr == "chan" {
-					info = s.OnChannelType()
-				} else if tmpStr == "interface" {
-					info = s.OnInterfaceType()
+				s.next()
+				if _, ok := constant.KeyWordType[tmpStr]; ok {
+					info = s.OnTypeSwitch(tmpStr)
 				} else {
 					info = s.PackageInfo.GetType(tmpStr)
-					s.next()
 				}
 			}
 
@@ -521,32 +518,24 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
 
+			if tmpStr == "iota" {
+				fmt.Println("")
+			}
 			baseInfo, ok := dao.BaseTypeInfo[tmpStr]
 			if ok {
 				s.nextToken()
 				info = baseInfo
 			} else {
-
-				switch tmpStr {
-				case "func":
-					info = s.OnFuncType()
-				case "map":
-					info = s.OnMapType()
-				case "interface":
-					info = s.OnInterfaceType()
-				case "struct":
-					info = s.OnStructType()
-				case "chan":
-					info = s.OnChannelType()
-				default:
+				s.nextToken()
+				if _, ok := constant.KeyWordType[tmpStr]; ok {
+					info = s.OnTypeSwitch(tmpStr)
+				} else {
 					if s.buf[nextTokenIdx] == '.' {
 						info = s.OnQualifiedIdentType()
 
 					} else {
 						info = s.PackageInfo.GetType(tmpStr)
-						s.nextToken()
 					}
-
 				}
 			}
 		}
@@ -571,7 +560,17 @@ func (s *source) FunctionDeclarations() {
 
 	// FunctionBody
 	info.Body = s.funcBodyBlock()
-	s.PackageInfo.AllFuncInfo[info.GetName()] = info
+
+	if funcInfo, ok := s.PackageInfo.AllFuncInfo[info.GetNameKey()]; ok {
+		funcInfo.Receiver = info.Receiver
+		funcInfo.ParamsInPoint = info.ParamsInPoint
+		funcInfo.ParamsOutPoint = info.ParamsOutPoint
+		funcInfo.Body = info.Body
+		funcInfo.SetIsAnalysis()
+	} else {
+		info.SetIsAnalysis()
+		s.PackageInfo.AllFuncInfo[info.GetNameKey()] = info
+	}
 }
 
 // MethodDecl = "func" Receiver MethodName Signature [ FunctionBody ] .
@@ -597,7 +596,17 @@ func (s *source) MethodDeclarations() {
 
 	// FunctionBody
 	info.Body = s.funcBodyBlock()
-	s.PackageInfo.AllFuncInfo[info.GetName()] = info
+
+	if funcInfo, ok := s.PackageInfo.AllFuncInfo[info.GetNameKey()]; ok {
+		funcInfo.Receiver = info.Receiver
+		funcInfo.ParamsInPoint = info.ParamsInPoint
+		funcInfo.ParamsOutPoint = info.ParamsOutPoint
+		funcInfo.Body = info.Body
+		funcInfo.SetIsAnalysis()
+	} else {
+		info.SetIsAnalysis()
+		s.PackageInfo.AllFuncInfo[info.GetNameKey()] = info
+	}
 }
 
 // func 名稱

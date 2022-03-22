@@ -9,12 +9,13 @@ import (
 
 func NewPackageInfo() *PackageInfo {
 	info := &PackageInfo{
-		TypeBase:      NewPointBase(),
-		AllTypeInfos:  make(map[string]*TypeInfo),
-		AllVarInfos:   make(map[string]*VarInfo),
-		AllConstInfos: make(map[string]*ConstInfo),
-		AllFuncInfo:   make(map[string]*FuncInfo),
-		AllImportLink: make(map[string]*ImportInfo),
+		TypeBase:        NewPointBase(),
+		UndefVarOrConst: make(map[string]ITypeInfo),
+		AllTypeInfos:    make(map[string]*TypeInfo),
+		AllVarInfos:     make(map[string]*VarInfo),
+		AllConstInfos:   make(map[string]*ConstInfo),
+		AllFuncInfo:     make(map[string]*FuncInfo),
+		AllImportLink:   make(map[string]*ImportInfo),
 	}
 	return info
 }
@@ -23,6 +24,7 @@ func NewPackageInfoByNode(node *goloader.GoFileNode) *PackageInfo {
 	info := &PackageInfo{
 		TypeBase:                  NewPointBase(),
 		ImplicitlyVarOrConstInfos: make([]ITypeInfo, 0),
+		UndefVarOrConst:           make(map[string]ITypeInfo),
 		AllTypeInfos:              make(map[string]*TypeInfo),
 		AllVarInfos:               make(map[string]*VarInfo),
 		AllConstInfos:             make(map[string]*ConstInfo),
@@ -40,6 +42,12 @@ type PackageInfo struct {
 	GoPath           string
 	CurrentFileNodes FileDataNode `json:"-"`
 
+	// var, const 解析完成前儲存於此
+	// 當該 package 解析完成最後在分類
+	// 或是就不分了
+	AllVarAndConst []ITypeInfo
+
+	UndefVarOrConst           map[string]ITypeInfo
 	ImplicitlyVarOrConstInfos []ITypeInfo // 隱藏式宣告參數 var or const
 	AllTypeInfos              map[string]*TypeInfo
 	AllVarInfos               map[string]*VarInfo
@@ -74,22 +82,11 @@ func (self *PackageInfo) GetPackage(packageName string) *ImportInfo {
 		}
 	}
 
-	// package 不存在
-	// packageName 與 path 不同
-	// import 未重新命名
-	importLink := NewImportLink()
-	// importLink.SetGoPath(self.GoPath)
-	importLink.NewName = packageName
-	self.AllImportLink[fmt.Sprintf("%s_%s", "unknow", packageName)] = importLink
-	return importLink
+	fmt.Printf("GetPackage Error packageNAme: %s, GoPath: %s", packageName, self.GoPath)
+	panic("")
 }
 
 func (self *PackageInfo) GetPackageType(packageName, typeName string) (*ImportInfo, ITypeInfo) {
-	// link, ok := self.AllImportLink[packageName]
-	// if !ok {
-	// 	panic("")
-	// }
-
 	link := self.GetPackage(packageName)
 
 	// golang 內建 package 處理
@@ -101,10 +98,17 @@ func (self *PackageInfo) GetPackageType(packageName, typeName string) (*ImportIn
 	typeInfo := link.Package.GetType(typeName)
 	return link, typeInfo
 }
+func (self *PackageInfo) GetPackageFunc(packageName, funcName string) (*ImportInfo, ITypeInfo) {
+	link := self.GetPackage(packageName)
 
-func (self *PackageInfo) ExistType(typeName string) bool {
-	_, ok := self.AllTypeInfos[typeName]
-	return ok
+	// golang 內建 package 處理
+	if link.Package == nil {
+		return link, nil
+	}
+
+	// 一般 package
+	typeInfo := link.Package.GetFunc(funcName)
+	return link, typeInfo
 }
 
 func (self *PackageInfo) GetType(typeName string) ITypeInfo {
@@ -116,12 +120,31 @@ func (self *PackageInfo) GetType(typeName string) ITypeInfo {
 	}
 	iTypeInfo, ok := self.AllTypeInfos[typeName]
 	if !ok {
-		typeinfo := NewTypeDef()
-		typeinfo.SetGoPath(self.GoPath)
-		typeinfo.SetTypeFrom(constant.From_Local)
-		typeinfo.SetName(typeName)
-		self.AllTypeInfos[typeName] = typeinfo
-		iTypeInfo = typeinfo
+		typeInfo := NewTypeDef()
+		typeInfo.SetGoPath(self.GoPath)
+		typeInfo.SetTypeFrom(constant.From_Local)
+		typeInfo.SetName(typeName)
+		self.AllTypeInfos[typeName] = typeInfo
+		iTypeInfo = typeInfo
+	}
+
+	return iTypeInfo
+}
+func (self *PackageInfo) GetFunc(funcName string) ITypeInfo {
+	if funcName == "" {
+		panic("typeName empty")
+	}
+	if self == nil {
+		panic("type not find")
+	}
+	iTypeInfo, ok := self.AllFuncInfo[funcName]
+	if !ok {
+		funcInfo := NewFuncInfo()
+		funcInfo.SetGoPath(self.GoPath)
+		funcInfo.SetTypeFrom(constant.From_Local)
+		funcInfo.SetName(funcName)
+		self.AllFuncInfo[funcName] = funcInfo
+		iTypeInfo = funcInfo
 	}
 
 	return iTypeInfo

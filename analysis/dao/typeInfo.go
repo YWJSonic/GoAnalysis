@@ -250,7 +250,7 @@ func (self *TypeInfoBool) GetTypeBase() TypeBase {
 type TypeInfoQualifiedIdent struct {
 	TypeBase
 	ImportLink      *ImportInfo // 指定的 import package
-	ContentTypeInfo ITypeInfo   // 指定該包的 type
+	ContentTypeInfo ITypeInfo   // 指定該包的 itype
 }
 
 func (self *TypeInfoQualifiedIdent) GetTypeBase() TypeBase {
@@ -277,7 +277,6 @@ var BaseTypeInfo map[string]ITypeInfo = map[string]ITypeInfo{
 	"float64":    &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "float64", TypeFrom: constant.From_Golang}},
 	"int":        &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int", TypeFrom: constant.From_Golang}},
 	"int8":       &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int8", TypeFrom: constant.From_Golang}},
-	"iota":       &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int", TypeFrom: constant.From_Golang}},
 	"int16":      &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int16", TypeFrom: constant.From_Golang}},
 	"int32":      &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int32", TypeFrom: constant.From_Golang}},
 	"int64":      &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int64", TypeFrom: constant.From_Golang}},
@@ -290,4 +289,28 @@ var BaseTypeInfo map[string]ITypeInfo = map[string]ITypeInfo{
 	"error":      &TypeInfoStruct{TypeBase: &PointBase{TypeName: "error", TypeFrom: constant.From_Golang}},
 	"string":     &TypeInfoString{TypeBase: &PointBase{TypeName: "string", TypeFrom: constant.From_Golang}},
 	"rune":       &TypeInfoString{TypeBase: &PointBase{TypeName: "rune", TypeFrom: constant.From_Golang}},
+}
+
+var BaseConstInfo map[string]ITypeInfo = map[string]ITypeInfo{
+	"iota":  &TypeInfoNumeric{TypeBase: &PointBase{TypeName: "int", TypeFrom: constant.From_Golang}},
+	"true":  &TypeInfoBool{TypeBase: &PointBase{TypeName: "true", TypeFrom: constant.From_Golang, GoPath: ""}},
+	"false": &TypeInfoBool{TypeBase: &PointBase{TypeName: "false", TypeFrom: constant.From_Golang, GoPath: ""}},
+}
+
+var BaseFuncInfo map[string]ITypeInfo = map[string]ITypeInfo{
+	"append":     &TypeInfoFunction{TypeBase: &PointBase{TypeName: "append", TypeFrom: constant.From_Golang}},
+	"cap":        &TypeInfoFunction{TypeBase: &PointBase{TypeName: "cap", TypeFrom: constant.From_Golang}},
+	"close":      &TypeInfoFunction{TypeBase: &PointBase{TypeName: "close", TypeFrom: constant.From_Golang}},
+	"comparable": &TypeInfoFunction{TypeBase: &PointBase{TypeName: "comparable", TypeFrom: constant.From_Golang}},
+	"copy":       &TypeInfoFunction{TypeBase: &PointBase{TypeName: "copy", TypeFrom: constant.From_Golang}},
+	"delete":     &TypeInfoFunction{TypeBase: &PointBase{TypeName: "delete", TypeFrom: constant.From_Golang}},
+	"imag":       &TypeInfoFunction{TypeBase: &PointBase{TypeName: "imag", TypeFrom: constant.From_Golang}},
+	"len":        &TypeInfoFunction{TypeBase: &PointBase{TypeName: "len", TypeFrom: constant.From_Golang}},
+	"make":       &TypeInfoFunction{TypeBase: &PointBase{TypeName: "make", TypeFrom: constant.From_Golang}},
+	"new":        &TypeInfoFunction{TypeBase: &PointBase{TypeName: "new", TypeFrom: constant.From_Golang}},
+	"panic":      &TypeInfoFunction{TypeBase: &PointBase{TypeName: "panic", TypeFrom: constant.From_Golang}},
+	"print":      &TypeInfoFunction{TypeBase: &PointBase{TypeName: "print", TypeFrom: constant.From_Golang}},
+	"println":    &TypeInfoFunction{TypeBase: &PointBase{TypeName: "println", TypeFrom: constant.From_Golang}},
+	"real":       &TypeInfoFunction{TypeBase: &PointBase{TypeName: "real", TypeFrom: constant.From_Golang}},
+	"recover":    &TypeInfoFunction{TypeBase: &PointBase{TypeName: "recover", TypeFrom: constant.From_Golang}},
 }

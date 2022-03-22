@@ -5,33 +5,32 @@ import (
 	"fmt"
 )
 
-// StructType    = "struct" "{" { FieldDecl ";" } "}" .
-// FieldDecl     = (IdentifierList Type | EmbeddedField) [ Tag ] .
-// EmbeddedField = [ "*" ] TypeName .
-// Tag           = string_lit .
-/* 進入指標應當只在
- * r="_" range="struct" // 應該調整為統一在
- */
-func (s *source) OnStructType() *dao.TypeInfoStruct {
-	info := dao.NewTypeInfoStruct()
-	info.SetTypeName("struct")
-	s.nextToken()
-	if s.buf[s.r+1] == '}' {
-		s.nextCh()
-		s.nextCh()
-		return info
-	}
-	s.nextCh()
-
-	// TODO
-	// 會出現兩個不同結尾 須調整
-	// FieldDecl
-	s.OnFieldDecl(info)
-	if s.ch == '}' {
-		panic("struct error")
-	}
-	return info
-}
+// // StructType    = "struct" "{" { FieldDecl ";" } "}" .
+// // FieldDecl     = (IdentifierList Type | EmbeddedField) [ Tag ] .
+// // EmbeddedField = [ "*" ] TypeName .
+// // Tag           = string_lit .
+// /* 進入指標應當只在
+//  * r="_" range="struct" // 應該調整為統一在
+//  */
+// func (s *source) OnStructType() *dao.TypeInfoStruct {
+// 	info := dao.NewTypeInfoStruct()
+// 	info.SetTypeName("struct")
+// 	s.nextToken()
+// 	if s.buf[s.r+1] == '}' {
+// 		s.nextCh()
+// 		s.nextCh()
+// 		return info
+// 	}
+// 	s.nextCh()
+// 	// TODO
+// 	// 會出現兩個不同結尾 須調整
+// 	// FieldDecl
+// 	s.OnFieldDecl(info)
+// 	if s.ch == '}' {
+// 		panic("struct error")
+// 	}
+// 	return info
+// }
 
 func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 
@@ -84,7 +83,6 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 			s.nextCh()
 
 			names := s.scanIdentifiers()
-
 			// 調整 (struct{ xxx\n}), (struct{ xxx\t\tType}) 格式
 			if !s.isOnNewlineSymbol() {
 				s.toNextCh()
@@ -201,14 +199,14 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 	}
 }
 
-func (s *source) onPointType() *dao.TypeInfoPointer {
-	s.nextCh()
+// func (s *source) onPointType() *dao.TypeInfoPointer {
+// 	s.nextCh()
 
-	info := dao.NewTypeInfoPointer()
-	info.SetTypeName("point")
-	info.ContentTypeInfo = s.OnDeclarationsType()
-	return info
-}
+// 	info := dao.NewTypeInfoPointer()
+// 	info.SetTypeName("point")
+// 	info.ContentTypeInfo = s.OnDeclarationsType()
+// 	return info
+// }
 
 // 處理 package type 類型
 // QualifiedIdent = PackageName "." identifier .
@@ -219,7 +217,6 @@ func (s *source) onPointType() *dao.TypeInfoPointer {
 func (s *source) OnQualifiedIdentType() *dao.TypeInfoQualifiedIdent {
 	var info = dao.NewTypeInfoQualifiedIdent()
 
-	s.nextToken()
 	packageName := s.rangeStr()
 	s.onQualifiedIdentifier(packageName, info)
 	return info
@@ -448,7 +445,7 @@ func (s *source) OnComments(commentType string) (str string) {
 
 func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 	switch key {
-	case "*":
+	case "*", "&":
 		pointInfo := dao.NewTypeInfoPointer()
 		pointInfo.SetTypeName("point")
 		pointInfo.ContentTypeInfo = s.OnDeclarationsType()
@@ -461,7 +458,6 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 			s.nextCh()
 		} else {
 			s.nextCh()
-			// FieldDecl
 			s.OnFieldDecl(structInfo)
 		}
 		info = structInfo
@@ -498,8 +494,6 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 		funcInfo := dao.NewTypeInfoFunction()
 		funcInfo.SetTypeName("func")
 		funcInfo.ParamsInPoint, funcInfo.ParamsOutPoint = s.onSignature()
-		// funcInfo.ParamsInPoint = s.OnParameters()
-		// funcInfo.ParamsOutPoint = s.OnDeclarationsResult()
 		info = funcInfo
 	case "interface":
 		interfaceInfo := dao.NewTypeInfoInterface()

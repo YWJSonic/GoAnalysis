@@ -29,25 +29,6 @@ func (s *source) scanExpressionList() []string {
 
 	return expressions
 }
-func (s *source) scanVarExpressionList() []string {
-	var expressions []string
-	s.nextCh()
-
-	if s.ch == '`' || s.ch == '"' {
-		expressions = append(expressions, s.scanStringLit(s.ch))
-	} else {
-		for {
-			expressions = append(expressions, s.onFakeExpression('\n'))
-			if s.ch != ',' {
-				break
-			}
-			s.nextCh()
-			s.nextCh()
-		}
-	}
-
-	return expressions
-}
 
 func (s *source) onFakeExpression(endTag rune) string {
 	offset := s.r
@@ -102,11 +83,18 @@ func (s *source) onScanConstExpression() string {
 			if tag == s.ch {
 
 				if s.ch == ' ' {
-					if s.buf[s.r+1] == ' ' {
+
+					if s.checkCommon() {
 						scanDone = true
-					} else if s.checkCommon() {
+						break
+					}
+					s.nextCh()
+
+					if s.buf[s.r] == ' ' {
 						scanDone = true
-					} else if _, oplen, isop := s.checkBinary_op(); isop {
+						break
+					}
+					if _, oplen, isop := s.checkBinary_op(); isop {
 						for i := 0; i < oplen; i++ {
 							s.nextCh()
 						}

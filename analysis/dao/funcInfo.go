@@ -14,38 +14,25 @@ func (self *FuncInfo) GetTypeBase() TypeBase {
 	return self.TypeBase
 }
 
-func (self *FuncInfo) Print() string {
-	str := "func("
-	if self.Receiver.ContentTypeInfo != nil {
-		str += self.Receiver.GetName() + " " + self.Receiver.ContentTypeInfo.GetTypeName()
-	}
-	str += ") " + self.GetName() + "("
-
-	for idx, input := range self.ParamsInPoint {
-		str += input.GetName() + " " + input.ContentTypeInfo.GetTypeName()
-		if len(self.ParamsInPoint) > idx+1 {
-			str += ", "
+func (self *FuncInfo) GetReceiver() string {
+	var receiver string
+	if self.Receiver.ContentTypeInfo == nil {
+		return ""
+	} else {
+		rev := self.Receiver.GetName()
+		ret := ""
+		if info, ok := self.Receiver.ContentTypeInfo.(*TypeInfoPointer); ok {
+			ret = "*" + info.ContentTypeInfo.GetTypeName()
 		}
+		receiver = fmt.Sprintf("(%s %s)", rev, ret)
 	}
-	str += ") ("
 
-	for idx, output := range self.ParamsOutPoint {
-		str += output.GetName() + " " + output.ContentTypeInfo.GetName()
-		if len(self.ParamsOutPoint) > idx+1 {
-			str += ", "
-		}
-	}
-	str += ")"
-
-	return str
+	return receiver
 }
 
-func (self *FuncInfo) GetName() string {
+func (self *FuncInfo) GetNameKey() string {
 	if self.Receiver.ContentTypeInfo != nil {
-		rev := self.Receiver.GetName()
-		ret := self.Receiver.ContentTypeInfo.GetTypeName()
-		name := self.TypeBase.GetName()
-		return fmt.Sprintf("(%s %s)%s", rev, ret, name)
+		return fmt.Sprintf("%s %s", self.GetReceiver(), self.TypeBase.GetName())
 	} else {
 		return self.TypeBase.GetName()
 	}

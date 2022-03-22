@@ -287,10 +287,16 @@ func (s *source) checkCommon() bool {
 	return true
 }
 
+// 判斷運算子
+// 起始位置: "+" , "&"&
+//
+// @return Operator	// 運算子類型
+// @return int 		// 運算子長度
+// @return bool		// 是否為運算子
 func (s *source) checkBinary_op() (constant.Operator, int, bool) {
 	// "||", "&&", "==", "!=", "<", "<=", ">", ">=", "+", "-", ",", "^", "*", "/", "%", "<<", ">>", "&", "&^"
-	previrwCh1 := s.buf[s.r+1]
-	previrwCh2 := s.buf[s.r+2]
+	previrwCh1 := s.buf[s.r]
+	previrwCh2 := s.buf[s.r+1]
 	switch previrwCh1 {
 	case '+':
 		return constant.Add, 1, true
@@ -350,8 +356,8 @@ func (s *source) checkBinary_op() (constant.Operator, int, bool) {
 
 func (s *source) checkRel_op() (constant.Operator, int, bool) {
 	// "==" | "!=" | "<" | "<=" | ">" | ">=" .
-	previrwCh1 := s.buf[s.r+1]
-	previrwCh2 := s.buf[s.r+2]
+	previrwCh1 := s.buf[s.r]
+	previrwCh2 := s.buf[s.r+1]
 	switch previrwCh1 {
 	case '!':
 		if previrwCh2 == '=' {
@@ -380,7 +386,7 @@ func (s *source) checkRel_op() (constant.Operator, int, bool) {
 
 func (s *source) checAdd_op() (constant.Operator, int, bool) {
 	//  "+" | "-" | "|" | "^"
-	previrwCh1 := s.buf[s.r+1]
+	previrwCh1 := s.buf[s.r]
 	switch previrwCh1 {
 	case '+':
 		return constant.Add, 1, true
@@ -396,8 +402,8 @@ func (s *source) checAdd_op() (constant.Operator, int, bool) {
 
 func (s *source) checMul_op() (constant.Operator, int, bool) {
 	// "*" | "/" | "%" | "<<" | ">>" | "&" | "&^"
-	previrwCh1 := s.buf[s.r+1]
-	previrwCh2 := s.buf[s.r+2]
+	previrwCh1 := s.buf[s.r]
+	previrwCh2 := s.buf[s.r+1]
 	switch previrwCh1 {
 	case '*':
 		return constant.Mul, 1, true
@@ -427,8 +433,8 @@ func (s *source) checMul_op() (constant.Operator, int, bool) {
 
 func (s *source) checUnary_op() (constant.Operator, int, bool) {
 	// "+" | "-" | "!" | "^" | "*" | "&" | "<-"
-	previrwCh1 := s.buf[s.r+1]
-	previrwCh2 := s.buf[s.r+2]
+	previrwCh1 := s.buf[s.r]
+	previrwCh2 := s.buf[s.r+1]
 	switch previrwCh1 {
 	case '+':
 		return constant.Add, 1, true

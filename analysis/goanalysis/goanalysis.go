@@ -7,6 +7,7 @@ import (
 	_ "codeanalysis/load/project/goloader"
 	wwe "codeanalysis/load/project/goloader"
 	"codeanalysis/util"
+	"fmt"
 	"strings"
 )
 
@@ -35,9 +36,6 @@ func GoAnalysisSpaceFirst(node *wwe.GoFileNode) {
 			// 檔案路徑與 import 路徑無法批配
 			// 未讀取 go.mod 檔
 			// main 檔層級路徑待確認
-			if node.Path() == Instants.ProjectRoot.Path() {
-				// panic("node is go file")
-			}
 			idx := strings.Index(node.Path(), Instants.ProjectRoot.Path())
 			pwd := node.Path()
 			if idx == 0 {
@@ -69,6 +67,10 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	s := source{
 		buf:         buf.Bytes(),
 		PackageInfo: packageInfo,
+	}
+
+	if packageInfo.CurrentFileNodes.Path() == "/home/yang/Desktop/GameBackend/gamemaster/main.go" {
+		fmt.Println("")
 	}
 
 	s.start()

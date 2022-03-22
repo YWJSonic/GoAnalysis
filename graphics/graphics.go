@@ -1,14 +1,13 @@
 package graphics
 
 import (
-	"codeanalysis/analysis/dao"
 	ansdao "codeanalysis/analysis/dao"
 	"fmt"
 	"io/ioutil"
 	"strings"
 )
 
-func OutputPlantUmlGraphics(data *dao.ProjectInfo) {
+func OutputPlantUmlGraphics(data *ansdao.ProjectInfo) {
 	uml := PlaneUml{
 		data: data,
 		line: make(map[string]struct{}),

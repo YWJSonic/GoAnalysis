@@ -102,6 +102,9 @@ var initialized bool
 
 var a [1024]byte
 var s uint = 33
+
+const s1 = 8 &^ 3
+
 var i = 1 << s         // 1 has type int
 var j int32 = 1 << s   // 1 has type int32; j == 0
 var k = uint64(1 << s) // 1 has type uint64; k == 1<<33
@@ -121,6 +124,15 @@ var oo = 1<<s == 2<<s        // 1 and 2 have type int; oo == true
 var pp = 1<<s == 1<<33       // illegal: 1 has type int, but 1<<33 overflows int
 // var xx = a[1.0<<s]            // 1.0 has type int; xx == a[0]
 var bb = make([]byte, 1.0<<s) // 1.0 has type int; len(bb) == 0
+var opb1 = 0xf1 | 0xb7
+var opb2 = 1 / 9
+
+const opb3 = 1 ^ 9
+const opb4 = .1 * 9
+const opb5 = 1 ^ 9
+
+var opb6 = opb5 + opb4
+
 var (
 	WSX   = 3
 	fgh   = 1.0

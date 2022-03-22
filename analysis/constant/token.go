@@ -165,6 +165,17 @@ const (
 	Shr    // >>
 )
 
+var Bool_op = map[Operator]struct{}{
+	OrOr:   {},
+	AndAnd: {},
+	Eql:    {},
+	Neq:    {},
+	Lss:    {},
+	Leq:    {},
+	Gtr:    {},
+	Geq:    {},
+}
+
 // Operator precedences
 const (
 	_ = iota
@@ -197,35 +208,11 @@ var typeStringLit = []TypeString{
 	_uint16,
 	_uint32,
 	_uint64,
-	_uintptr,
-}
-
-const (
-	_bool       TypeString = "bool"
-	_byte       TypeString = "byte"
-	_complex64  TypeString = "complex64"
-	_complex128 TypeString = "complex128"
-	_error      TypeString = "error"
-	_float32    TypeString = "float32"
-	_float64    TypeString = "float64"
-	_int        TypeString = "int"
-	_int8       TypeString = "int8"
-	_int16      TypeString = "int16"
-	_int32      TypeString = "int32"
-	_int64      TypeString = "int64"
-	_rune       TypeString = "rune"
-	_string     TypeString = "string"
-	_uint       TypeString = "uint"
-	_uint8      TypeString = "uint8"
-	_uint16     TypeString = "uint16"
-	_uint32     TypeString = "uint32"
-	_uint64     TypeString = "uint64"
-	_uintptr    TypeString = "uintptr"
-)
+	_uintptr}
 
 type KeyWordString = string
 
-var keyWordStringLit = []string{
+var keyWordStringLit = []KeyWordString{
 	_break,
 	_default,
 	_func,
@@ -279,6 +266,76 @@ const (
 	_import      KeyWordString = "import"
 	_return      KeyWordString = "return"
 	_var         KeyWordString = "var"
+
+	_append  KeyWordString = "append"
+	_cap     KeyWordString = "cap"
+	_close   KeyWordString = "close"
+	_complex KeyWordString = "complex"
+	_copy    KeyWordString = "copy"
+	_delete  KeyWordString = "delete"
+	_imag    KeyWordString = "imag"
+	_len     KeyWordString = "len"
+	_make    KeyWordString = "make"
+	_new     KeyWordString = "new"
+	_panic   KeyWordString = "panic"
+	_print   KeyWordString = "print"
+	_println KeyWordString = "println"
+	_real    KeyWordString = "real"
+	_recover KeyWordString = "recover"
+
+	_any        KeyWordString = "any"
+	_comparable KeyWordString = "comparable"
+	_true       KeyWordString = "true"
+	_false      KeyWordString = "false"
+	_iota       KeyWordString = "iota"
+	_nil        KeyWordString = "nil"
+
+	_bool       TypeString = "bool"
+	_byte       TypeString = "byte"
+	_complex64  TypeString = "complex64"
+	_complex128 TypeString = "complex128"
+	_error      TypeString = "error"
+	_float32    TypeString = "float32"
+	_float64    TypeString = "float64"
+	_int        TypeString = "int"
+	_int8       TypeString = "int8"
+	_int16      TypeString = "int16"
+	_int32      TypeString = "int32"
+	_int64      TypeString = "int64"
+	_rune       TypeString = "rune"
+	_string     TypeString = "string"
+	_uint       TypeString = "uint"
+	_uint8      TypeString = "uint8"
+	_uint16     TypeString = "uint16"
+	_uint32     TypeString = "uint32"
+	_uint64     TypeString = "uint64"
+	_uintptr    TypeString = "uintptr"
 )
 
 var TokenLit = []byte{'"', '`', '\'', '(', '{', '[', ';', ',', ']', ')', ':', '}', '+', '.', '*', '-', '%', '/', '|', '&', '<', '^', '=', '>', '~', '!'}
+
+var KeyWordType = map[string]struct{}{
+	_map:       {},
+	_struct:    {},
+	_chan:      {},
+	_func:      {},
+	_interface: {},
+}
+
+var KeyWorkFunc = map[string]struct{}{
+	_append:     {},
+	_cap:        {},
+	_close:      {},
+	_comparable: {},
+	_copy:       {},
+	_delete:     {},
+	_imag:       {},
+	_len:        {},
+	_make:       {},
+	_new:        {},
+	_panic:      {},
+	_print:      {},
+	_println:    {},
+	_real:       {},
+	_recover:    {},
+}
