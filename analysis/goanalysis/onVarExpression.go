@@ -7,38 +7,68 @@ import (
 	"fmt"
 )
 
+// 嘗試兩階算掃描
+// 第一階段
+// 表達式範圍紀錄
+// 第二階段
+// 等專案內的 package 都掃描完成
+// 回頭掃描表達式
 func (s *source) onVarExpressionList(infos []*dao.VarInfo) []string {
 	var expressions []string
-	for _, info := range infos {
-		s.nextCh()
-		exp := s.onVarExpression(info.ContentTypeInfo)
-		info.Expression = exp
-
-		if info.ContentTypeInfo == nil {
-			// 從表達式解析型態
-
-			if exp.ExpressionType != nil {
-				info.ContentTypeInfo = exp.ExpressionType
-			} else if exp.PrimaryExpr != nil {
-				if exp.PrimaryExpr.Operand != nil {
-					if exp.PrimaryExpr.Operand.Literal != nil {
-						if exp.PrimaryExpr.Operand.Literal.CompositeLit != nil {
-							info.ContentTypeInfo = exp.PrimaryExpr.Operand.Literal.CompositeLit.LiteralType
-						}
-					}
-				}
-			}
+	s.nextCh()
+	otherEndTag := ','
+	for i, count := 0, len(infos); i < count; i++ {
+		if i == count-1 {
+			otherEndTag = 0
 		}
 
-		fmt.Println("-----------------------------")
-		fmt.Printf("Name: %s = %s\n", info.GetName(), info.Expression.ContentStr)
-
+		expressions = append(expressions, s.onFirstScanExpression(otherEndTag))
 		if s.ch == ',' {
+			s.toNextCh()
 			s.nextCh()
 		}
 	}
+
 	return expressions
 }
+
+// 嘗試一次就將資料解析出來
+// 失敗:
+// 多個相同結構無法判斷
+// ex:
+// identifier "." : 後續可接續的東西過多無法辨識, 在其他資料未建立完成前無法已名稱查詢
+// func (s *source) onVarExpressionList(infos []*dao.VarInfo) []string {
+// 	var expressions []string
+// 	for _, info := range infos {
+// 		s.nextCh()
+// 		exp := s.onVarExpression(info.ContentTypeInfo)
+// 		info.Expression = exp
+
+// 		if info.ContentTypeInfo == nil {
+// 			// 從表達式解析型態
+
+// 			if exp.ExpressionType != nil {
+// 				info.ContentTypeInfo = exp.ExpressionType
+// 			} else if exp.PrimaryExpr != nil {
+// 				if exp.PrimaryExpr.Operand != nil {
+// 					if exp.PrimaryExpr.Operand.Literal != nil {
+// 						if exp.PrimaryExpr.Operand.Literal.CompositeLit != nil {
+// 							info.ContentTypeInfo = exp.PrimaryExpr.Operand.Literal.CompositeLit.LiteralType
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+
+// 		fmt.Println("-----------------------------")
+// 		fmt.Printf("Name: %s = %s\n", info.GetName(), info.Expression.ContentStr)
+
+// 		if s.ch == ',' {
+// 			s.nextCh()
+// 		}
+// 	}
+// 	return expressions
+// }
 
 func (s *source) onVarExpression(iInfo dao.ITypeInfo) *dao.Expression {
 
@@ -74,7 +104,7 @@ func (s *source) onVarExpression(iInfo dao.ITypeInfo) *dao.Expression {
 
 			} else if string(s.buf[s.r+1:s.r+3]) == "..." {
 				// dineamic array
-				fmt.Println(s.ch)
+				panic("")
 
 			} else {
 				// Expression array: [5+6], KeyType map: [string], Expression range: [1-1:8*6],
@@ -129,17 +159,17 @@ func (s *source) onVarExpression(iInfo dao.ITypeInfo) *dao.Expression {
 			return exp
 
 		case '+':
-			fmt.Println(s.ch)
+			panic("")
 		case '-':
-			fmt.Println(s.ch)
+			panic("")
 		case '!':
-			fmt.Println(s.ch)
+			panic("")
 		case '^':
-			fmt.Println(s.ch)
+			panic("")
 		case '*':
-			fmt.Println(s.ch)
+			panic("")
 		case '(':
-			fmt.Println(s.ch)
+			panic("")
 		case '&':
 			// 解析指標
 			liteType := dao.NewTypeInfoPointer()
@@ -160,7 +190,7 @@ func (s *source) onVarExpression(iInfo dao.ITypeInfo) *dao.Expression {
 			return exp
 
 		case '<':
-			fmt.Println(s.ch)
+			panic("")
 		case '0':
 			ident := s.scanIdentifier()
 			var basicLit dao.ITypeInfo
@@ -197,135 +227,133 @@ func (s *source) onVarExpression(iInfo dao.ITypeInfo) *dao.Expression {
 
 		default:
 			if util.IsLetter(s.ch) {
-				// 解析 宣告名稱 或 型別名稱
-				identifierOrType := s.scanIdentifier()
-
-				if s.ch == '.' {
-					if importPackage := s.PackageInfo.GetPackage(identifierOrType); importPackage != nil {
-
-						var info = dao.NewTypeInfoQualifiedIdent()
-						s.nextCh()
-						typeName := s.scanIdentifier()
-						fullName := fmt.Sprintf("%s.%s", identifierOrType, typeName)
-
-						info.SetName(fullName)
-						if s.ch == '(' {
-							link, iItype := s.PackageInfo.GetPackageFunc(identifierOrType, typeName)
-							info.ImportLink, info.ContentTypeInfo = link, iItype
-						} else {
-							link, iItype := s.PackageInfo.GetPackageType(identifierOrType, typeName)
-							info.ImportLink, info.ContentTypeInfo = link, iItype
-
-						}
-						primary := &dao.PrimaryExpr{
-							Operand: &dao.Operand{
-								OperandName: info,
-							},
-						}
-						s.onSubPrimaryExpr(primary)
-						exp.PrimaryExpr = primary
-						exp.ContentStr = string(s.buf[offset:s.r])
-						return exp
-					}
-				} else if _, ok := constant.KeyWorkFunc[identifierOrType]; ok {
-					// 字串為系統保留 方法名稱
-					info := dao.BaseFuncInfo[identifierOrType]
-
-					primary := &dao.PrimaryExpr{
-						Operand: &dao.Operand{
-							OperandName: info,
-						},
-					}
-					s.onSubPrimaryExpr(primary)
-					exp.PrimaryExpr = primary
-					exp.ContentStr = string(s.buf[offset:s.r])
-					return exp
-
-				} else if _, ok := constant.KeyWordType[identifierOrType]; ok {
-					// 字串為系統保留 類型名稱
-					liteType := s.OnTypeSwitch(identifierOrType)
-					liteValue := s.onCompositeLit(liteType)
-
-					if liteValue.LiteralValue == nil {
-						exp.ExpressionType = liteType
-
-					} else {
-						prim := &dao.PrimaryExpr{
-							Operand: &dao.Operand{
-								Literal: &dao.Literal{
-									CompositeLit: liteValue,
-								},
-							},
-						}
-
-						exp.PrimaryExpr = prim
-					}
-					exp.ContentStr = string(s.buf[offset:s.r])
-					return exp
-
-				} else if baseConstInfo, ok := dao.BaseConstInfo[identifierOrType]; ok {
-					// 字串為基礎型別
-					exp.ExpressionType = baseConstInfo
-					exp.ContentStr = string(s.buf[offset:s.r])
-					return exp
-
-				} else if baseTypeInfo, ok := dao.BaseTypeInfo[identifierOrType]; ok {
-					// 字串為基礎型別
-					exp.ExpressionType = baseTypeInfo
-
-					// Conversion
-					if s.ch == '(' {
-						s.nextCh()
-						subexp := s.onVarExpression(nil)
-						exp.SubExpression = append(exp.SubExpression, *subexp)
-					}
-					s.nextCh()
-					exp.ContentStr = string(s.buf[offset:s.r])
-					return exp
-
-				} else if constInfo, ok := s.PackageInfo.AllConstInfos[identifierOrType]; ok {
-					// 字串為 const
-					exp.ExpressionType = constInfo
-					exp.ContentStr = string(s.buf[offset:s.r])
-					return exp
-
-				} else if varInfo, ok := s.PackageInfo.AllVarInfos[identifierOrType]; ok {
-					// 字串為 var
-					exp.ExpressionType = varInfo
-					exp.ContentStr = string(s.buf[offset:s.r])
-					return exp
-
-				} else {
-					if info, ok := iInfo.(*dao.TypeInfoStruct); ok {
-						// 未查詢到結構名稱
-						if subInfo, ok := info.VarInfos[identifierOrType]; ok {
-							exp.ExpressionType = subInfo.ContentTypeInfo
-						} else {
-							for _, subInfo := range info.ImplicitlyVarInfos {
-								if subInfo.ContentTypeInfo.GetName() == identifierOrType {
-									exp.ExpressionType = subInfo.ContentTypeInfo
-								}
-							}
-						}
-
-					} else {
-						// 字串可能是 未定義 const or var
-						s.PackageInfo.UndefVarOrConst[identifierOrType] = info
-						exp.ContentStr = identifierOrType
-					}
-					exp.ContentStr = string(s.buf[offset:s.r])
-					return exp
-				}
-
+				exp = s.onIdentifier(iInfo)
+				exp.ContentStr = string(s.buf[offset:s.r])
 			} else if util.IsDecimal(s.ch) {
 				exp = s.onExpressionNumber()
 				exp.ContentStr = string(s.buf[offset:s.r])
 				return exp
 			} else {
 				// 解析特殊符號
-				fmt.Println(s.ch)
+				panic("")
 			}
 		}
+	}
+}
+
+func (s *source) onIdentifier(iInfo dao.ITypeInfo) *dao.Expression {
+	exp := &dao.Expression{}
+	// 解析 宣告名稱 或 型別名稱
+	identifierOrType := s.scanIdentifier()
+
+	if s.ch == '.' {
+		// selector, TypeAssertion, QualifiedIdent, MethodExpr
+		if importPackage := s.PackageInfo.GetPackage(identifierOrType); importPackage != nil {
+
+			var info = dao.NewTypeInfoQualifiedIdent()
+			s.nextCh()
+			typeName := s.scanIdentifier()
+			fullName := fmt.Sprintf("%s.%s", identifierOrType, typeName)
+
+			info.SetName(fullName)
+			if s.ch == '(' {
+				link, iItype := s.PackageInfo.GetPackageFunc(identifierOrType, typeName)
+				info.ImportLink, info.ContentTypeInfo = link, iItype
+			} else {
+				link, iItype := s.PackageInfo.GetPackageType(identifierOrType, typeName)
+				info.ImportLink, info.ContentTypeInfo = link, iItype
+
+			}
+			primary := &dao.PrimaryExpr{
+				Operand: &dao.Operand{
+					OperandName: info,
+				},
+			}
+			s.onSubPrimaryExpr(primary)
+			exp.PrimaryExpr = primary
+		}
+		return exp
+	} else if _, ok := constant.KeyWorkFunc[identifierOrType]; ok {
+		// 字串為系統保留 方法名稱
+		info := dao.BaseFuncInfo[identifierOrType]
+
+		primary := &dao.PrimaryExpr{
+			Operand: &dao.Operand{
+				OperandName: info,
+			},
+		}
+		s.onSubPrimaryExpr(primary)
+		exp.PrimaryExpr = primary
+		return exp
+
+	} else if _, ok := constant.KeyWordType[identifierOrType]; ok {
+		// 字串為系統保留 類型名稱
+		liteType := s.OnTypeSwitch(identifierOrType)
+		liteValue := s.onCompositeLit(liteType)
+
+		if liteValue.LiteralValue == nil {
+			exp.ExpressionType = liteType
+
+		} else {
+			prim := &dao.PrimaryExpr{
+				Operand: &dao.Operand{
+					Literal: &dao.Literal{
+						CompositeLit: liteValue,
+					},
+				},
+			}
+
+			exp.PrimaryExpr = prim
+		}
+		return exp
+
+	} else if baseConstInfo, ok := dao.BaseConstInfo[identifierOrType]; ok {
+		// 字串為基礎型別
+		exp.ExpressionType = baseConstInfo
+		return exp
+
+	} else if baseTypeInfo, ok := dao.BaseTypeInfo[identifierOrType]; ok {
+		// 字串為基礎型別
+		exp.ExpressionType = baseTypeInfo
+
+		// Conversion
+		if s.ch == '(' {
+			s.nextCh()
+			subexp := s.onVarExpression(nil)
+			exp.SubExpression = append(exp.SubExpression, *subexp)
+		}
+		s.nextCh()
+		return exp
+
+	} else if constInfo, ok := s.PackageInfo.AllConstInfos[identifierOrType]; ok {
+		// 字串為 const
+		exp.ExpressionType = constInfo
+		return exp
+
+	} else if varInfo, ok := s.PackageInfo.AllVarInfos[identifierOrType]; ok {
+		// 字串為 var
+		exp.ExpressionType = varInfo
+		return exp
+
+	} else {
+		if info, ok := iInfo.(*dao.TypeInfoStruct); ok {
+			// 未查詢到結構名稱
+			if subInfo, ok := info.VarInfos[identifierOrType]; ok {
+				exp.ExpressionType = subInfo.ContentTypeInfo
+			} else {
+				for _, subInfo := range info.ImplicitlyVarInfos {
+					if subInfo.ContentTypeInfo.GetName() == identifierOrType {
+						exp.ExpressionType = subInfo.ContentTypeInfo
+					}
+				}
+			}
+
+		} else {
+			// 字串可能是 未定義 const or var
+			s.PackageInfo.UndefVarOrConst[identifierOrType] = info
+			exp.ContentStr = identifierOrType
+		}
+		return exp
 	}
 }
 

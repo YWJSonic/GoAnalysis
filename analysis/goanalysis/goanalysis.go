@@ -7,7 +7,6 @@ import (
 	_ "codeanalysis/load/project/goloader"
 	wwe "codeanalysis/load/project/goloader"
 	"codeanalysis/util"
-	"fmt"
 	"strings"
 )
 
@@ -67,10 +66,6 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 	s := source{
 		buf:         buf.Bytes(),
 		PackageInfo: packageInfo,
-	}
-
-	if packageInfo.CurrentFileNodes.Path() == "/home/yang/Desktop/GameBackend/gamemaster/main.go" {
-		fmt.Println("")
 	}
 
 	s.start()

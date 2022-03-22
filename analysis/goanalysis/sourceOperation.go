@@ -12,7 +12,7 @@ func (s *source) start() {
 }
 
 func (s *source) checkEnd() bool {
-	if s.r == s.e {
+	if s.r+1 == s.e {
 		s.isEnd = true
 		return true
 	}
@@ -82,6 +82,21 @@ func (s *source) toNextToken() rune {
 		}
 	}
 	return s.ch
+}
+
+func (s *source) nextLine() {
+	s.b = s.r + 1
+	for {
+		s.r++
+		if s.checkEnd() {
+			return
+		}
+
+		if s.isOnNewlineSymbol() {
+			s.ch = rune(s.buf[s.r])
+			return
+		}
+	}
 }
 
 // 跳至下一個 ' ' or '\n'

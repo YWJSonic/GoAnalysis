@@ -175,7 +175,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			s.next()
 
 			// 解析表達式
-			exps := s.scanExpressionList()
+			exps := s.scanExpressionList(infos)
 			for idx, info := range infos {
 				info.Expression = exps[idx]
 			}
@@ -204,7 +204,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			typeInfo := s.OnDeclarationsType()
 			s.next()
 
-			exps := s.scanExpressionList()
+			exps := s.scanExpressionList(infos)
 			for idx, info := range infos {
 				info.ContentTypeInfo = typeInfo
 				info.Expression = exps[idx]
@@ -334,7 +334,7 @@ func (s *source) VarSpec() []*dao.VarInfo {
 			if s.buf[s.r+1] == '=' {
 				s.next()
 				// 解析表達式
-				// exps = s.onVarExpressionList(infos)
+				s.onVarExpressionList(infos)
 
 				// for idx, info := range infos {
 				// 	// 關聯 表達式內容
@@ -835,48 +835,49 @@ func (s *source) OnDeclarationsResult() []dao.FuncParams {
 //  }
 // b=任意 r="_"
 func (s *source) funcBodyBlock() string {
-	if s.buf[s.r+1] != '{' || s.ch == '\n' {
-		return ""
-	}
-	s.nextCh()
-	offset := s.r
-	scanDone := false
-	var blockCount int
+	return s.onStatement()
+	// if s.buf[s.r+1] != '{' || s.ch == '\n' {
+	// 	return ""
+	// }
+	// s.nextCh()
+	// offset := s.r
+	// scanDone := false
+	// var blockCount int
 
-	for !scanDone {
-		s.toNextToken()
-		switch s.buf[s.r+1] {
-		case '}':
-			s.nextCh()
-			if blockCount > 0 {
-				blockCount--
-				continue
-			}
-			scanDone = true
-		case '\'':
-			s.nextCh()
-			if s.buf[s.r+1] == '\\' { // 跳脫字元
-				s.nextCh()
-				s.nextCh()
-			}
-			s.nextTargetToken('\'')
-		case '"':
-			s.nextCh()
-			s.nextTargetToken('"')
-		case '/':
-			commentType := string(s.buf[s.r+1 : s.r+3])
-			if commentType == "//" || commentType == "/*" {
-				s.OnComments(commentType)
-			} else {
-				s.nextCh()
-			}
-		case '{':
-			s.nextCh()
-			blockCount++
-		default:
-			s.nextCh()
-		}
-	}
-	s.nextCh()
-	return string(s.buf[offset:s.r])
+	// for !scanDone {
+	// 	s.toNextToken()
+	// 	switch s.buf[s.r+1] {
+	// 	case '}':
+	// 		s.nextCh()
+	// 		if blockCount > 0 {
+	// 			blockCount--
+	// 			continue
+	// 		}
+	// 		scanDone = true
+	// 	case '\'':
+	// 		s.nextCh()
+	// 		if s.buf[s.r+1] == '\\' { // 跳脫字元
+	// 			s.nextCh()
+	// 			s.nextCh()
+	// 		}
+	// 		s.nextTargetToken('\'')
+	// 	case '"':
+	// 		s.nextCh()
+	// 		s.nextTargetToken('"')
+	// 	case '/':
+	// 		commentType := string(s.buf[s.r+1 : s.r+3])
+	// 		if commentType == "//" || commentType == "/*" {
+	// 			s.OnComments(commentType)
+	// 		} else {
+	// 			s.nextCh()
+	// 		}
+	// 	case '{':
+	// 		s.nextCh()
+	// 		blockCount++
+	// 	default:
+	// 		s.nextCh()
+	// 	}
+	// }
+	// s.nextCh()
+	// return string(s.buf[offset:s.r])
 }
