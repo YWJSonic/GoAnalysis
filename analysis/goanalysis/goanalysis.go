@@ -7,6 +7,7 @@ import (
 	_ "codeanalysis/load/project/goloader"
 	wwe "codeanalysis/load/project/goloader"
 	"codeanalysis/util"
+	"fmt"
 	"strings"
 )
 
@@ -104,6 +105,22 @@ func AnalysisStyle2(packageInfo *dao.PackageInfo, code string) {
 				s.VariableDeclarations()
 
 			default:
+			}
+		}
+	}
+}
+
+func GoAnalysisExpression(project *dao.ProjectInfo) {
+	for _, packageInfo := range project.LocalPackageMap {
+		for _, constInfo := range packageInfo.AllConstInfos {
+			if constInfo.ContentTypeInfo == nil {
+				fmt.Println(constInfo.Expression)
+			}
+		}
+
+		for _, varInfo := range packageInfo.AllVarInfos {
+			if varInfo.ContentTypeInfo == nil {
+				fmt.Println(varInfo.Expression)
 			}
 		}
 	}

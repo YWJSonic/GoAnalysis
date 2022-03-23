@@ -1,7 +1,5 @@
 package goanalysis
 
-import "fmt"
-
 func (s *source) onStatementList() {
 
 }
@@ -53,6 +51,5 @@ func (s *source) onStatement() string {
 	}
 
 	statement = string(s.buf[offset:s.r])
-	fmt.Println(statement)
 	return statement
 }
