@@ -269,7 +269,7 @@ func (s *source) OnArrayType() *dao.TypeInfoArray {
 	// ArrayLength
 	s.nextCh()
 
-	info.Size = s.onFakeExpression(']')
+	info.Size = s.onFirstScanExpression(']')
 	info.ContentTypeInfo = s.OnDeclarationsType()
 	return info
 }
@@ -475,7 +475,7 @@ func (s *source) OnTypeSwitch(key string) (info dao.ITypeInfo) {
 			s.nextCh()
 			arrayInfo := dao.NewTypeInfoArray()
 			arrayInfo.SetTypeName("array")
-			arrayInfo.Size = s.onFakeExpression('\n')
+			arrayInfo.Size = s.onFirstScanExpression(']')
 			arrayInfo.ContentTypeInfo = s.OnDeclarationsType()
 			info = arrayInfo
 		}

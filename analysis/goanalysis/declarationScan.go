@@ -175,7 +175,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			s.next()
 
 			// 解析表達式
-			exps := s.scanExpressionList(infos)
+			exps := s.scanConstExpressionList(infos)
 			for idx, info := range infos {
 				info.Expression = exps[idx]
 			}
@@ -204,7 +204,7 @@ func (s *source) ConstSpec() []*dao.ConstInfo {
 			typeInfo := s.OnDeclarationsType()
 			s.next()
 
-			exps := s.scanExpressionList(infos)
+			exps := s.scanConstExpressionList(infos)
 			for idx, info := range infos {
 				info.ContentTypeInfo = typeInfo
 				info.Expression = exps[idx]
@@ -301,14 +301,6 @@ func (s *source) VarSpec() []*dao.VarInfo {
 
 	if s.buf[nextIdx] == '\n' {
 		panic("")
-		// s.next()
-		// name := s.rangeStr()
-		// s.toNextCh()
-
-		// if s.CheckCommon() {
-		// 	s.OnComments(string(s.buf[s.r+1 : s.r+3]))
-		// }
-		// return infos
 	}
 
 	infos = s.VariableIdentifierList()
@@ -319,8 +311,6 @@ func (s *source) VarSpec() []*dao.VarInfo {
 		s.onVarExpressionList(infos)
 	} else {
 		typeInfo := s.OnDeclarationsType()
-		// var exps []string
-
 		// 默認初始化
 
 		// 建立關聯
@@ -334,7 +324,7 @@ func (s *source) VarSpec() []*dao.VarInfo {
 			if s.buf[s.r+1] == '=' {
 				s.next()
 				// 解析表達式
-				s.onVarExpressionList(infos)
+				s.scanVarExpressionList(infos)
 
 				// for idx, info := range infos {
 				// 	// 關聯 表達式內容
@@ -479,11 +469,8 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 		s.nextCh()
 		info = s.OnTypeSwitch(string(s.ch))
 	case '[': // ArrayType, SliceType
-		if s.buf[s.r+2] == ']' { // slice type
-			info = s.OnSliceType()
-		} else { // array type
-			info = s.OnArrayType()
-		}
+		s.nextCh()
+		info = s.OnTypeSwitch(string(s.ch))
 
 	case '<': // OutPutChanelType
 		info = s.OnChannelType()
@@ -493,12 +480,9 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 		nextEndIdx := s.nextIdx()
 		nextTokenIdx := s.nextTokenIdx()
 
+		// 判斷下一步定位點
 		if nextEndIdx < nextTokenIdx {
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextEndIdx]))
-
-			if tmpStr == "iota" {
-				fmt.Println("")
-			}
 			baseInfo, ok := dao.BaseTypeInfo[tmpStr]
 			if ok {
 				s.next()
@@ -512,15 +496,8 @@ func (s *source) OnDeclarationsType() (info dao.ITypeInfo) {
 				}
 			}
 
-		} else if nextTokenIdx == nextEndIdx {
-			s.nextToken()
 		} else {
-
 			tmpStr := strings.TrimSpace(string(s.buf[s.r+1 : nextTokenIdx]))
-
-			if tmpStr == "iota" {
-				fmt.Println("")
-			}
 			baseInfo, ok := dao.BaseTypeInfo[tmpStr]
 			if ok {
 				s.nextToken()

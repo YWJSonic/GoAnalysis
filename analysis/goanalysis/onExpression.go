@@ -4,22 +4,7 @@ import (
 	"codeanalysis/analysis/dao"
 )
 
-// func (s *source) scanExpressionList() []string {
-// 	var expressions []string
-// 	s.nextCh()
-// 	for {
-// 		expressions = append(expressions, s.onFakeExpression('\n'))
-// 		if s.ch != ',' {
-// 			break
-// 		}
-// 		s.nextCh()
-// 		s.nextCh()
-// 	}
-
-// 	return expressions
-// }
-
-func (s *source) scanExpressionList(infos []*dao.ConstInfo) []string {
+func (s *source) scanVarExpressionList(infos []*dao.VarInfo) []string {
 	var expressions []string
 	s.nextCh()
 	otherEndTag := ','
@@ -36,18 +21,25 @@ func (s *source) scanExpressionList(infos []*dao.ConstInfo) []string {
 	}
 
 	return expressions
-	// var expressions []string
-	// s.nextCh()
-	// for {
-	// 	expressions = append(expressions, s.onScanConstExpression())
-	// 	if s.ch != ',' {
-	// 		break
-	// 	}
-	// 	s.nextCh()
-	// 	s.nextCh()
-	// }
+}
 
-	// return expressions
+func (s *source) scanConstExpressionList(infos []*dao.ConstInfo) []string {
+	var expressions []string
+	s.nextCh()
+	otherEndTag := ','
+	for i, count := 0, len(infos); i < count; i++ {
+		if i == count-1 {
+			otherEndTag = 0
+		}
+
+		expressions = append(expressions, s.onFirstScanExpression(otherEndTag))
+		if s.ch == ',' {
+			s.toNextCh()
+			s.nextCh()
+		}
+	}
+
+	return expressions
 }
 
 func (s *source) onFakeExpression(endTag rune) string {
