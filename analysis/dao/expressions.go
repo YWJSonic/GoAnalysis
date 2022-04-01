@@ -13,8 +13,6 @@ func NewExpression() *Expression {
 	return &Expression{}
 }
 
-type IExpressionContext interface{}
-
 // 初始化表達式
 type PrimaryExpr struct {
 	Operand    *Operand    // 數值操作
