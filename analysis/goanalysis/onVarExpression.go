@@ -7,31 +7,6 @@ import (
 	"fmt"
 )
 
-// 嘗試兩階算掃描
-// 第一階段
-// 表達式範圍紀錄
-// 第二階段
-// 等專案內的 package 都掃描完成
-// 回頭掃描表達式
-func (s *source) onVarExpressionList(infos []*dao.VarInfo) []string {
-	var expressions []string
-	s.nextCh()
-	otherEndTag := ','
-	for i, count := 0, len(infos); i < count; i++ {
-		if i == count-1 {
-			otherEndTag = 0
-		}
-
-		expressions = append(expressions, s.onFirstScanExpression(otherEndTag))
-		if s.ch == ',' {
-			s.toNextCh()
-			s.nextCh()
-		}
-	}
-
-	return expressions
-}
-
 // 嘗試一次就將資料解析出來
 // 失敗:
 // 多個相同結構無法判斷
@@ -43,10 +18,8 @@ func (s *source) onVarExpressionList(infos []*dao.VarInfo) []string {
 // 		s.nextCh()
 // 		exp := s.onVarExpression(info.ContentTypeInfo)
 // 		info.Expression = exp
-
 // 		if info.ContentTypeInfo == nil {
 // 			// 從表達式解析型態
-
 // 			if exp.ExpressionType != nil {
 // 				info.ContentTypeInfo = exp.ExpressionType
 // 			} else if exp.PrimaryExpr != nil {
@@ -59,10 +32,8 @@ func (s *source) onVarExpressionList(infos []*dao.VarInfo) []string {
 // 				}
 // 			}
 // 		}
-
 // 		fmt.Println("-----------------------------")
 // 		fmt.Printf("Name: %s = %s\n", info.GetName(), info.Expression.ContentStr)
-
 // 		if s.ch == ',' {
 // 			s.nextCh()
 // 		}
@@ -167,7 +138,11 @@ func (s *source) onVarExpression(iInfo dao.ITypeInfo) *dao.Expression {
 		case '^':
 			panic("")
 		case '*':
-			panic("")
+			// unary_op UnaryExpr, Expression binary_op Expression,
+			typeInfo := s.OnTypeSwitch(string(s.ch))
+			exp.ExpressionType = typeInfo
+			exp.ContentStr = string(s.buf[offset:s.r])
+			return exp
 		case '(':
 			panic("")
 		case '&':
@@ -229,6 +204,7 @@ func (s *source) onVarExpression(iInfo dao.ITypeInfo) *dao.Expression {
 			if util.IsLetter(s.ch) {
 				exp = s.onIdentifier(iInfo)
 				exp.ContentStr = string(s.buf[offset:s.r])
+				return exp
 			} else if util.IsDecimal(s.ch) {
 				exp = s.onExpressionNumber()
 				exp.ContentStr = string(s.buf[offset:s.r])
@@ -247,30 +223,78 @@ func (s *source) onIdentifier(iInfo dao.ITypeInfo) *dao.Expression {
 	identifierOrType := s.scanIdentifier()
 
 	if s.ch == '.' {
-		// selector, TypeAssertion, QualifiedIdent, MethodExpr
+		// selector, TypeAssertion, QualifiedIdent, MethodExpr, CompositeLit
 		if importPackage := s.PackageInfo.GetPackage(identifierOrType); importPackage != nil {
 
-			var info = dao.NewTypeInfoQualifiedIdent()
 			s.nextCh()
 			typeName := s.scanIdentifier()
-			fullName := fmt.Sprintf("%s.%s", identifierOrType, typeName)
+			_, expType := s.PackageInfo.GetIdentifier(identifierOrType, typeName)
 
-			info.SetName(fullName)
-			if s.ch == '(' {
-				link, iItype := s.PackageInfo.GetPackageFunc(identifierOrType, typeName)
-				info.ImportLink, info.ContentTypeInfo = link, iItype
+			if expType != nil {
+				// 可判別類型
+				switch info := expType.(type) {
+				case *dao.TypeInfo:
+					// TypeInfo: QualifiedIdent
+					fmt.Println(info)
+
+					switch s.ch {
+					case '{':
+						// CompositeLit
+						liteType := info
+						liteValue := s.onCompositeLit(liteType)
+						if liteValue.LiteralValue == nil {
+							exp.ExpressionType = liteType
+
+						} else {
+							prim := &dao.PrimaryExpr{
+								Operand: &dao.Operand{
+									Literal: &dao.Literal{
+										CompositeLit: liteValue,
+									},
+								},
+							}
+
+							exp.PrimaryExpr = prim
+						}
+					case '(':
+						// Conversion
+						s.nextCh()
+						subExp := s.onVarExpression(nil)
+						pri := &dao.PrimaryExpr{
+							Conversion: &dao.Conversion{
+								ConversionType: info,
+								SubExpression:  subExp,
+							},
+						}
+						exp.ExpressionType = info
+						exp.PrimaryExpr = pri
+					}
+
+					return exp
+
+				case *dao.FuncInfo:
+					// MethodExpr
+					fmt.Println(info)
+
+				}
 			} else {
-				link, iItype := s.PackageInfo.GetPackageType(identifierOrType, typeName)
-				info.ImportLink, info.ContentTypeInfo = link, iItype
+				// 無法判別, 存在於未解析檔案
+				if s.ch == '{' {
+					// struct
+					_, liteType := s.PackageInfo.GetPackageType(identifierOrType, typeName)
+					s.onCompositeLit(liteType)
+				}
+				fmt.Println("")
+			}
+			fmt.Println("")
 
-			}
-			primary := &dao.PrimaryExpr{
-				Operand: &dao.Operand{
-					OperandName: info,
-				},
-			}
-			s.onSubPrimaryExpr(primary)
-			exp.PrimaryExpr = primary
+			// primary := &dao.PrimaryExpr{
+			// 	Operand: &dao.Operand{
+			// 		OperandName: info,
+			// 	},
+			// }
+			// s.onSubPrimaryExpr(primary)
+			// exp.PrimaryExpr = primary
 		}
 		return exp
 	} else if _, ok := constant.KeyWorkFunc[identifierOrType]; ok {
@@ -282,28 +306,59 @@ func (s *source) onIdentifier(iInfo dao.ITypeInfo) *dao.Expression {
 				OperandName: info,
 			},
 		}
+
+		// Arguments
+		subExpList := dao.NewExpression()
+		for {
+			// 跨過 ',' 和 '('
+			s.nextCh()
+			s.toNextCh()
+
+			subexp := s.onVarExpression(nil)
+			subExpList.SubExpression = append(subExpList.SubExpression, *subexp)
+			if s.ch != ',' {
+				s.nextCh()
+				break
+			}
+		}
+
+		// Arguments
 		s.onSubPrimaryExpr(primary)
 		exp.PrimaryExpr = primary
 		return exp
 
 	} else if _, ok := constant.KeyWordType[identifierOrType]; ok {
-		// 字串為系統保留 類型名稱
-		liteType := s.OnTypeSwitch(identifierOrType)
-		liteValue := s.onCompositeLit(liteType)
 
-		if liteValue.LiteralValue == nil {
-			exp.ExpressionType = liteType
+		if identifierOrType == "func" {
 
-		} else {
-			prim := &dao.PrimaryExpr{
+			funcLit := s.onFuncLit()
+			exp.PrimaryExpr = &dao.PrimaryExpr{
 				Operand: &dao.Operand{
 					Literal: &dao.Literal{
-						CompositeLit: liteValue,
+						FunctionLit: funcLit,
 					},
 				},
 			}
+		} else {
 
-			exp.PrimaryExpr = prim
+			// 字串為系統保留 類型名稱
+			liteType := s.OnTypeSwitch(identifierOrType)
+			liteValue := s.onCompositeLit(liteType)
+
+			if liteValue.LiteralValue == nil {
+				exp.ExpressionType = liteType
+
+			} else {
+				prim := &dao.PrimaryExpr{
+					Operand: &dao.Operand{
+						Literal: &dao.Literal{
+							CompositeLit: liteValue,
+						},
+					},
+				}
+
+				exp.PrimaryExpr = prim
+			}
 		}
 		return exp
 
@@ -398,12 +453,22 @@ func (s *source) onCompositeLit(literalType dao.ITypeInfo) *dao.CompositeLit {
 		case *dao.TypeInfoMap:
 			exp.LiteralValue = s.onScanMapElementList(info)
 		case *dao.TypeInfo:
-			if structInfo, ok := info.ContentTypeInfo.(*dao.TypeInfoStruct); ok {
+			if info.ContentTypeInfo == nil {
+				exp.LiteralValue = s.onScanStructUnknowElementList()
+			} else if structInfo, ok := info.ContentTypeInfo.(*dao.TypeInfoStruct); ok {
+				exp.LiteralValue = s.onScanStructElementList(structInfo)
+			}
+		case *dao.TypeInfoQualifiedIdent:
+			if info.ContentTypeInfo == nil {
+				exp.LiteralValue = s.onScanStructUnknowElementList()
+			} else if structInfo, ok := info.ContentTypeInfo.(*dao.TypeInfoStruct); ok {
 				exp.LiteralValue = s.onScanStructElementList(structInfo)
 			}
 		}
 
-		s.nextCh()
+		if s.ch != '}' {
+			s.nextCh()
+		}
 	}
 	return exp
 }
@@ -529,6 +594,53 @@ func (s *source) onScanMapElementList(info *dao.TypeInfoMap) *dao.ElementList {
 			if s.checkCommon() {
 				s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 			}
+		} else if s.ch == '}' {
+			// 结束符号在同一行
+			break
+		}
+	}
+
+	return elementList
+}
+
+// 解析未知結構, 只紀錄名稱對應的關聯
+func (s *source) onScanStructUnknowElementList() *dao.ElementList {
+	if s.buf[s.r+1] == '}' {
+		// 提前結束
+		s.nextCh()
+		return nil
+	}
+
+	var elementList = &dao.ElementList{}
+	for {
+		if s.buf[s.r+1] == '}' {
+			// 结束符号在下一行
+			s.nextCh()
+			break
+		}
+		s.toNextCh()
+		s.nextCh()
+
+		// Key
+		keyedElement := dao.KeyedElement{}
+		key := s.scanIdentifier()
+		keyedElement.SubExpressionKey = &dao.Key{
+			SubFieldName: key,
+		}
+
+		if s.ch == ':' {
+			// element Value
+			s.toNextCh()
+			s.nextCh()
+
+			keyedElement.SubElement = &dao.Element{
+				SubExpression: s.onVarExpression(nil),
+			}
+		}
+
+		elementList.KeyedElements = append(elementList.KeyedElements, keyedElement)
+		if s.ch == ',' {
+			s.toNextCh()
 		} else if s.ch == '}' {
 			// 结束符号在同一行
 			break
@@ -721,4 +833,12 @@ func (s *source) onArguments() *dao.PrimaryExpr {
 	}
 	s.nextCh()
 	return primary
+}
+
+// finc() "_"{}
+func (s *source) onFuncLit() *dao.FunctionLit {
+	info := &dao.FunctionLit{}
+	info.ParamsInPoint, info.ParamsOutPoint = s.onSignature()
+	info.Body = s.funcBodyBlock()
+	return info
 }

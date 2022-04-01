@@ -306,9 +306,18 @@ func (s *source) VarSpec() []*dao.VarInfo {
 	infos = s.VariableIdentifierList()
 	s.toNextCh()
 
+	if infos[0].GetName() == "showConfig" {
+		fmt.Print("")
+	}
+
 	if s.buf[s.r+1] == '=' {
 		s.next()
-		s.onVarExpressionList(infos)
+
+		// 解析表達式
+		exps := s.scanVarExpressionList(infos)
+		for idx, info := range infos {
+			info.Expression = exps[idx]
+		}
 	} else {
 		typeInfo := s.OnDeclarationsType()
 		// 默認初始化
@@ -323,15 +332,12 @@ func (s *source) VarSpec() []*dao.VarInfo {
 			// 指定初始化
 			if s.buf[s.r+1] == '=' {
 				s.next()
-				// 解析表達式
-				s.scanVarExpressionList(infos)
 
-				// for idx, info := range infos {
-				// 	// 關聯 表達式內容
-				// 	if len(exps) > idx {
-				// 		info.Expression = exps[idx]
-				// 	}
-				// }
+				// 解析表達式
+				exps := s.scanVarExpressionList(infos)
+				for idx, info := range infos {
+					info.Expression = exps[idx]
+				}
 			}
 		}
 	}
@@ -340,6 +346,12 @@ func (s *source) VarSpec() []*dao.VarInfo {
 		common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		for _, info := range infos {
 			info.Common = common
+		}
+	}
+
+	for _, info := range infos {
+		if info.Expression == nil && info.ContentTypeInfo == nil {
+			fmt.Println("")
 		}
 	}
 

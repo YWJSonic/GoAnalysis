@@ -61,17 +61,17 @@ func NewTypeDef() *TypeInfo {
 	}
 }
 
-type TypeInfoRef struct {
-	TypeBase
-}
+// type TypeInfoRef struct {
+// 	TypeBase
+// }
 
-func (self *TypeInfoRef) GetTypeBase() TypeBase {
-	return self.TypeBase
-}
+// func (self *TypeInfoRef) GetTypeBase() TypeBase {
+// 	return self.TypeBase
+// }
 
-func NewTypeInfoRef() *TypeInfoRef {
-	return &TypeInfoRef{}
-}
+// func NewTypeInfoRef() *TypeInfoRef {
+// 	return &TypeInfoRef{}
+// }
 
 // struct 類型
 type TypeInfoStruct struct {

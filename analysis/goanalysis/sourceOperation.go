@@ -28,8 +28,9 @@ func (s *source) rangeStr() string {
 func (s *source) nextCh() rune {
 	s.r++
 	s.b = s.r
-	s.ch = rune(s.buf[s.r])
-	s.checkEnd()
+	if !s.checkEnd() {
+		s.ch = rune(s.buf[s.r])
+	}
 	return s.ch
 }
 
@@ -58,28 +59,6 @@ func (s *source) toNextCh() rune {
 			break
 		}
 		s.nextCh()
-	}
-	return s.ch
-}
-
-func (s *source) toNextToken() rune {
-	var rp1 byte = s.buf[s.r+1]
-	var isRun bool = true
-	for isRun {
-		for _, token := range constant.TokenLit {
-			if token == rp1 {
-				isRun = false
-			}
-		}
-
-		if isRun {
-			s.nextCh()
-			rp1 = s.buf[s.r+1]
-		}
-
-		if s.checkEnd() {
-			isRun = false
-		}
 	}
 	return s.ch
 }
@@ -196,56 +175,6 @@ func (s *source) nextTargetToken(ch rune) {
 		s.ch = rune(s.buf[s.r])
 		if s.ch == ch {
 			return
-		}
-	}
-}
-
-// 跳至下一個目標 token 位置
-func (s *source) nextTargetTokenIdx(ch byte) (tmpr int) {
-	tmpr = s.r
-	for {
-		tmpr++
-		if tmpr == s.e {
-			return
-		}
-
-		if s.buf[tmpr] == ch {
-			return
-		}
-	}
-}
-
-// 取得下一個結束位置
-// @params 指定結束位元 0=只使用預設 '\n'
-// @return 結束位置
-func (s *source) nextEndIdx(endTarget byte) (tmpr int) {
-	tmpr = s.r
-	for {
-		tmpr++
-		if tmpr == s.e {
-			return
-		}
-
-		if s.buf[tmpr] == endTarget || s.buf[tmpr] == '\n' {
-			return
-		}
-	}
-}
-
-// 跳至第一個符合陣列內元素的物件
-func (s *source) toFirstNextTarget(targets []byte) {
-	s.b = s.r + 1
-	for {
-		s.r++
-		if s.checkEnd() {
-			return
-		}
-
-		for _, target := range targets {
-			if s.buf[s.r] == target {
-				s.ch = rune(s.buf[s.r])
-				return
-			}
 		}
 	}
 }

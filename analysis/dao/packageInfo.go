@@ -42,11 +42,6 @@ type PackageInfo struct {
 	GoPath           string
 	CurrentFileNodes FileDataNode `json:"-"`
 
-	// var, const 解析完成前儲存於此
-	// 當該 package 解析完成最後在分類
-	// 或是就不分了
-	AllVarAndConst []ITypeInfo
-
 	UndefVarOrConst           map[string]ITypeInfo
 	ImplicitlyVarOrConstInfos []ITypeInfo // 隱藏式宣告參數 var or const
 	AllTypeInfos              map[string]*TypeInfo
@@ -148,4 +143,25 @@ func (self *PackageInfo) GetFunc(funcName string) ITypeInfo {
 	}
 
 	return iTypeInfo
+}
+
+func (self *PackageInfo) GetIdentifier(packageName, name string) (*ImportInfo, ITypeInfo) {
+	link := self.GetPackage(packageName)
+
+	// golang 內建 package 處理
+	if link.Package == nil {
+		return link, nil
+	}
+
+	if info, ok := link.Package.AllConstInfos[name]; ok {
+		return link, info
+	} else if info, ok := link.Package.AllVarInfos[name]; ok {
+		return link, info
+	} else if info, ok := link.Package.AllFuncInfo[name]; ok {
+		return link, info
+	} else if info, ok := link.Package.AllTypeInfos[name]; ok {
+		return link, info
+	} else {
+		return link, nil
+	}
 }

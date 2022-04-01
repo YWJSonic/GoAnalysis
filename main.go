@@ -13,7 +13,7 @@ func main() {
 
 func RunAnalysis() {
 	// go http.ListenAndServe("0.0.0.0:6060", nil)
-	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GameBackend/gamemaster")
+	projectRootNode := goloader.LoadRoot("/home/yang/Desktop/GoAnalysis")
 
 	goanalysis.Instants = dao.NewProjectInfo(projectRootNode)
 
@@ -27,6 +27,9 @@ func RunAnalysis() {
 
 	// 解析專案
 	goanalysis.GoAnalysisSpaceFirst(projectRootNode)
+	// 解析表達式 第二階段
+	// goanalysis.GoAnalysisExpression(goanalysis.Instants)
+	// 輸出圖形化
 	graphics.OutputPlantUmlGraphics(goanalysis.Instants)
 
 	// data, err := json.Marshal(goanalysis.Instants)

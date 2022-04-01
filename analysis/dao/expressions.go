@@ -76,7 +76,10 @@ type Literal struct {
 }
 
 type FunctionLit struct {
-	Name string
+	BasicLit       ITypeInfo    // 基礎類型
+	ParamsInPoint  []FuncParams // 輸入參數
+	ParamsOutPoint []FuncParams // 輸出參數
+	Body           string       `json:"-"` // 方法內文 *尚未解析
 }
 
 // CompositeLit 組合類型

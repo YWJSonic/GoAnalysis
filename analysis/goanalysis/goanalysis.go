@@ -121,7 +121,36 @@ func GoAnalysisExpression(project *dao.ProjectInfo) {
 		for _, varInfo := range packageInfo.AllVarInfos {
 			if varInfo.ContentTypeInfo == nil {
 				fmt.Println(varInfo.Expression)
+				analysisExpression(packageInfo, varInfo)
 			}
+		}
+	}
+}
+
+func analysisExpression(packageInfo *dao.PackageInfo, varInfo *dao.VarInfo) {
+	buf := bytes.NewBuffer([]byte(" "))
+	buf.WriteString(varInfo.Expression.ContentStr)
+	s := source{
+		buf:         buf.Bytes(),
+		PackageInfo: packageInfo,
+	}
+
+	s.start()
+
+	for {
+		s.toNextCh()
+
+		if s.r+1 == s.e {
+			break
+		}
+
+		// 最外層註解
+		if s.checkCommon() {
+			s.OnComments(string(s.buf[s.r+1 : s.r+3]))
+		} else {
+			s.nextCh()
+			s.onVarExpression(varInfo)
+
 		}
 	}
 }
