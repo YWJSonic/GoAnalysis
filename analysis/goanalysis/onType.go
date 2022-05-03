@@ -193,7 +193,18 @@ func (s *source) OnFieldDecl(info *dao.TypeInfoStruct) {
 			}
 
 			if !s.isOnNewlineSymbol() {
-				panic("struct 解析錯誤")
+				// 單行宣告 * struct{ xxx, yyy int }
+				if s.buf[s.r+1] == '}' {
+					s.next()
+					if !s.isOnNewlineSymbol() {
+						s.toNextCh()
+						break
+					} else {
+						break
+					}
+				} else {
+					panic("struct 解析錯誤")
+				}
 			}
 		}
 	}

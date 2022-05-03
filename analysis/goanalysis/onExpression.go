@@ -2,7 +2,6 @@ package goanalysis
 
 import (
 	"codeanalysis/analysis/dao"
-	"fmt"
 )
 
 // var 第一階段表達式解析接口
@@ -18,7 +17,6 @@ func (s *source) scanVarExpressionList(infos []*dao.VarInfo) []*dao.Expression {
 		exp := dao.NewExpression()
 		exp.ContentStr = s.onFirstScanExpression(otherEndTag)
 		expressions = append(expressions, exp)
-		fmt.Println(exp.ContentStr)
 
 		if s.ch == ',' {
 			s.toNextCh()

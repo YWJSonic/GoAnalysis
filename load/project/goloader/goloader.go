@@ -13,7 +13,7 @@ func LoadRoot(rootPath string) *GoFileNode {
 
 	option := Option{
 		MaxDepth: 0,
-		SkipFile: []string{".vscode", ".git", "vendor"},
+		SkipFile: []string{".vscode", ".git", "vendor", "doc"},
 	}
 	rootNode.Childes = loopBuildStruct(rootNode, 0, option)
 	return rootNode

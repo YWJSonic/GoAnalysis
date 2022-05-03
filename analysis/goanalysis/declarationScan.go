@@ -306,10 +306,6 @@ func (s *source) VarSpec() []*dao.VarInfo {
 	infos = s.VariableIdentifierList()
 	s.toNextCh()
 
-	if infos[0].GetName() == "showConfig" {
-		fmt.Print("")
-	}
-
 	if s.buf[s.r+1] == '=' {
 		s.next()
 
@@ -346,12 +342,6 @@ func (s *source) VarSpec() []*dao.VarInfo {
 		common := s.OnComments(string(s.buf[s.r+1 : s.r+3]))
 		for _, info := range infos {
 			info.Common = common
-		}
-	}
-
-	for _, info := range infos {
-		if info.Expression == nil && info.ContentTypeInfo == nil {
-			fmt.Println("")
 		}
 	}
 

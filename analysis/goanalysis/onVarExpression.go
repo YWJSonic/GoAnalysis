@@ -284,9 +284,7 @@ func (s *source) onIdentifier(iInfo dao.ITypeInfo) *dao.Expression {
 					_, liteType := s.PackageInfo.GetPackageType(identifierOrType, typeName)
 					s.onCompositeLit(liteType)
 				}
-				fmt.Println("")
 			}
-			fmt.Println("")
 
 			// primary := &dao.PrimaryExpr{
 			// 	Operand: &dao.Operand{
