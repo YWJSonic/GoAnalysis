@@ -1,0 +1,1064 @@
+@startuml
+namespace bytes #5861af{
+
+
+
+}
+
+namespace codeanalysis #7cf3ef{
+
+
+
+}
+
+namespace codeanalysis.analysis.constant #cc30cf{
+
+	class IntLiteType <<(T,#00FF00)>> {}
+	class KeyWordString <<(T,#00FF00)>> {}
+	class LitKind <<(T,#00FF00)>> {}
+	class Operator <<(T,#00FF00)>> {}
+	class TypeString <<(T,#00FF00)>> {}
+	class token <<(T,#00FF00)>> {}
+
+	class KeyWorkFunc <<(V,#FF0000)>> {}
+	class Bool_op <<(V,#FF0000)>> {}
+	class typeStringLit <<(V,#FF0000)>> {}
+	class keyWordStringLit <<(V,#FF0000)>> {}
+	class TokenLit <<(V,#FF0000)>> {}
+	class KeyWordType <<(V,#FF0000)>> {}
+
+	class From_Vendor <<(C,#FF00FF)>> {}
+	class _Rbrack <<(C,#FF00FF)>> {}
+	class _Dot <<(C,#FF00FF)>> {}
+	class Shl <<(C,#FF00FF)>> {}
+	class _real <<(C,#FF00FF)>> {}
+	class _iota <<(C,#FF00FF)>> {}
+	class _Comma <<(C,#FF00FF)>> {}
+	class _copy <<(C,#FF00FF)>> {}
+	class precCmp <<(C,#FF00FF)>> {}
+	class _fallthrough <<(C,#FF00FF)>> {}
+	class _import <<(C,#FF00FF)>> {}
+	class _make <<(C,#FF00FF)>> {}
+	class _EOF <<(C,#FF00FF)>> {}
+	class _Define <<(C,#FF00FF)>> {}
+	class _Rbrace <<(C,#FF00FF)>> {}
+	class _else <<(C,#FF00FF)>> {}
+	class _return <<(C,#FF00FF)>> {}
+	class _delete <<(C,#FF00FF)>> {}
+	class _false <<(C,#FF00FF)>> {}
+	class _nil <<(C,#FF00FF)>> {}
+	class tokenCount <<(C,#FF00FF)>> {}
+	class Goto <<(C,#FF00FF)>> {}
+	class Leq <<(C,#FF00FF)>> {}
+	class Shr <<(C,#FF00FF)>> {}
+	class _go <<(C,#FF00FF)>> {}
+	class _chan <<(C,#FF00FF)>> {}
+	class _Fallthrough <<(C,#FF00FF)>> {}
+	class _Var <<(C,#FF00FF)>> {}
+	class Mul <<(C,#FF00FF)>> {}
+	class _println <<(C,#FF00FF)>> {}
+	class _true <<(C,#FF00FF)>> {}
+	class _Import <<(C,#FF00FF)>> {}
+	class IntLit <<(C,#FF00FF)>> {}
+	class _byte <<(C,#FF00FF)>> {}
+	class _int16 <<(C,#FF00FF)>> {}
+	class From_Local <<(C,#FF00FF)>> {}
+	class _Case <<(C,#FF00FF)>> {}
+	class _Else <<(C,#FF00FF)>> {}
+	class IntLiteType_Binary <<(C,#FF00FF)>> {}
+	class Gtr <<(C,#FF00FF)>> {}
+	class precAdd <<(C,#FF00FF)>> {}
+	class _Lbrack <<(C,#FF00FF)>> {}
+	class Fallthrough <<(C,#FF00FF)>> {}
+	class IntLiteType_Octal <<(C,#FF00FF)>> {}
+	class _case <<(C,#FF00FF)>> {}
+	class IntLiteType_None <<(C,#FF00FF)>> {}
+	class _bool <<(C,#FF00FF)>> {}
+	class _int64 <<(C,#FF00FF)>> {}
+	class _int <<(C,#FF00FF)>> {}
+	class _Lparen <<(C,#FF00FF)>> {}
+	class _Continue <<(C,#FF00FF)>> {}
+	class _For <<(C,#FF00FF)>> {}
+	class _Range <<(C,#FF00FF)>> {}
+	class StringLit <<(C,#FF00FF)>> {}
+	class Eql <<(C,#FF00FF)>> {}
+	class _Goto <<(C,#FF00FF)>> {}
+	class _Switch <<(C,#FF00FF)>> {}
+	class Geq <<(C,#FF00FF)>> {}
+	class Div <<(C,#FF00FF)>> {}
+	class _switch <<(C,#FF00FF)>> {}
+	class _complex <<(C,#FF00FF)>> {}
+	class _Func <<(C,#FF00FF)>> {}
+	class Defer <<(C,#FF00FF)>> {}
+	class _select <<(C,#FF00FF)>> {}
+	class _range <<(C,#FF00FF)>> {}
+	class _Colon <<(C,#FF00FF)>> {}
+	class _If <<(C,#FF00FF)>> {}
+	class IntLiteType_Hex <<(C,#FF00FF)>> {}
+	class And <<(C,#FF00FF)>> {}
+	class RuneLit <<(C,#FF00FF)>> {}
+	class Tilde <<(C,#FF00FF)>> {}
+	class Or <<(C,#FF00FF)>> {}
+	class _goto <<(C,#FF00FF)>> {}
+	class _cap <<(C,#FF00FF)>> {}
+	class _uint32 <<(C,#FF00FF)>> {}
+	class DefType_Def <<(C,#FF00FF)>> {}
+	class _Star <<(C,#FF00FF)>> {}
+	class _Map <<(C,#FF00FF)>> {}
+	class _Package <<(C,#FF00FF)>> {}
+	class AndNot <<(C,#FF00FF)>> {}
+	class _struct <<(C,#FF00FF)>> {}
+	class _Operator <<(C,#FF00FF)>> {}
+	class _Rparen <<(C,#FF00FF)>> {}
+	class _Struct <<(C,#FF00FF)>> {}
+	class Add <<(C,#FF00FF)>> {}
+	class From_Golang <<(C,#FF00FF)>> {}
+	class _IncOp <<(C,#FF00FF)>> {}
+	class _defer <<(C,#FF00FF)>> {}
+	class _len <<(C,#FF00FF)>> {}
+	class _uint16 <<(C,#FF00FF)>> {}
+	class Go <<(C,#FF00FF)>> {}
+	class Sub <<(C,#FF00FF)>> {}
+	class _panic <<(C,#FF00FF)>> {}
+	class _recover <<(C,#FF00FF)>> {}
+	class _Literal <<(C,#FF00FF)>> {}
+	class _Default <<(C,#FF00FF)>> {}
+	class _func <<(C,#FF00FF)>> {}
+	class _uint8 <<(C,#FF00FF)>> {}
+	class _for <<(C,#FF00FF)>> {}
+	class _print <<(C,#FF00FF)>> {}
+	class From_Local_Package <<(C,#FF00FF)>> {}
+	class _Lbrace <<(C,#FF00FF)>> {}
+	class _Chan <<(C,#FF00FF)>> {}
+	class Continue <<(C,#FF00FF)>> {}
+	class OrOr <<(C,#FF00FF)>> {}
+	class AndAnd <<(C,#FF00FF)>> {}
+	class _break <<(C,#FF00FF)>> {}
+	class _type <<(C,#FF00FF)>> {}
+	class _Const <<(C,#FF00FF)>> {}
+	class _Select <<(C,#FF00FF)>> {}
+	class FloatLit <<(C,#FF00FF)>> {}
+	class Def <<(C,#FF00FF)>> {}
+	class precAndAnd <<(C,#FF00FF)>> {}
+	class precMul <<(C,#FF00FF)>> {}
+	class _complex64 <<(C,#FF00FF)>> {}
+	class _ <<(C,#FF00FF)>> {}
+	class _Break <<(C,#FF00FF)>> {}
+	class _continue <<(C,#FF00FF)>> {}
+	class _rune <<(C,#FF00FF)>> {}
+	class _uintptr <<(C,#FF00FF)>> {}
+	class _AssignOp <<(C,#FF00FF)>> {}
+	class _Return <<(C,#FF00FF)>> {}
+	class _complex128 <<(C,#FF00FF)>> {}
+	class _string <<(C,#FF00FF)>> {}
+	class _DotDotDot <<(C,#FF00FF)>> {}
+	class Break <<(C,#FF00FF)>> {}
+	class _any <<(C,#FF00FF)>> {}
+	class _float32 <<(C,#FF00FF)>> {}
+	class _Arrow <<(C,#FF00FF)>> {}
+	class _Go <<(C,#FF00FF)>> {}
+	class _Interface <<(C,#FF00FF)>> {}
+	class Recv <<(C,#FF00FF)>> {}
+	class _new <<(C,#FF00FF)>> {}
+	class ImagLit <<(C,#FF00FF)>> {}
+	class Xor <<(C,#FF00FF)>> {}
+	class _package <<(C,#FF00FF)>> {}
+	class _imag <<(C,#FF00FF)>> {}
+	class _float64 <<(C,#FF00FF)>> {}
+	class _uint <<(C,#FF00FF)>> {}
+	class _Defer <<(C,#FF00FF)>> {}
+	class Not <<(C,#FF00FF)>> {}
+	class _const <<(C,#FF00FF)>> {}
+	class _if <<(C,#FF00FF)>> {}
+	class _close <<(C,#FF00FF)>> {}
+	class _comparable <<(C,#FF00FF)>> {}
+	class DefType_Decl <<(C,#FF00FF)>> {}
+	class _Name <<(C,#FF00FF)>> {}
+	class _Type <<(C,#FF00FF)>> {}
+	class Rem <<(C,#FF00FF)>> {}
+	class _default <<(C,#FF00FF)>> {}
+	class _map <<(C,#FF00FF)>> {}
+	class _int32 <<(C,#FF00FF)>> {}
+	class IntLiteType_Decimal <<(C,#FF00FF)>> {}
+	class Lss <<(C,#FF00FF)>> {}
+	class precOrOr <<(C,#FF00FF)>> {}
+	class _interface <<(C,#FF00FF)>> {}
+	class _var <<(C,#FF00FF)>> {}
+	class _error <<(C,#FF00FF)>> {}
+	class _Assign <<(C,#FF00FF)>> {}
+	class _Semi <<(C,#FF00FF)>> {}
+	class Neq <<(C,#FF00FF)>> {}
+	class _append <<(C,#FF00FF)>> {}
+	class _int8 <<(C,#FF00FF)>> {}
+	class _uint64 <<(C,#FF00FF)>> {}
+}
+
+namespace codeanalysis.analysis.dao #95556f{
+	interface TypeBase {
+		GetName() string
+		SetName(string) 
+		GetTypeName() string
+		SetTypeName(string) 
+		SetGoPath(string) 
+		SetTypeFrom(types.TypeFrom) 
+		GetIsAnalysis() bool
+		SetIsAnalysis() 
+	}
+	interface ITypeInfo {
+		GetTypeBase() TypeBase
+		GetName() string
+		SetName(string) 
+		GetTypeName() string
+		SetTypeName(string) 
+	}
+	interface FileDataNode {
+		Path() string
+		Name() string
+	}
+	interface IExpressionContext {
+	}
+
+	class Arguments <<(T,#00FF00)>> {
+		point SubExpression
+	}
+	class CompositeLit <<(T,#00FF00)>> {
+		ITypeInfo LiteralType
+		point LiteralValue
+	}
+	class ConstInfo <<(T,#00FF00)>> {
+		point Expression
+		string Common
+		ITypeInfo ContentTypeInfo
+	}
+	class Conversion <<(T,#00FF00)>> {
+		ITypeInfo ConversionType
+		point SubExpression
+	}
+	class Element <<(T,#00FF00)>> {
+		point SubExpression
+		point SubLiteralValue
+	}
+	class ElementList <<(T,#00FF00)>> {
+		[] KeyedElements
+	}
+	class Expression <<(T,#00FF00)>> {
+		ITypeInfo ExpressionType
+		string ContentStr
+		[] SubExpression
+		string Operators
+		point PrimaryExpr
+	}
+	class FuncInfo <<(T,#00FF00)>> {
+		[] ParamsInPoint
+		[] ParamsOutPoint
+		string Body
+		FuncParams Receiver
+	}
+	class FuncParams <<(T,#00FF00)>> {
+		ITypeInfo ContentTypeInfo
+	}
+	class FunctionLit <<(T,#00FF00)>> {
+		ITypeInfo BasicLit
+		[] ParamsInPoint
+		[] ParamsOutPoint
+		string Body
+	}
+	class ImportInfo <<(T,#00FF00)>> {
+		point Package
+		string NewName
+		string ImportMod
+	}
+	class Index <<(T,#00FF00)>> {
+		point Expression
+	}
+	class Key <<(T,#00FF00)>> {
+		string SubFieldName
+		point SubExpression
+		point SubLiteralValue
+	}
+	class KeyedElement <<(T,#00FF00)>> {
+		point SubExpressionKey
+		point SubElement
+	}
+	class Literal <<(T,#00FF00)>> {
+		ITypeInfo BasicLit
+		point CompositeLit
+		point FunctionLit
+	}
+	class MethodExpr <<(T,#00FF00)>> {
+		point ReceiverType
+		point Method
+	}
+	class ModuleInfo <<(T,#00FF00)>> {
+		string GoVersion
+		FileDataNode CurrentFileNodes
+		map VendorMap
+		string ModuleName
+	}
+	class Operand <<(T,#00FF00)>> {
+		string OperandStrName
+		ITypeInfo OperandName
+		point Literal
+		point SubExpression
+	}
+	class PackageInfo <<(T,#00FF00)>> {
+		FileDataNode CurrentFileNodes
+		map UndefVarOrConst
+		map AllTypeInfos
+		map AllConstInfos
+		map AllFuncInfo
+		string PackageVersion
+		string GoPath
+		[] ImplicitlyVarOrConstInfos
+		map AllVarInfos
+		map AllImportLink
+	}
+	class PointBase <<(T,#00FF00)>> {
+		string Name
+		string TypeName
+		types.TypeFrom TypeFrom
+		string GoPath
+		bool IsAnalysis
+	}
+	class PrimaryExpr <<(T,#00FF00)>> {
+		point SubPrimaryExpr
+		point Arguments
+		point Index
+		point Conversion
+		point MethodExpr
+		point Selector
+		point Slice
+		point TypeAssertion
+		point Operand
+	}
+	class ProjectInfo <<(T,#00FF00)>> {
+		point ModuleInfo
+		FileDataNode ProjectRoot
+		map LocalPackageMap
+		map VendorPackageMap
+		map GolangPackageMap
+	}
+	class Selector <<(T,#00FF00)>> {
+		point TypeInfoFunc
+	}
+	class Slice <<(T,#00FF00)>> {
+		[] Expression
+	}
+	class TypeAssertion <<(T,#00FF00)>> {
+		ITypeInfo Typeinfo
+	}
+	class TypeInfo <<(T,#00FF00)>> {
+		string DefType
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoArray <<(T,#00FF00)>> {
+		string Size
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoBool <<(T,#00FF00)>> {}
+	class TypeInfoChannel <<(T,#00FF00)>> {
+		int FlowType
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoFunction <<(T,#00FF00)>> {
+		[] ParamsInPoint
+		[] ParamsOutPoint
+		string Common
+	}
+	class TypeInfoInterface <<(T,#00FF00)>> {
+		[] MatchInfos
+	}
+	class TypeInfoMap <<(T,#00FF00)>> {
+		ITypeInfo KeyType
+		ITypeInfo ValueType
+	}
+	class TypeInfoNumeric <<(T,#00FF00)>> {}
+	class TypeInfoPointer <<(T,#00FF00)>> {
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoQualifiedIdent <<(T,#00FF00)>> {
+		point ImportLink
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoRef <<(T,#00FF00)>> {}
+	class TypeInfoSlice <<(T,#00FF00)>> {
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoString <<(T,#00FF00)>> {}
+	class TypeInfoStruct <<(T,#00FF00)>> {
+		[] ImplicitlyVarInfos
+		map VarInfos
+	}
+	class VarInfo <<(T,#00FF00)>> {
+		point Expression
+		string Tag
+		string Common
+		ITypeInfo ContentTypeInfo
+	}
+
+	class BaseTypeInfo <<(V,#FF0000)>> {}
+	class BaseConstInfo <<(V,#FF0000)>> {}
+	class BaseFuncInfo <<(V,#FF0000)>> {}
+
+}
+
+namespace codeanalysis.analysis.goanalysis #d2492f{
+	interface t7 {
+	}
+	interface g8 {
+		Test1([1024]) int
+		Test2(int64) float32
+	}
+	interface t8 {
+		T8_1(int) int
+	}
+	interface GRedisAdapater {
+		WW3() 
+		HGet(string,string,int) (string,error)
+		HGetAll(string) (map,error)
+		HMSet(string,[]) (bool,error)
+		HDel(string,[]) (int64,error)
+		Del(string) (int64,error)
+		UpdateTotalBet(string,map) error
+		CreateGameRecordId(time.Time) string
+		Nw1(string,string,int64) string
+		Nw2(string,string,int64) string
+		UpdateGame29Paradise(string,string,string,float64,float64,float64,float64) error
+	}
+	interface g7 {
+	}
+
+	class As <<(T,#00FF00)>> {
+		int WWe
+		string asd
+	}
+	class Bs <<(T,#00FF00)>> {}
+	class Ds <<(T,#00FF00)>> {
+		int WWe
+		string asd
+	}
+	class Feature <<(T,#00FF00)>> {
+		func SetMockWebsocketServer
+		func Run
+	}
+	class Feature2 <<(T,#00FF00)>> {
+		func SetMockWebsocketServer
+		func Run
+	}
+	class Feature3 <<(T,#00FF00)>> {
+		func SetMockWebsocketServer
+		func Run
+	}
+	class G16Options <<(T,#00FF00)>> {
+		string a
+		 shutdownChan
+		[] Rounds
+		[] DisabledPatterns
+		 writeFlow
+		 ww
+		string s
+		string b
+		[] MinCoins
+		[] BirdCatchCounts
+		string d
+		chan writeFlowBackup
+		 writeEnd
+		map subscriberMap
+		sync.Mutex mu
+	}
+	class GSA <<(T,#00FF00)>> {}
+	class Gs <<(T,#00FF00)>> {}
+	class Ws <<(T,#00FF00)>> {}
+	class f1 <<(T,#00FF00)>> {}
+	class g1 <<(T,#00FF00)>> {}
+	class g2 <<(T,#00FF00)>> {}
+	class g3 <<(T,#00FF00)>> {}
+	class g4 <<(T,#00FF00)>> {}
+	class g5 <<(T,#00FF00)>> {}
+	class g61 <<(T,#00FF00)>> {}
+	class g9 <<(T,#00FF00)>> {}
+	class gg1 <<(T,#00FF00)>> {}
+	class m1 <<(T,#00FF00)>> {}
+	class m2 <<(T,#00FF00)>> {}
+	class m3 <<(T,#00FF00)>> {}
+	class m4 <<(T,#00FF00)>> {}
+	class source <<(T,#00FF00)>> {
+		[] buf
+		int b
+		int r
+		int e
+		rune ch
+		bool isEnd
+		point PackageInfo
+	}
+	class t1 <<(T,#00FF00)>> {}
+	class t2 <<(T,#00FF00)>> {}
+	class t4 <<(T,#00FF00)>> {}
+	class t5 <<(T,#00FF00)>> {}
+	class t6 <<(T,#00FF00)>> {
+		t1 T6_1
+		t2 T6_2
+	}
+
+	class hgqe <<(V,#FF0000)>> {}
+	class HandlerIdxgfwer <<(V,#FF0000)>> {}
+	class once <<(V,#FF0000)>> {}
+	class k <<(V,#FF0000)>> {}
+	class n <<(V,#FF0000)>> {}
+	class bb <<(V,#FF0000)>> {}
+	class opb2 <<(V,#FF0000)>> {}
+	class tf2 <<(V,#FF0000)>> {}
+	class opb1 <<(V,#FF0000)>> {}
+	class HandlerIdx5tt2 <<(V,#FF0000)>> {}
+	class j <<(V,#FF0000)>> {}
+	class fgh <<(V,#FF0000)>> {}
+	class tf1 <<(V,#FF0000)>> {}
+	class oo <<(V,#FF0000)>> {}
+	class r334f <<(V,#FF0000)>> {}
+	class GX <<(V,#FF0000)>> {}
+	class HandlerIdx12332 <<(V,#FF0000)>> {}
+	class s <<(V,#FF0000)>> {}
+	class i <<(V,#FF0000)>> {}
+	class w <<(V,#FF0000)>> {}
+	class Instants <<(V,#FF0000)>> {}
+	class m <<(V,#FF0000)>> {}
+	class p <<(V,#FF0000)>> {}
+	class b <<(V,#FF0000)>> {}
+	class a <<(V,#FF0000)>> {}
+	class initialized <<(V,#FF0000)>> {}
+	class o <<(V,#FF0000)>> {}
+	class mm <<(V,#FF0000)>> {}
+	class pp <<(V,#FF0000)>> {}
+	class opb6 <<(V,#FF0000)>> {}
+	class WSX <<(V,#FF0000)>> {}
+
+	class h <<(C,#FF00FF)>> {}
+	class ck <<(C,#FF00FF)>> {}
+	class l <<(C,#FF00FF)>> {}
+	class s1 <<(C,#FF00FF)>> {}
+	class cc1 <<(C,#FF00FF)>> {}
+	class ca2 <<(C,#FF00FF)>> {}
+	class c2e <<(C,#FF00FF)>> {}
+	class cb <<(C,#FF00FF)>> {}
+	class cc4 <<(C,#FF00FF)>> {}
+	class eof <<(C,#FF00FF)>> {}
+	class cm <<(C,#FF00FF)>> {}
+	class zero <<(C,#FF00FF)>> {}
+	class opb3 <<(C,#FF00FF)>> {}
+	class opb4 <<(C,#FF00FF)>> {}
+	class opb5 <<(C,#FF00FF)>> {}
+	class d <<(C,#FF00FF)>> {}
+	class size <<(C,#FF00FF)>> {}
+	class v <<(C,#FF00FF)>> {}
+	class c3e <<(C,#FF00FF)>> {}
+	class Î <<(C,#FF00FF)>> {}
+	class Pi <<(C,#FF00FF)>> {}
+	class ca <<(C,#FF00FF)>> {}
+	class e <<(C,#FF00FF)>> {}
+	class cb3 <<(C,#FF00FF)>> {}
+	class u <<(C,#FF00FF)>> {}
+	class c1e <<(C,#FF00FF)>> {}
+	class c <<(C,#FF00FF)>> {}
+	class cb1 <<(C,#FF00FF)>> {}
+	class cj <<(C,#FF00FF)>> {}
+	class ca1 <<(C,#FF00FF)>> {}
+}
+
+namespace codeanalysis.analysis.goanalysis.scanObj #c6186f{
+
+	class HandleExp <<(T,#00FF00)>> {
+		int e
+		rune ch
+		bool isEnd
+		point PackageInfo
+		[] buf
+		int b
+		int r
+	}
+
+
+}
+
+namespace codeanalysis.graphics #76db8f{
+
+	class PlaneUml <<(T,#00FF00)>> {
+		[] context
+		[] packages
+		map line
+		point data
+	}
+
+	class nameReplacer <<(V,#FF0000)>> {}
+	class disableLineKeyword <<(V,#FF0000)>> {}
+	class disableNamsSpace <<(V,#FF0000)>> {}
+
+}
+
+namespace codeanalysis.graphics.constant #adb6ef{
+
+
+	class SportCss <<(V,#FF0000)>> {}
+
+	class LineStyle_Hidden <<(C,#FF00FF)>> {}
+	class Arrow_ExpandRight <<(C,#FF00FF)>> {}
+	class Visibility_PackagePrivate <<(C,#FF00FF)>> {}
+	class Visibility_public <<(C,#FF00FF)>> {}
+	class Color_Green <<(C,#FF00FF)>> {}
+	class Visibility_Protected <<(C,#FF00FF)>> {}
+	class Line_Splite <<(C,#FF00FF)>> {}
+	class Arrow_ExpandLeft <<(C,#FF00FF)>> {}
+	class Arrow_Polymerization <<(C,#FF00FF)>> {}
+	class Visibility_Private <<(C,#FF00FF)>> {}
+	class Color_Red <<(C,#FF00FF)>> {}
+	class LineStyle_Bold <<(C,#FF00FF)>> {}
+	class LineStyle_Dashed <<(C,#FF00FF)>> {}
+	class Line_Normal <<(C,#FF00FF)>> {}
+	class LineStyle_Dotted <<(C,#FF00FF)>> {}
+	class Color_blue <<(C,#FF00FF)>> {}
+	class Arrow_Composition <<(C,#FF00FF)>> {}
+}
+
+namespace codeanalysis.graphics.dao #8f3d0f{
+
+	class Abstract <<(T,#00FF00)>> {}
+	class Annotaion <<(T,#00FF00)>> {}
+	class Class <<(T,#00FF00)>> {
+		string Name
+		[] Field
+	}
+	class Entity <<(T,#00FF00)>> {
+		[] Field
+		string Name
+	}
+	class Interface <<(T,#00FF00)>> {
+		string Name
+		[] Field
+	}
+	class NameSpace <<(T,#00FF00)>> {
+		[] TypeList
+		[] Interface
+		string Color
+		string name
+		[] VarList
+		[] ConstList
+	}
+	class PackageSpace <<(T,#00FF00)>> {
+		[] VarList
+		[] TypeList
+		[] Interface
+		string Color
+		string name
+	}
+	class Together <<(T,#00FF00)>> {
+		[] Obj
+	}
+	class UserClass <<(T,#00FF00)>> {
+		string Name
+		[] Field
+		rune SpotWord
+		string SpotColor
+	}
+
+
+}
+
+namespace codeanalysis.load.project.goloader #64926f{
+
+	class ANAT1 <<(T,#00FF00)>> {
+		string M
+	}
+	class GoFileNode <<(T,#00FF00)>> {
+		string path
+		string FileType
+		os.FileInfo file
+		point parent
+		[] Childes
+	}
+	class Option <<(T,#00FF00)>> {
+		[] SkipFile
+		int MaxDepth
+	}
+
+
+}
+
+namespace codeanalysis.structTest #c0000f{
+
+	class G16Options <<(T,#00FF00)>> {
+		chan writeFlowBackup
+		 writeEnd
+		 shutdownChan
+		sync.Mutex mu
+		[] Antes
+		[] Rounds
+		[] DisabledPatterns
+		 writeFlow
+		 ww
+		map subscriberMap
+		[] MinCoins
+		[] BirdCatchCounts
+	}
+
+
+}
+
+namespace codeanalysis.types #eaaaaf{
+
+	class TypeFrom <<(T,#00FF00)>> {}
+
+
+}
+
+namespace codeanalysis.util #6aaacf{
+
+
+
+}
+
+namespace encoding.json #5e7a0f{
+
+
+
+}
+
+namespace fmt #a1862f{
+
+
+
+}
+
+namespace io.ioutil #b9e7af{
+
+
+
+}
+
+namespace log #fcf3cf{
+
+
+
+}
+
+namespace net.http.pprof #f0c30f{
+
+
+
+}
+
+namespace os #d8618f{
+
+	class FileInfo <<(T,#00FF00)>> {}
+
+
+}
+
+namespace path.filepath #70c32f{
+
+
+
+}
+
+namespace sort #9b6dcf{
+
+
+
+}
+
+namespace strconv #f6db6f{
+
+
+
+}
+
+namespace strings #8924af{
+
+
+
+}
+
+namespace sync #a79e8f{
+
+	class Mutex <<(T,#00FF00)>> {}
+	class Once <<(T,#00FF00)>> {}
+
+
+}
+
+namespace testing #b3cf4f{
+
+	class T <<(T,#00FF00)>> {}
+
+
+}
+
+namespace time #de79ef{
+
+	class Time <<(T,#00FF00)>> {}
+
+
+}
+
+namespace unicode #830c4f{
+
+
+
+}
+
+namespace unicode.utf8 #e4924f{
+
+
+
+}
+
+codeanalysis.analysis.constant.Add --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.And --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.AndAnd --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.AndNot --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Def --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Div --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Eql --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.FloatLit --> codeanalysis.analysis.constant.LitKind #c9249f;line.dashed;
+codeanalysis.analysis.constant.From_Golang --> codeanalysis.types.TypeFrom #c9249f;line.dashed;
+codeanalysis.analysis.constant.From_Local --> codeanalysis.types.TypeFrom #c9249f;line.dashed;
+codeanalysis.analysis.constant.From_Local_Package --> codeanalysis.types.TypeFrom #c9249f;line.dashed;
+codeanalysis.analysis.constant.From_Vendor --> codeanalysis.types.TypeFrom #c9249f;line.dashed;
+codeanalysis.analysis.constant.Geq --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Gtr --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.ImagLit --> codeanalysis.analysis.constant.LitKind #c9249f;line.dashed;
+codeanalysis.analysis.constant.IntLit --> codeanalysis.analysis.constant.LitKind #c9249f;line.dashed;
+codeanalysis.analysis.constant.IntLiteType_Binary --> codeanalysis.analysis.constant.IntLiteType #c9249f;line.dashed;
+codeanalysis.analysis.constant.IntLiteType_Decimal --> codeanalysis.analysis.constant.IntLiteType #c9249f;line.dashed;
+codeanalysis.analysis.constant.IntLiteType_Hex --> codeanalysis.analysis.constant.IntLiteType #c9249f;line.dashed;
+codeanalysis.analysis.constant.IntLiteType_None --> codeanalysis.analysis.constant.IntLiteType #c9249f;line.dashed;
+codeanalysis.analysis.constant.IntLiteType_Octal --> codeanalysis.analysis.constant.IntLiteType #c9249f;line.dashed;
+codeanalysis.analysis.constant.Leq --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Lss --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Mul --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Neq --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Not --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Or --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.OrOr --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Recv --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Rem --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.RuneLit --> codeanalysis.analysis.constant.LitKind #c9249f;line.dashed;
+codeanalysis.analysis.constant.Shl --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Shr --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.StringLit --> codeanalysis.analysis.constant.LitKind #c9249f;line.dashed;
+codeanalysis.analysis.constant.Sub --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Tilde --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant.Xor --> codeanalysis.analysis.constant.Operator #c9249f;line.dashed;
+codeanalysis.analysis.constant._Arrow --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Assign --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._AssignOp --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Break --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Case --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Chan --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Colon --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Comma --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Const --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Continue --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Default --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Defer --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Define --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Dot --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._DotDotDot --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._EOF --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Else --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Fallthrough --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._For --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Func --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Go --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Goto --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._If --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Import --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._IncOp --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Interface --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Lbrace --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Lbrack --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Literal --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Lparen --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Map --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Name --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Operator --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Package --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Range --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Rbrace --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Rbrack --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Return --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Rparen --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Select --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Semi --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Star --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Struct --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Switch --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Type --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._Var --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.constant._any --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._append --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._bool --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._break --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._byte --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._cap --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._case --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._chan --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._close --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._comparable --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._complex --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._complex128 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._complex64 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._const --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._continue --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._copy --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._default --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._defer --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._delete --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._else --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._error --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._fallthrough --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._false --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._float32 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._float64 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._for --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._func --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._go --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._goto --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._if --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._imag --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._import --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._int --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._int16 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._int32 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._int64 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._int8 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._interface --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._iota --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._len --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._make --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._map --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._new --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._nil --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._package --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._panic --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._print --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._println --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._range --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._real --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._recover --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._return --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._rune --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._select --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._string --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._struct --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._switch --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._true --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._type --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant._uint --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._uint16 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._uint32 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._uint64 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._uint8 --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._uintptr --> codeanalysis.analysis.constant.TypeString #c9249f;line.dashed;
+codeanalysis.analysis.constant._var --> codeanalysis.analysis.constant.KeyWordString #c9249f;line.dashed;
+codeanalysis.analysis.constant.tokenCount --> codeanalysis.analysis.constant.token #c9249f;line.dashed;
+codeanalysis.analysis.dao.Arguments --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.BaseConstInfo --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.BaseFuncInfo --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.BaseTypeInfo --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.CompositeLit --> codeanalysis.analysis.dao.ElementList #92493f;line.dashed;
+codeanalysis.analysis.dao.CompositeLit --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.ConstInfo --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.ConstInfo --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.Conversion --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.Conversion --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.Element --> codeanalysis.analysis.dao.ElementList #92493f;line.dashed;
+codeanalysis.analysis.dao.Element --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.ElementList --> codeanalysis.analysis.dao.KeyedElement #92493f;line.dashed;
+codeanalysis.analysis.dao.Expression --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.Expression --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.Expression --> codeanalysis.analysis.dao.PrimaryExpr #92493f;line.dashed;
+codeanalysis.analysis.dao.FuncInfo --> codeanalysis.analysis.dao.FuncParams #92493f;line.dashed;
+codeanalysis.analysis.dao.FuncParams --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.FunctionLit --> codeanalysis.analysis.dao.FuncParams #92493f;line.dashed;
+codeanalysis.analysis.dao.FunctionLit --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.ImportInfo --> codeanalysis.analysis.dao.PackageInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.Index --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.Key --> codeanalysis.analysis.dao.ElementList #92493f;line.dashed;
+codeanalysis.analysis.dao.Key --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.KeyedElement --> codeanalysis.analysis.dao.Element #92493f;line.dashed;
+codeanalysis.analysis.dao.KeyedElement --> codeanalysis.analysis.dao.Key #92493f;line.dashed;
+codeanalysis.analysis.dao.Literal --> codeanalysis.analysis.dao.CompositeLit #92493f;line.dashed;
+codeanalysis.analysis.dao.Literal --> codeanalysis.analysis.dao.FunctionLit #92493f;line.dashed;
+codeanalysis.analysis.dao.Literal --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.MethodExpr --> codeanalysis.analysis.dao.FuncInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.MethodExpr --> codeanalysis.analysis.dao.TypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.ModuleInfo --> codeanalysis.analysis.dao.FileDataNode #92493f;line.dashed;
+codeanalysis.analysis.dao.Operand --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.Operand --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.Operand --> codeanalysis.analysis.dao.Literal #92493f;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.ConstInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.FileDataNode #92493f;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.FuncInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.ImportInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.TypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.VarInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.PointBase --> codeanalysis.types.TypeFrom #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.Arguments #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.Conversion #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.Index #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.MethodExpr #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.Operand #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.PrimaryExpr #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.Selector #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.Slice #92493f;line.dashed;
+codeanalysis.analysis.dao.PrimaryExpr --> codeanalysis.analysis.dao.TypeAssertion #92493f;line.dashed;
+codeanalysis.analysis.dao.ProjectInfo --> codeanalysis.analysis.dao.FileDataNode #92493f;line.dashed;
+codeanalysis.analysis.dao.ProjectInfo --> codeanalysis.analysis.dao.ModuleInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.ProjectInfo --> codeanalysis.analysis.dao.PackageInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.Selector --> codeanalysis.analysis.dao.TypeInfoQualifiedIdent #92493f;line.dashed;
+codeanalysis.analysis.dao.Slice --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeAssertion --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfo --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoArray --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoChannel --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoFunction --> codeanalysis.analysis.dao.FuncParams #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoInterface --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoMap --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoPointer --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoQualifiedIdent --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoQualifiedIdent --> codeanalysis.analysis.dao.ImportInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoSlice --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.TypeInfoStruct --> codeanalysis.analysis.dao.VarInfo #92493f;line.dashed;
+codeanalysis.analysis.dao.VarInfo --> codeanalysis.analysis.dao.Expression #92493f;line.dashed;
+codeanalysis.analysis.dao.VarInfo --> codeanalysis.analysis.dao.ITypeInfo #92493f;line.dashed;
+codeanalysis.analysis.goanalysis.Feature --> codeanalysis.load.project.goloader.ANAT1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.Feature2 --> codeanalysis.load.project.goloader.ANAT1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.Feature3 --> codeanalysis.load.project.goloader.ANAT1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.G16Options --> codeanalysis.load.project.goloader.ANAT1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.G16Options --> codeanalysis.load.project.goloader.GoFileNode #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.G16Options --> sync.Mutex #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.Gs --> codeanalysis.analysis.goanalysis.Ws #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.Instants --> codeanalysis.analysis.dao.ProjectInfo #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.Ws --> codeanalysis.analysis.goanalysis.As #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.g5 --> codeanalysis.analysis.goanalysis.t1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.g9 --> codeanalysis.analysis.goanalysis.g1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.m3 --> codeanalysis.load.project.goloader.ANAT1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.once --> sync.Once #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.scanObj.HandleExp --> codeanalysis.analysis.dao.PackageInfo #c30c3f;line.dashed;
+codeanalysis.analysis.goanalysis.source --> codeanalysis.analysis.dao.PackageInfo #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.t5 --> codeanalysis.analysis.goanalysis.t1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.t6 --> codeanalysis.analysis.goanalysis.t1 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.t6 --> codeanalysis.analysis.goanalysis.t2 #cf3cff;line.dashed;
+codeanalysis.analysis.goanalysis.tf2 --> codeanalysis.load.project.goloader.ANAT1 #cf3cff;line.dashed;
+codeanalysis.graphics.PlaneUml --> codeanalysis.analysis.dao.ProjectInfo #73cf5f;line.dashed;
+codeanalysis.graphics.PlaneUml --> codeanalysis.graphics.dao.NameSpace #73cf5f;line.dashed;
+codeanalysis.graphics.dao.NameSpace --> codeanalysis.graphics.dao.Interface #8c30df;line.dashed;
+codeanalysis.graphics.dao.NameSpace --> codeanalysis.graphics.dao.UserClass #8c30df;line.dashed;
+codeanalysis.graphics.dao.PackageSpace --> codeanalysis.graphics.dao.Interface #8c30df;line.dashed;
+codeanalysis.graphics.dao.PackageSpace --> codeanalysis.graphics.dao.UserClass #8c30df;line.dashed;
+codeanalysis.load.project.goloader.GoFileNode --> codeanalysis.load.project.goloader.GoFileNode #61863f;line.dashed;
+codeanalysis.load.project.goloader.GoFileNode --> os.FileInfo #61863f;line.dashed;
+codeanalysis.structTest.G16Options --> codeanalysis.load.project.goloader.ANAT1 #bcf3df;line.dashed;
+codeanalysis.structTest.G16Options --> codeanalysis.load.project.goloader.GoFileNode #bcf3df;line.dashed;
+codeanalysis.structTest.G16Options --> sync.Mutex #bcf3df;line.dashed;
+@enduml

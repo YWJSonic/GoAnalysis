@@ -1,0 +1,193 @@
+@startuml
+
+namespace codeanalysis.analysis.dao{
+	interface TypeBase {
+		GetName() string
+		SetName(string) 
+		GetTypeName() string
+		SetTypeName(string) 
+		SetGoPath(string) 
+		SetTypeFrom(types.TypeFrom) 
+		GetIsAnalysis() bool
+		SetIsAnalysis() 
+	}
+	interface ITypeInfo {
+		GetTypeBase() TypeBase
+		GetName() string
+		SetName(string) 
+		GetTypeName() string
+		SetTypeName(string) 
+	}
+	interface FileDataNode {
+		Path() string
+		Name() string
+	}
+	
+	class PointBase <<(T,#00FF00)>> {
+		string Name
+		string TypeName
+		types.TypeFrom TypeFrom
+		string GoPath
+		bool IsAnalysis
+	}
+	
+	class ProjectInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		ModuleInfo ModuleInfo
+		FileDataNode ProjectRoot
+		map LocalPackageMap
+		map VendorPackageMap
+		map GolangPackageMap
+	}
+	class ModuleInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		string GoVersion
+		FileDataNode CurrentFileNodes
+		map VendorMap
+		string ModuleName
+	}
+
+	class PackageInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		FileDataNode CurrentFileNodes
+		string PackageVersion
+		string GoPath
+		map[string]ITypeInfo UndefVarOrConst
+		map[string]TypeInfo AllTypeInfos
+		map[string]ConstInfo AllConstInfos
+		map[string]FuncInfo AllFuncInfo
+		[]ITypeInfo ImplicitlyVarOrConstInfos
+		map[string]VarInfo AllVarInfos
+		map[string]ImportInfo AllImportLink
+	}
+
+	class ImportInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		PackageInfo Package
+		string NewName
+		string ImportMod
+	}
+	class TypeInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		string DefType
+		ITypeInfo ContentTypeInfo
+	}
+	class VarInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		string Expression
+		string Tag
+		string Common
+		ITypeInfo ContentTypeInfo
+	}
+	class ConstInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		string Expression
+		string Common
+		ITypeInfo ContentTypeInfo
+	}
+	class FuncInfo <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		[]FuncParams ParamsInPoint
+		[]FuncParams ParamsOutPoint
+		string Body
+		FuncParams Receiver
+	}
+
+
+
+
+	class TypeInfoBool <<(T,#00FF00)>> {
+		TypeBase TypeBase
+
+	}
+	class TypeInfoNumeric <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		
+	}
+	class TypeInfoString <<(T,#00FF00)>> {
+		TypeBase TypeBase
+
+	}
+	class TypeInfoChannel <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		int FlowType
+		ITypeInfo ContentTypeInfo
+	}
+
+	class TypeInfoFunction <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		[]FuncParams ParamsInPoint
+		[]FuncParams ParamsOutPoint
+		string Common
+	}
+	class FuncParams <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoPointer <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoQualifiedIdent <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		point ImportLink
+		ITypeInfo ContentTypeInfo
+	}
+
+	class TypeInfoArray <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		string Size
+		ITypeInfo ContentTypeInfo
+	}
+	class TypeInfoMap <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		ITypeInfo KeyType
+		ITypeInfo ValueType
+	}
+	class TypeInfoSlice <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		ITypeInfo ContentTypeInfo
+	}
+
+	class TypeInfoStruct <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		[]VarInfo ImplicitlyVarInfos
+		map[string]VarInfo VarInfos
+	}
+	class TypeInfoInterface <<(T,#00FF00)>> {
+		TypeBase TypeBase
+		[]ITypeInfo MatchInfos
+	}
+
+
+
+}
+
+codeanalysis.analysis.dao.ConstInfo --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.FuncInfo --> codeanalysis.analysis.dao.FuncParams #ff0000;line.dashed;
+codeanalysis.analysis.dao.FuncParams --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.ImportInfo --> codeanalysis.analysis.dao.PackageInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.ModuleInfo --> codeanalysis.analysis.dao.FileDataNode #ff0000;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.ConstInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.FileDataNode #ff0000;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.FuncInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.ImportInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.TypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.PackageInfo --> codeanalysis.analysis.dao.VarInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.ProjectInfo --> codeanalysis.analysis.dao.FileDataNode #ff0000;line.dashed;
+codeanalysis.analysis.dao.ProjectInfo --> codeanalysis.analysis.dao.ModuleInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.ProjectInfo --> codeanalysis.analysis.dao.PackageInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfo --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoArray --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoChannel --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoFunction --> codeanalysis.analysis.dao.FuncParams #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoInterface --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoMap --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoPointer --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoQualifiedIdent --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoQualifiedIdent --> codeanalysis.analysis.dao.ImportInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.TypeInfoStruct --> codeanalysis.analysis.dao.VarInfo #ff0000;line.dashed;
+codeanalysis.analysis.dao.VarInfo --> codeanalysis.analysis.dao.ITypeInfo #ff0000;line.dashed;
+
+@enduml

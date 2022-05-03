@@ -13,6 +13,14 @@ TypeName  = identifier | QualifiedIdent . (QualifiedIdent = PackageName "." iden
 TypeLit   = ArrayType | StructType | PointerType | FunctionType | InterfaceType |
 	    SliceType | MapType | ChannelType .
 
+// New Types =========================================================================
+Type      = TypeName [ TypeArgs ] | TypeLit | "(" Type ")" .
+TypeName  = identifier | QualifiedIdent . (QualifiedIdent = PackageName "." identifier .) (PackageName    = identifier .)
+TypeArgs  = "[" TypeList [ "," ] "]" .
+TypeList  = Type { "," Type } .
+TypeLit   = ArrayType | StructType | PointerType | FunctionType | InterfaceType |
+	    SliceType | MapType | ChannelType .
+
 // Type declarations =========================================================================
 TypeDecl = "type" ( TypeSpec | "(" { TypeSpec ";" } ")" ) .
 TypeSpec = AliasDecl | TypeDef .

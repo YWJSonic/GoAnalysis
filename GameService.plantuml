@@ -1,0 +1,3850 @@
+@startuml
+namespace GameService #f838f6{
+
+
+
+}
+
+namespace GameService.cmd #cc3964{
+
+
+	class showConfig <<(V,#FF0000)>> {}
+	class configFile <<(V,#FF0000)>> {}
+	class gameConfigFile <<(V,#FF0000)>> {}
+	class RootCmd <<(V,#FF0000)>> {}
+	class serverCmd <<(V,#FF0000)>> {}
+
+}
+
+namespace GameService.constant #d0ab20{
+
+
+
+	class Game139Id <<(C,#FF00FF)>> {}
+	class Game36Id <<(C,#FF00FF)>> {}
+	class Arangodb_Collection_CheatTable <<(C,#FF00FF)>> {}
+	class ModuleId_Club_Lounge <<(C,#FF00FF)>> {}
+	class CompetitionScoreType_Score <<(C,#FF00FF)>> {}
+	class Game26NumId <<(C,#FF00FF)>> {}
+	class Game31NumId <<(C,#FF00FF)>> {}
+	class Arangodb_StatusCollectionError <<(C,#FF00FF)>> {}
+	class Game6Id <<(C,#FF00FF)>> {}
+	class OrderRecordEvent_Leave <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Disbanding <<(C,#FF00FF)>> {}
+	class APM_TRANSACTION_TYPE_TIMEKEEPER <<(C,#FF00FF)>> {}
+	class Game40Id <<(C,#FF00FF)>> {}
+	class Game10NumId <<(C,#FF00FF)>> {}
+	class Game16NumId <<(C,#FF00FF)>> {}
+	class Game25NumId <<(C,#FF00FF)>> {}
+	class CarryAmountLog_Type_Repayment <<(C,#FF00FF)>> {}
+	class PlayerMatchStatus_Playing <<(C,#FF00FF)>> {}
+	class Game35Id <<(C,#FF00FF)>> {}
+	class CompetitionScoreType_Balance <<(C,#FF00FF)>> {}
+	class Game31Id <<(C,#FF00FF)>> {}
+	class Game27NumId <<(C,#FF00FF)>> {}
+	class Game32NumId <<(C,#FF00FF)>> {}
+	class Game40NumId <<(C,#FF00FF)>> {}
+	class ChanSize_Tiny <<(C,#FF00FF)>> {}
+	class Game61Id <<(C,#FF00FF)>> {}
+	class Game21NumId <<(C,#FF00FF)>> {}
+	class OrderRecordEvent_Reward <<(C,#FF00FF)>> {}
+	class ChanSize_Medium <<(C,#FF00FF)>> {}
+	class ModuleId_Party <<(C,#FF00FF)>> {}
+	class GameService_Level <<(C,#FF00FF)>> {}
+	class OrderRecordType_Competition <<(C,#FF00FF)>> {}
+	class Arangodb_Collection_SlackAlerts <<(C,#FF00FF)>> {}
+	class ModuleId_MessageQueue <<(C,#FF00FF)>> {}
+	class Game17Id <<(C,#FF00FF)>> {}
+	class Game17NumId <<(C,#FF00FF)>> {}
+	class Game36NumId <<(C,#FF00FF)>> {}
+	class CarryAmountLog_Status_Fail <<(C,#FF00FF)>> {}
+	class APM_TRANSACTION_TYPE_ROOM <<(C,#FF00FF)>> {}
+	class Game8NumId <<(C,#FF00FF)>> {}
+	class GameType_Normal <<(C,#FF00FF)>> {}
+	class Game13Id <<(C,#FF00FF)>> {}
+	class Game26Id <<(C,#FF00FF)>> {}
+	class Game27Id <<(C,#FF00FF)>> {}
+	class Game5NumId <<(C,#FF00FF)>> {}
+	class Test_apm_service_name <<(C,#FF00FF)>> {}
+	class Game4NumId <<(C,#FF00FF)>> {}
+	class RoomStatusCode_WaitRoomCreate <<(C,#FF00FF)>> {}
+	class APM_TRANSACTION_TYPE_GAMECORE <<(C,#FF00FF)>> {}
+	class Game_CreatingTimeout <<(C,#FF00FF)>> {}
+	class Websocket_Level <<(C,#FF00FF)>> {}
+	class Game8Id <<(C,#FF00FF)>> {}
+	class Arangodb_Collection_Competition <<(C,#FF00FF)>> {}
+	class ChanSize_Large <<(C,#FF00FF)>> {}
+	class Arangodb_StatusReadError <<(C,#FF00FF)>> {}
+	class PlayerRoomDataForGame_GameStatus_PlayGame <<(C,#FF00FF)>> {}
+	class Nats_Level <<(C,#FF00FF)>> {}
+	class Party1Id <<(C,#FF00FF)>> {}
+	class Game24NumId <<(C,#FF00FF)>> {}
+	class PlayerRoomDataForGame_GameStatus_Initial <<(C,#FF00FF)>> {}
+	class Identity_Member <<(C,#FF00FF)>> {}
+	class Identity_Bot <<(C,#FF00FF)>> {}
+	class RoomStatusCode_InitializedTimeout <<(C,#FF00FF)>> {}
+	class RoomStatusCode_WaitingCompetitionSignUp <<(C,#FF00FF)>> {}
+	class Game39Id <<(C,#FF00FF)>> {}
+	class OrderRecordEvent_Join <<(C,#FF00FF)>> {}
+	class Arangodb_StatusUpdateError <<(C,#FF00FF)>> {}
+	class ModuleId_Room <<(C,#FF00FF)>> {}
+	class Game6NumId <<(C,#FF00FF)>> {}
+	class Game7NumId <<(C,#FF00FF)>> {}
+	class Game14NumId <<(C,#FF00FF)>> {}
+	class Game18NumId <<(C,#FF00FF)>> {}
+	class Game61NumId <<(C,#FF00FF)>> {}
+	class APM_TRANSACTION_TYPE_NoticeType <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Playing <<(C,#FF00FF)>> {}
+	class PlayerRoomDataForLounge_LoungeStatus_StartGame <<(C,#FF00FF)>> {}
+	class Game13NumId <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Empty <<(C,#FF00FF)>> {}
+	class RoomStatusCode_CanRemove <<(C,#FF00FF)>> {}
+	class Arangodb_StatusCreateDocumentError <<(C,#FF00FF)>> {}
+	class Arangodb_Collection_Competition_Log <<(C,#FF00FF)>> {}
+	class Game10Id <<(C,#FF00FF)>> {}
+	class Game11Id <<(C,#FF00FF)>> {}
+	class Game21Id <<(C,#FF00FF)>> {}
+	class PlayerRoomData_RoomType_Lounge <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Ready <<(C,#FF00FF)>> {}
+	class Arangodb_PlayerPermissionDenied <<(C,#FF00FF)>> {}
+	class Game24Id <<(C,#FF00FF)>> {}
+	class Game20NumId <<(C,#FF00FF)>> {}
+	class ItemType_Money <<(C,#FF00FF)>> {}
+	class Redis_Max_ReTry_Count <<(C,#FF00FF)>> {}
+	class Game4Id <<(C,#FF00FF)>> {}
+	class ChanSize_Small <<(C,#FF00FF)>> {}
+	class Game7Id <<(C,#FF00FF)>> {}
+	class Game11NumId <<(C,#FF00FF)>> {}
+	class Game22NumId <<(C,#FF00FF)>> {}
+	class CarryAmountLog_Type_ManualRepayment <<(C,#FF00FF)>> {}
+	class Arango_Max_ReTry_Count <<(C,#FF00FF)>> {}
+	class Arangodb_StatusTxError <<(C,#FF00FF)>> {}
+	class Arangodb_StatusEmptyID <<(C,#FF00FF)>> {}
+	class PlayerRoomDataForGame_GameStatus_GameOver <<(C,#FF00FF)>> {}
+	class Arangodb_Level <<(C,#FF00FF)>> {}
+	class BalanceModifySubject <<(C,#FF00FF)>> {}
+	class OpenByGameSubject <<(C,#FF00FF)>> {}
+	class PlayerMatchStatus_Matching <<(C,#FF00FF)>> {}
+	class PlayerMatchStatus_InLounge <<(C,#FF00FF)>> {}
+	class Arangodb_StatusDataInvalid <<(C,#FF00FF)>> {}
+	class RoomStatusCode_WaitingCompetitionGameReward <<(C,#FF00FF)>> {}
+	class Game33Id <<(C,#FF00FF)>> {}
+	class GameType_Competition <<(C,#FF00FF)>> {}
+	class CarryAmountLog_Type_Withdrawal <<(C,#FF00FF)>> {}
+	class InternalBroadcast <<(C,#FF00FF)>> {}
+	class Game2Id <<(C,#FF00FF)>> {}
+	class Game32Id <<(C,#FF00FF)>> {}
+	class Game37Id <<(C,#FF00FF)>> {}
+	class Game9NumId <<(C,#FF00FF)>> {}
+	class PlayerRoomDataForGame_GameStatus_SingleGameEnd <<(C,#FF00FF)>> {}
+	class RoomStatusCode_WaitingCompetitionGameStart <<(C,#FF00FF)>> {}
+	class Arangodb_Collection_Players <<(C,#FF00FF)>> {}
+	class Game22Id <<(C,#FF00FF)>> {}
+	class Game25Id <<(C,#FF00FF)>> {}
+	class Game14Id <<(C,#FF00FF)>> {}
+	class Game139NumId <<(C,#FF00FF)>> {}
+	class GameType_Club <<(C,#FF00FF)>> {}
+	class PlayerRoomData_RoomType_Game <<(C,#FF00FF)>> {}
+	class Game18Id <<(C,#FF00FF)>> {}
+	class Arangodb_StatusRemoveError <<(C,#FF00FF)>> {}
+	class Arangodb_Error_Transaction_Internal <<(C,#FF00FF)>> {}
+	class PlayerRoomModifySubject <<(C,#FF00FF)>> {}
+	class Identity_None <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Restart <<(C,#FF00FF)>> {}
+	class Test_apm_service_environment <<(C,#FF00FF)>> {}
+	class Game20Id <<(C,#FF00FF)>> {}
+	class Party2Id <<(C,#FF00FF)>> {}
+	class Game15NumId <<(C,#FF00FF)>> {}
+	class Game35NumId <<(C,#FF00FF)>> {}
+	class CloseByGameSubject <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Initializing <<(C,#FF00FF)>> {}
+	class RoomStatusCode_WaitingPlayerReady <<(C,#FF00FF)>> {}
+	class Game15Id <<(C,#FF00FF)>> {}
+	class Game16Id <<(C,#FF00FF)>> {}
+	class PlayerRoomDataForGame_GameStatus_EarlyVictory <<(C,#FF00FF)>> {}
+	class PlayerRoomDataForLounge_LoungeStatus_Wait <<(C,#FF00FF)>> {}
+	class Redis_Level <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Settlement <<(C,#FF00FF)>> {}
+	class Arangodb_StatusCollectionNotFound <<(C,#FF00FF)>> {}
+	class Arangodb_StatusOptionsError <<(C,#FF00FF)>> {}
+	class ModuleId_Club_Party <<(C,#FF00FF)>> {}
+	class Game9Id <<(C,#FF00FF)>> {}
+	class Party3Id <<(C,#FF00FF)>> {}
+	class Game39NumId <<(C,#FF00FF)>> {}
+	class CarryAmountLog_Status_Success <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Idle <<(C,#FF00FF)>> {}
+	class Arangodb_StatusOK <<(C,#FF00FF)>> {}
+	class RoomStatusCode_Closing <<(C,#FF00FF)>> {}
+	class Game5Id <<(C,#FF00FF)>> {}
+	class Game1NumId <<(C,#FF00FF)>> {}
+	class Game2NumId <<(C,#FF00FF)>> {}
+	class GameType_Custom <<(C,#FF00FF)>> {}
+	class Test_apm_url <<(C,#FF00FF)>> {}
+	class ModuleId_Game <<(C,#FF00FF)>> {}
+	class ModuleId_Lounge <<(C,#FF00FF)>> {}
+	class Game1Id <<(C,#FF00FF)>> {}
+	class Game37NumId <<(C,#FF00FF)>> {}
+	class ModuleId_WebSocket <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.dao #603a72{
+
+	class Game10Config <<(T,#00FF00)>> {}
+	class Game11Config <<(T,#00FF00)>> {}
+	class Game139Config <<(T,#00FF00)>> {}
+	class Game13Config <<(T,#00FF00)>> {}
+	class Game14Config <<(T,#00FF00)>> {}
+	class Game15Config <<(T,#00FF00)>> {}
+	class Game16Config <<(T,#00FF00)>> {}
+	class Game17Config <<(T,#00FF00)>> {}
+	class Game18Config <<(T,#00FF00)>> {}
+	class Game1Config <<(T,#00FF00)>> {}
+	class Game20Config <<(T,#00FF00)>> {}
+	class Game21Config <<(T,#00FF00)>> {}
+	class Game22Config <<(T,#00FF00)>> {}
+	class Game24Config <<(T,#00FF00)>> {}
+	class Game25Config <<(T,#00FF00)>> {}
+	class Game26Config <<(T,#00FF00)>> {}
+	class Game27Config <<(T,#00FF00)>> {}
+	class Game29Config <<(T,#00FF00)>> {}
+	class Game2Config <<(T,#00FF00)>> {}
+	class Game31Config <<(T,#00FF00)>> {}
+	class Game32Config <<(T,#00FF00)>> {}
+	class Game33Config <<(T,#00FF00)>> {}
+	class Game35Config <<(T,#00FF00)>> {}
+	class Game36Config <<(T,#00FF00)>> {}
+	class Game37Config <<(T,#00FF00)>> {}
+	class Game39Config <<(T,#00FF00)>> {}
+	class Game40Config <<(T,#00FF00)>> {}
+	class Game4Config <<(T,#00FF00)>> {}
+	class Game5Config <<(T,#00FF00)>> {}
+	class Game61Config <<(T,#00FF00)>> {}
+	class Game6Config <<(T,#00FF00)>> {}
+	class Game7Config <<(T,#00FF00)>> {}
+	class Game8Config <<(T,#00FF00)>> {}
+	class Game9Config <<(T,#00FF00)>> {}
+	class MessageQueueRequestBody <<(T,#00FF00)>> {}
+	class MessageQueueSubscribeByOperationCodeRequest <<(T,#00FF00)>> {
+		 Subscriber
+		types.MessageQueueTopicId SubcribeTopic
+		types.OperationCode OperationCode
+	}
+	class MessageQueueSubscribeQueueGroupRequest <<(T,#00FF00)>> {
+		 Subscriber
+		types.MessageQueueTopicId SubcribeTopic
+		types.MessageQueueTopicId PublishTopic
+		types.QueueGroup QueueGroup
+	}
+	class MessageQueueSubscribeRequest <<(T,#00FF00)>> {
+		 Subscriber
+		types.MessageQueueTopicId SubcribeTopic
+		types.MessageQueueTopicId PublishTopic
+		types.SequenceId StartAtSequence
+	}
+	class MessageQueueUnsubscribeRequest <<(T,#00FF00)>> {
+		types.MessageQueueTopicId SubcribeTopic
+	}
+	class Party1Config <<(T,#00FF00)>> {}
+	class Party2Config <<(T,#00FF00)>> {}
+	class Party3Config <<(T,#00FF00)>> {}
+	class RequestId <<(T,#00FF00)>> {
+		protocol.TraceId RequestId
+	}
+	class SlotTheme <<(T,#00FF00)>> {}
+	class TableMessage <<(T,#00FF00)>> {}
+	class ThemeCache <<(T,#00FF00)>> {}
+
+
+}
+
+namespace GameService.env #8d1d90{
+
+	class Apm <<(T,#00FF00)>> {
+		string ServiceName
+		string ServiceEnvironment
+		string ServerUrls
+	}
+	class ArangoDB <<(T,#00FF00)>> {
+		int Connlimit
+		string Username
+		string Password
+		int RetryCount
+		time.Duration RetryInterval
+		string HttpProtocol
+		string Addr
+		string Database
+	}
+	class Base <<(T,#00FF00)>> {
+		bool EnableCheatTable
+		bool EnableSaveGameProcess
+	}
+	class BotConfig <<(T,#00FF00)>> {
+		[] InitBalanceRange
+	}
+	class Config <<(T,#00FF00)>> {
+		point Websocket
+		point Trace
+		point Redis
+		point Nats
+		point Game
+		point Base
+		point Apm
+		point ArangoDB
+		point Discovery
+	}
+	class Discovery <<(T,#00FF00)>> {
+		int Port
+	}
+	class Game <<(T,#00FF00)>> {
+		point Game2
+		point Game9
+		point Game10
+		point Game11
+		point Game25
+		point Game39
+		point Party1
+		point Base
+		point Game4
+		point Game13
+		point Game14
+		point Game16
+		point Game31
+		point Game36
+		point Game1
+		point Game24
+		point Game32
+		point Game33
+		point Party2
+		point Game22
+		point Game26
+		point Party3
+		point Game6
+		point Game7
+		point Game21
+		point Game27
+		point Game37
+		point Game40
+		point Game5
+		point Game8
+		point Game15
+		point Game18
+		point Game139
+		point Game17
+		point Game20
+		point Game29
+		point Game35
+		point Game61
+	}
+	class Game10Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game11Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game139Config <<(T,#00FF00)>> {
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+	}
+	class Game13Config <<(T,#00FF00)>> {
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+	}
+	class Game14Config <<(T,#00FF00)>> {
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+	}
+	class Game15Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game16Config <<(T,#00FF00)>> {
+		[] IconFrameList
+		BotConfig AggressiveBot
+		BotConfig ConservativeBot
+		string GameId
+		float64 BasisRTP
+		time.Duration BotLeaveCheckTime
+		int BotLeaveProbability
+		time.Duration ReadyTimeout
+		time.Duration RestartTimeout
+		time.Duration DisbandTimeout
+		BotConfig ModerateBot
+		[] IconList
+		time.Duration SettlementOfCustomRoomExpire
+		time.Duration IdleTimeout
+		time.Duration CompetitionTimeout
+		int NumOfPlayers
+		map NumOfMembersMap
+	}
+	class Game17Config <<(T,#00FF00)>> {
+		BotConfig ConservativeBot
+		string GameId
+		float64 BasisRTP
+		time.Duration IdleTimeout
+		time.Duration DisbandTimeout
+		time.Duration RestartTimeout
+		map NumOfMembersMap
+		time.Duration SettlementOfCustomRoomExpire
+		BotConfig ModerateBot
+		time.Duration BotLeaveCheckTime
+		time.Duration ReadyTimeout
+		[] IconList
+		[] IconFrameList
+		BotConfig AggressiveBot
+		time.Duration CompetitionTimeout
+		int NumOfPlayers
+		int BotLeaveProbability
+	}
+	class Game18Config <<(T,#00FF00)>> {
+		BotConfig ModerateBot
+		map NumOfMembersMap
+		time.Duration RestartTimeout
+		time.Duration DisbandTimeout
+		time.Duration CompetitionTimeout
+		[] IconFrameList
+		time.Duration SettlementOfCustomRoomExpire
+		time.Duration BotLeaveCheckTime
+		int BotLeaveProbability
+		float64 BasisRTP
+		int NumOfPlayers
+		[] IconList
+		BotConfig AggressiveBot
+		time.Duration IdleTimeout
+		time.Duration ReadyTimeout
+		BotConfig ConservativeBot
+		string GameId
+	}
+	class Game1Config <<(T,#00FF00)>> {
+		BotConfig AggressiveBot
+		BotConfig ConservativeBot
+		string GameId
+		time.Duration IdleTimeout
+		int NumOfPlayers
+		[] IconFrameList
+		BotConfig ModerateBot
+		float64 BasisRTP
+		time.Duration ReadyTimeout
+		map NumOfMembersMap
+		[] IconList
+	}
+	class Game20Config <<(T,#00FF00)>> {
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+	}
+	class Game21Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game22Config <<(T,#00FF00)>> {
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+	}
+	class Game24Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game25Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game26Config <<(T,#00FF00)>> {
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+	}
+	class Game27Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game29Config <<(T,#00FF00)>> {
+		string GameId
+		time.Duration IdleTimeout
+	}
+	class Game2Config <<(T,#00FF00)>> {
+		int NumOfPlayers
+		[] IconList
+		BotConfig AggressiveBot
+		BotConfig ConservativeBot
+		BotConfig ModerateBot
+		string GameId
+		float64 BasisRTP
+		time.Duration IdleTimeout
+		time.Duration ReadyTimeout
+		map NumOfMembersMap
+		[] IconFrameList
+	}
+	class Game31Config <<(T,#00FF00)>> {
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+	}
+	class Game32Config <<(T,#00FF00)>> {
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+	}
+	class Game33Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game35Config <<(T,#00FF00)>> {
+		int NumOfPlayers
+		map NumOfMembersMap
+		[] IconFrameList
+		BotConfig ModerateBot
+		string GameId
+		time.Duration ReadyTimeout
+		[] IconList
+		BotConfig AggressiveBot
+		BotConfig ConservativeBot
+		float64 BasisRTP
+		time.Duration IdleTimeout
+	}
+	class Game36Config <<(T,#00FF00)>> {
+		float64 BasisRTP
+		time.Duration IdleTimeout
+		map NumOfMembersMap
+		[] IconFrameList
+		BotConfig ConservativeBot
+		string GameId
+		int NumOfPlayers
+		[] IconList
+		BotConfig AggressiveBot
+		BotConfig ModerateBot
+		time.Duration ReadyTimeout
+	}
+	class Game37Config <<(T,#00FF00)>> {
+		string GameId
+		float64 BasisRTP
+		time.Duration IdleTimeout
+		[] IconList
+		[] IconFrameList
+		time.Duration ReadyTimeout
+		int NumOfPlayers
+		map NumOfMembersMap
+		BotConfig ModerateBot
+	}
+	class Game39Config <<(T,#00FF00)>> {
+		time.Duration IdleTimeout
+		time.Duration ReadyTimeout
+		BotConfig ModerateBot
+		string GameId
+		time.Duration SettlementOfCustomRoomExpire
+		BotConfig AggressiveBot
+		BotConfig ConservativeBot
+		time.Duration BotLeaveCheckTime
+		map NumOfMembersMap
+		int NumOfPlayers
+		time.Duration CompetitionTimeout
+		time.Duration RestartTimeout
+		time.Duration DisbandTimeout
+		[] IconList
+		[] IconFrameList
+		int BotLeaveProbability
+		float64 BasisRTP
+	}
+	class Game40Config <<(T,#00FF00)>> {
+		string GameId
+		time.Duration SettlementOfCustomRoomExpire
+		BotConfig ModerateBot
+		int BotLeaveProbability
+		time.Duration DisbandTimeout
+		int NumOfPlayers
+		[] IconFrameList
+		time.Duration RestartTimeout
+		map NumOfMembersMap
+		[] IconList
+		time.Duration CompetitionTimeout
+		BotConfig AggressiveBot
+		BotConfig ConservativeBot
+		time.Duration BotLeaveCheckTime
+		float64 BasisRTP
+		time.Duration IdleTimeout
+		time.Duration ReadyTimeout
+	}
+	class Game4Config <<(T,#00FF00)>> {
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+	}
+	class Game5Config <<(T,#00FF00)>> {
+		float64 BasisRTP
+		string GameId
+		time.Duration ReadyTimeout
+		int NumOfPlayers
+		map NumOfMembersMap
+		[] IconList
+		[] IconFrameList
+		BotConfig ModerateBot
+		time.Duration IdleTimeout
+	}
+	class Game61Config <<(T,#00FF00)>> {
+		string GameId
+		time.Duration IdleTimeout
+		int NumOfPlayers
+		time.Duration PlayerIdleWarn
+		time.Duration PlayerIdleTimeout
+		time.Duration DataRefreshInterval
+		time.Duration JackpotNotificationInterval
+	}
+	class Game6Config <<(T,#00FF00)>> {
+		time.Duration CompetitionTimeout
+		map NumOfMembersMap
+		time.Duration SettlementOfCustomRoomExpire
+		float64 BasisRTP
+		time.Duration IdleTimeout
+		time.Duration RestartTimeout
+		[] IconFrameList
+		int BotLeaveProbability
+		string GameId
+		time.Duration ReadyTimeout
+		int NumOfPlayers
+		BotConfig ConservativeBot
+		BotConfig ModerateBot
+		time.Duration BotLeaveCheckTime
+		time.Duration DisbandTimeout
+		[] IconList
+		BotConfig AggressiveBot
+	}
+	class Game7Config <<(T,#00FF00)>> {
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+	}
+	class Game8Config <<(T,#00FF00)>> {
+		float64 ExpectRtp
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+	}
+	class Game9Config <<(T,#00FF00)>> {
+		string GameId
+		int IdleTimeout
+		float64 MaxCompensation
+		float64 BasisRTP
+		float64 ExpectRtp
+	}
+	class GameBase <<(T,#00FF00)>> {
+		time.Duration SnapshotExpire
+		string ConfigPath
+		map NicknameMap
+		[] NicknameList
+	}
+	class Nats <<(T,#00FF00)>> {
+		int StanPingsInterval
+		int StanPingsMaxOut
+		string Addr
+		string Username
+		string Password
+		string ClusterID
+		time.Duration ReconnInterval
+		time.Duration ConnectTimeOut
+	}
+	class Party1Config <<(T,#00FF00)>> {
+		time.Duration IdleTimeout
+		time.Duration IdleLimit
+		time.Duration PlayerKickedInfoExpire
+		string PartyId
+		int NumOfMembers
+	}
+	class Party2Config <<(T,#00FF00)>> {
+		string PartyId
+		int NumOfMembers
+		time.Duration IdleTimeout
+		time.Duration IdleLimit
+		time.Duration PlayerKickedInfoExpire
+		uint64 ClubMemberLimit
+	}
+	class Party3Config <<(T,#00FF00)>> {
+		string PartyId
+		int NumOfMembers
+		time.Duration IdleTimeout
+		time.Duration PlayerMatchStatusExpire
+		time.Duration FakePlayingTime
+	}
+	class Redis <<(T,#00FF00)>> {
+		string Addr
+		string Password
+		int PoolSize
+		int RetryCount
+		time.Duration RetryInterval
+		time.Duration GameRecordIncrExpire
+	}
+	class Trace <<(T,#00FF00)>> {
+		bool OpenFile
+		string LogLevel
+		string Formatter
+		constants.ServiceCode LogServiceCode
+	}
+	class Websocket <<(T,#00FF00)>> {
+		string Addr
+		string Url
+		int PingMaxOut
+		time.Duration PingInterval
+		time.Duration ReconnInterval
+		time.Duration RequsetTimeOut
+		time.Duration ResendDuration
+		time.Duration ConnectTimeOut
+	}
+
+	class Setting <<(V,#FF0000)>> {}
+	class Gitcommitnum <<(V,#FF0000)>> {}
+	class GamecoreGitcommitnum <<(V,#FF0000)>> {}
+	class ProtocolGitcommitnum <<(V,#FF0000)>> {}
+
+}
+
+namespace GameService.module #5ae52a{
+
+	class GameFuncMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class entryGameFuncMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class readOnlyGameFuncMap <<(T,#00FF00)>> {
+		bool amended
+		map m
+	}
+
+	class expungedGameFuncMap <<(V,#FF0000)>> {}
+
+}
+
+namespace GameService.module.arangodb #a58f1a{
+
+	class G16CustomTheme <<(T,#00FF00)>> {
+		protodao.Accounting Accounting
+		G16Options Options
+		string ThemeID
+		string GameID
+		types.ArangoNumber MinPlayers
+		types.ArangoNumber AnteAndMinCoinProportion
+		types.ArangoNumber JuiceRatio
+		types.ArangoNumber CustomJuiceRatio
+		string EcSiteID
+		string GameType
+		string Title
+		types.ArangoNumber MaxPlayers
+		types.ArangoNumber AnteMax
+	}
+	class G16Options <<(T,#00FF00)>> {
+		[] Antes
+		[] MinCoins
+		[] Rounds
+		[] DisabledPatterns
+		[] BirdCatchCounts
+	}
+	class Handler <<(T,#00FF00)>> {
+		driver.Database db
+		context.Context ctx
+		point retry
+	}
+
+	class handlerInstances <<(V,#FF0000)>> {}
+	class Error_Arangodb_Connection <<(V,#FF0000)>> {}
+	class Error_Arangodb_NewClient <<(V,#FF0000)>> {}
+	class Error_Arangodb_Connect_Database <<(V,#FF0000)>> {}
+	class Error_Arangodb_Ping <<(V,#FF0000)>> {}
+	class handlerIdx <<(V,#FF0000)>> {}
+	class once <<(V,#FF0000)>> {}
+	class initialized <<(V,#FF0000)>> {}
+	class mu <<(V,#FF0000)>> {}
+
+}
+
+namespace GameService.module.arangodb.benchmark #5d1e08{
+
+
+	class mockGameRecordData <<(V,#FF0000)>> {}
+	class mockGameProcessData <<(V,#FF0000)>> {}
+	class mockPlayerData <<(V,#FF0000)>> {}
+	class mockTxScript <<(V,#FF0000)>> {}
+
+	class rontines <<(C,#FF00FF)>> {}
+	class httpProtocol <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.module.discovery #bfc7bc{
+
+
+
+}
+
+namespace GameService.module.flow #7ae4da{
+
+	class Flow <<(T,#00FF00)>> {
+		types.ModuleId to
+		types.RoomGuid guid
+		interface message
+		uint64 sequenceId
+		point transaction
+		types.ModuleId from
+		types.OperationCode operationCode
+		types.EventCode eventCode
+		protocol.ErrorCode statusCode
+		types.TraceId traceId
+	}
+
+
+}
+
+namespace GameService.module.nats #627350{
+
+	class Handler <<(T,#00FF00)>> {
+		 writeFlow
+		 shutdownChan
+		subscriptionMap subscriptionMap
+		flowMap flowMap
+		map subjectMap
+		context.Context ctx
+		int status
+		 writeFlowBackup
+		 writeEnd
+		map subscriberMap
+		point config
+		stan.Conn connection
+	}
+	class entryFlowMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class entrySubscriptionMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class flowMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class readOnlyFlowMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class readOnlySubscriptionMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class subscriptionMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+
+	class expungedSubscriptionMap <<(V,#FF0000)>> {}
+	class expungedFlowMap <<(V,#FF0000)>> {}
+	class cfg <<(V,#FF0000)>> {}
+	class publishCount <<(V,#FF0000)>> {}
+	class recieveCount <<(V,#FF0000)>> {}
+
+	class status_init <<(C,#FF00FF)>> {}
+	class status_running <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.module.noticehandler #6cac1a{
+
+	class Handler <<(T,#00FF00)>> {
+		 messageChan
+		 messageQueuePublisherChan
+		map gameReceiverMap
+		map partyReceiverMap
+		string guid
+		module.GameFuncMap gameFuncMap
+	}
+
+
+}
+
+namespace GameService.module.redis #ff5556{
+
+	class Handler <<(T,#00FF00)>> {
+		redis.Cmdable redisClient
+		context.Context ctx
+		point config
+	}
+	class accountingRedis <<(T,#00FF00)>> {
+		types.Balance BotJuiceAmount
+		types.Balance MemberIncome
+		types.Balance MemberOutcome
+		types.Balance MemberJuiceAmount
+		types.Balance BotIncome
+		types.Balance BotOutcome
+	}
+
+	class Error_Redis_Handler_ZPopMax_Too_Many_Arguments <<(V,#FF0000)>> {}
+	class Error_Redis_Handler_MemoryUsage <<(V,#FF0000)>> {}
+	class roomIncrIndex <<(V,#FF0000)>> {}
+	class mutex <<(V,#FF0000)>> {}
+	class handlerInstance <<(V,#FF0000)>> {}
+	class Error_Redis_Handler_ZPopMin_Too_Many_Arguments <<(V,#FF0000)>> {}
+	class serverIndex <<(V,#FF0000)>> {}
+	class once <<(V,#FF0000)>> {}
+	class Error_Redis_Handler_BitPos_Too_Many_Arguments <<(V,#FF0000)>> {}
+
+}
+
+namespace GameService.module.redis.baseRedisScript #7e730a{
+
+
+
+}
+
+namespace GameService.module.redis.benchmark #ae00cc{
+
+	class mockPlayerMatchStatus <<(T,#00FF00)>> {}
+
+
+}
+
+namespace GameService.module.websocket #6756d2{
+
+	class Handler <<(T,#00FF00)>> {
+		point connection
+		 writeFlow
+		context.Context ctx
+		 writeFlowBackup
+		uint8 status
+		point config
+		 writeEnd
+		 shutdownChan
+		point ring
+		module.GameFuncMap gameFuncMap
+		flowMap flowMap
+		 reader
+		requestMap requestMap
+		string token
+		time.Time pingTime
+	}
+	class echoServer <<(T,#00FF00)>> {
+		map responseMap
+	}
+	class entryFlowMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class flowMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class readOnlyFlowMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class requestMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		map entry
+	}
+
+	class expungedFlowMap <<(V,#FF0000)>> {}
+	class cfg <<(V,#FF0000)>> {}
+	class respMap <<(V,#FF0000)>> {}
+
+	class running <<(C,#FF00FF)>> {}
+	class closing <<(C,#FF00FF)>> {}
+	class final <<(C,#FF00FF)>> {}
+	class serviceRegister <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party1{}
+namespace GameService.parties.party1.constant #e3c762{
+
+
+
+	class Seat_Status_Init <<(C,#FF00FF)>> {}
+	class Seat_Status_Ready <<(C,#FF00FF)>> {}
+	class Seat_Status_Playing <<(C,#FF00FF)>> {}
+	class Seat_Status_Disconnect <<(C,#FF00FF)>> {}
+	class Success <<(C,#FF00FF)>> {}
+	class InsufficientBalance <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party1.dao #883a0e{
+
+	class Game40CustomOptions <<(T,#00FF00)>> {
+		types.ArangoNumber JuiceRatio
+		[] MinCoins
+		[] DisabledPatterns
+		[] Odds
+		bool Active
+		types.ArangoNumber AnteAndMinCoinProportion
+		types.ArangoNumber AnteMax
+		types.ArangoNumber CustomJuiceRatio
+		[] Antes
+		[] Rounds
+		types.ThemeId ThemeID
+	}
+
+
+}
+
+namespace GameService.parties.party1.example #ef557e{
+
+
+	class opMap <<(V,#FF0000)>> {}
+	class evtMap <<(V,#FF0000)>> {}
+	class config <<(V,#FF0000)>> {}
+	class modMap <<(V,#FF0000)>> {}
+
+	class TestCase_LoungeEpoch <<(C,#FF00FF)>> {}
+	class TestCase_PartyEpoch <<(C,#FF00FF)>> {}
+	class TestCase_PartyConcurrently <<(C,#FF00FF)>> {}
+	class TestCase <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party1.lounge #90abc0{
+
+	class Lounge <<(T,#00FF00)>> {
+		 partyAckChan
+		context.Context handlerCtx
+		time.Time now
+		 messageQueuePublisherChan
+		storage.ArangodbAdapater arangodb
+		storage.RedisAdapater redis
+		point themeMap
+		context.CancelFunc disableHandler
+		 messageChan
+		point authorizedGameMap
+		types.EcSiteId ecSiteId
+		types.PartyId partyId
+		types.LoungeGuid guid
+		games.FuncNameMap mqFuncNameMap
+		point config
+		types.LoungeId loungeId
+	}
+	class loungeCache <<(T,#00FF00)>> {
+		types.GameId SelectedGameId
+		types.RoomStatusCode Status
+		time.Time CreatedTime
+		[] Seats
+		int HostId
+		interface SelectedOptions
+		types.RoomType RoomType
+		time.Time IdleTime
+		types.ThemeId SelectedThemeId
+		types.SequenceId NextSequenceId
+	}
+	class seatInfo <<(T,#00FF00)>> {
+		types.SeatId Id
+		bool IsAlive
+		string Nickname
+		string EcUserID
+		types.Balance CarryAmount
+		types.SessionId SessionId
+		types.PlayerId PlayerId
+		int Icon
+		int IconFrame
+		types.Balance Balance
+		int Status
+	}
+	class traceCache <<(T,#00FF00)>> {
+		string CreateRoomTraceHeader
+		string RoomTraceHeader
+		point roomTraceRoot
+		string GamecoreTraceHeader
+		point gamecoreTraceRoot
+	}
+
+
+	class NO_EVENTCODE <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party1.party #b439a0{
+
+	class Party <<(T,#00FF00)>> {
+		loungeMap loungeMap
+		 messageChan
+		 loungeAckChan
+		map ecSiteIdMap
+		games.FuncExecMap funcExecMap
+		point config
+		sync.Map authorizedGameMap
+		bool enabled
+		 webSocketWritterChan
+		 messageQueuePublisherChan
+		storage.ArangodbAdapater arangodb
+		requestMap requestMap
+		util.RoomCounter loungeCounter
+		games.FuncNameMap funcNameMap
+		context.Context ctx
+		point ring
+		storage.RedisAdapater redis
+		sync.Map themeMap
+		types.PartyGuid guid
+	}
+	class entryLoungeMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class loungeMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class readOnlyLoungeMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class requestMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		map entry
+	}
+
+	class expungedLoungeMap <<(V,#FF0000)>> {}
+
+	class MessageQueue_GetGameCustomSetting <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_OpenByGame <<(C,#FF00FF)>> {}
+	class NO_EVENTCODE <<(C,#FF00FF)>> {}
+	class WebSocket_CreateLounge <<(C,#FF00FF)>> {}
+	class WebSocket_JoinLounge <<(C,#FF00FF)>> {}
+	class WebSocket_RejoinLounge <<(C,#FF00FF)>> {}
+	class WebSocket_DeleteLounge <<(C,#FF00FF)>> {}
+	class WebSocket_RecreateLounge <<(C,#FF00FF)>> {}
+	class WebSocket_CreateCustomRoom <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_BalanceModify <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_CloseByGame <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party1.storage #e7c758{
+	interface ArangodbAdapater {
+		GetDocument(context.Context,string,string,interface) (int,error)
+		GetThemesByGameType(context.Context,string,string,interface) (int,error)
+		GetPlayerBalance(context.Context,string) (int,error,int64)
+		GetEcSites(context.Context) (int,[])
+	}
+	interface RedisAdapater {
+		Get(context.Context,string) (string,error)
+		SetEX(context.Context,string,interface,time.Duration) (string,error)
+		HSet(context.Context,string,[]) (int64,error)
+		Del(context.Context,string) (int64,error)
+		HDel(context.Context,string,[]) (int64,error)
+	}
+
+	class mockArango <<(T,#00FF00)>> {}
+	class mockRedis <<(T,#00FF00)>> {}
+
+
+}
+
+
+namespace GameService.parties.party2{}
+
+namespace GameService.parties.party2.constant #f3c73a{
+
+
+
+	class Seat_Status_Playing <<(C,#FF00FF)>> {}
+	class Seat_Status_Disconnect <<(C,#FF00FF)>> {}
+	class Success <<(C,#FF00FF)>> {}
+	class InsufficientBalance <<(C,#FF00FF)>> {}
+	class Seat_Status_Init <<(C,#FF00FF)>> {}
+	class Seat_Status_Ready <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party2.dao #698fb0{
+
+	class Game40CustomOptions <<(T,#00FF00)>> {
+		[] Rounds
+		[] DisabledPatterns
+		bool Active
+		types.ThemeId ThemeID
+		types.ArangoNumber AnteMax
+		[] MinCoins
+		[] Antes
+		[] Odds
+		types.ArangoNumber AnteAndMinCoinProportion
+		types.ArangoNumber JuiceRatio
+		types.ArangoNumber CustomJuiceRatio
+	}
+
+
+}
+
+namespace GameService.parties.party2.example #6a733c{
+
+
+	class modMap <<(V,#FF0000)>> {}
+	class opMap <<(V,#FF0000)>> {}
+	class evtMap <<(V,#FF0000)>> {}
+	class config <<(V,#FF0000)>> {}
+
+	class TestCase_LoungeEpoch <<(C,#FF00FF)>> {}
+	class TestCase_PartyEpoch <<(C,#FF00FF)>> {}
+	class TestCase_PartyConcurrently <<(C,#FF00FF)>> {}
+	class TestCase <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party2.lounge #cae412{
+
+	class Lounge <<(T,#00FF00)>> {
+		point themeMap
+		types.LoungeGuid guid
+		storage.RedisAdapater redis
+		point authorizedGameMap
+		storage.ArangodbAdapater arangodb
+		games.FuncNameMap mqFuncNameMap
+		types.EcSiteId ecSiteId
+		 messageQueuePublisherChan
+		 partyAckChan
+		time.Time now
+		types.PartyId partyId
+		types.LoungeId loungeId
+		 messageChan
+		context.Context handlerCtx
+		context.CancelFunc disableHandler
+		point config
+	}
+	class loungeCache <<(T,#00FF00)>> {
+		[] Seats
+		int HostId
+		interface SelectedOptions
+		types.GameId SelectedGameId
+		types.SequenceId NextSequenceId
+		time.Time CreatedTime
+		types.RoomStatusCode Status
+		time.Time IdleTime
+		types.ThemeId SelectedThemeId
+		types.Balance SelectedAnte
+		types.ClubId ClubId
+		string ClubName
+		types.RoomType RoomType
+	}
+	class seatInfo <<(T,#00FF00)>> {
+		types.PlayerId PlayerId
+		bool IsAlive
+		types.SessionId SessionId
+		string Nickname
+		string EcUserID
+		int Icon
+		int IconFrame
+		types.Balance Balance
+		types.SeatId Id
+		types.Balance CarryAmount
+		int Status
+	}
+	class traceCache <<(T,#00FF00)>> {
+		string CreateRoomTraceHeader
+		string RoomTraceHeader
+		point roomTraceRoot
+		string GamecoreTraceHeader
+		point gamecoreTraceRoot
+	}
+
+
+	class NO_EVENTCODE <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party2.party #e75592{
+
+	class Party <<(T,#00FF00)>> {
+		types.PartyGuid guid
+		 messageChan
+		 messageQueuePublisherChan
+		map ecSiteIdMap
+		games.FuncExecMap funcExecMap
+		point config
+		bool enabled
+		loungeMap loungeMap
+		storage.ArangodbAdapater arangodb
+		requestMap requestMap
+		util.RoomCounter loungeCounter
+		context.Context ctx
+		point ring
+		 webSocketWritterChan
+		storage.RedisAdapater redis
+		sync.Map themeMap
+		sync.Map authorizedGameMap
+		games.FuncNameMap funcNameMap
+		 loungeAckChan
+	}
+	class entryLoungeMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class entryRequestMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class loungeMap <<(T,#00FF00)>> {
+		int misses
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+	}
+	class readOnlyLoungeMap <<(T,#00FF00)>> {
+		bool amended
+		map m
+	}
+	class readOnlyRequestMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class requestMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+
+	class expungedLoungeMap <<(V,#FF0000)>> {}
+	class expungedRequestMap <<(V,#FF0000)>> {}
+
+	class WebSocket_RejoinLounge <<(C,#FF00FF)>> {}
+	class MessageQueue_CreateClub <<(C,#FF00FF)>> {}
+	class MessageQueue_GetClubLoungesList <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_BalanceModify <<(C,#FF00FF)>> {}
+	class Internal_ClubRemoved <<(C,#FF00FF)>> {}
+	class MessageQueue_GetGameCustomSetting <<(C,#FF00FF)>> {}
+	class MessageQueue_UpdateClubName <<(C,#FF00FF)>> {}
+	class MessageQueue_GetClubBalance <<(C,#FF00FF)>> {}
+	class MessageQueue_GetClubsInfo <<(C,#FF00FF)>> {}
+	class MessageQueue_GetClubMemberKickedInfo <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_OpenByGame <<(C,#FF00FF)>> {}
+	class WebSocket_CreateLounge <<(C,#FF00FF)>> {}
+	class WebSocket_CreateCustomRoom <<(C,#FF00FF)>> {}
+	class MessageQueue_JoinClub <<(C,#FF00FF)>> {}
+	class MessageQueue_RemoveClub <<(C,#FF00FF)>> {}
+	class MessageQueue_WithdrawClubBalance <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_CloseByGame <<(C,#FF00FF)>> {}
+	class MessageQueue_RemoveClubMember <<(C,#FF00FF)>> {}
+	class Internal_ClubMemberRemoved <<(C,#FF00FF)>> {}
+	class NO_EVENTCODE <<(C,#FF00FF)>> {}
+	class WebSocket_RecreateLounge <<(C,#FF00FF)>> {}
+	class WebSocket_JoinLounge <<(C,#FF00FF)>> {}
+	class WebSocket_DeleteLounge <<(C,#FF00FF)>> {}
+	class MessageQueue_GetMemberInfoInTheClub <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party2.storage #fee390{
+	interface ArangodbAdapater {
+		GetDocument(context.Context,string,string,interface) (int,error)
+		GetThemesByGameType(context.Context,string,string,interface) (int,error)
+		GetPlayerBalance(context.Context,string) (types.Balance,int,error)
+		GetEcSites(context.Context) (int,[])
+		CreateClub(context.Context,string,string,string) (map,error)
+		JoinClub(context.Context,string,string,string,uint64) (map,error)
+		UpdateClubName(context.Context,string,string,string,string) (int,error)
+		RemoveClubMember(context.Context,string,types.ClubId,string) (int,error)
+		RemoveClub(context.Context,string,types.ClubId) (int,error)
+		GetClubsInfo(context.Context,string) ([],error)
+		GetMemberInfoInTheClub(context.Context,string,types.ClubId) ([],int,error)
+		GetClubBalance(context.Context,string,types.ClubId) (types.Balance,float64,int,error)
+		WithdrawClubBalance(context.Context,string,types.ClubId,types.Balance) (int,error)
+		IsClubMember(context.Context,string,string) (bool,error)
+		UpdateClubMemberLoginTime(context.Context,string,string) (int,error)
+	}
+	interface RedisAdapater {
+		Get(context.Context,string) (string,error)
+		SetEX(context.Context,string,interface,time.Duration) (string,error)
+		HSet(context.Context,string,[]) (int64,error)
+		Del(context.Context,string) (int64,error)
+		HDel(context.Context,string,[]) (int64,error)
+		HGetAll(context.Context,string) (map,error)
+		HMSet(context.Context,string,[]) (bool,error)
+	}
+
+	class mockArango <<(T,#00FF00)>> {}
+	class mockRedis <<(T,#00FF00)>> {}
+
+
+}
+
+namespace GameService.parties.party2.utils #6a0176{
+
+
+
+}
+
+
+namespace GameService.parties.party3{}
+
+namespace GameService.parties.party3.constant #9ae48a{
+
+
+	class PassRankInfo <<(V,#FF0000)>> {}
+
+	class Seat_Status_Ready <<(C,#FF00FF)>> {}
+	class CompetitionGameStatus_Settlement <<(C,#FF00FF)>> {}
+	class InsufficientBalance <<(C,#FF00FF)>> {}
+	class CompetitionGameStartType_WaitPlayerFull <<(C,#FF00FF)>> {}
+	class CompetitionGameStartType_WaitTime <<(C,#FF00FF)>> {}
+	class CompetitionGameStatus_Playing <<(C,#FF00FF)>> {}
+	class CompetitionGameStatus_Close <<(C,#FF00FF)>> {}
+	class Success <<(C,#FF00FF)>> {}
+	class CustomData_Type_Lounge <<(C,#FF00FF)>> {}
+	class CompetitionGameStatus_InScheduler <<(C,#FF00FF)>> {}
+	class Seat_Status_Init <<(C,#FF00FF)>> {}
+	class CompetitionGameStatus_WaitScheduler <<(C,#FF00FF)>> {}
+	class CompetitionGameStatus_WaitSignUp <<(C,#FF00FF)>> {}
+	class CustomData_Type_TimeKeeper <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party3.example #f11c96{
+
+	class ChanEventName <<(T,#00FF00)>> {}
+
+	class modMap <<(V,#FF0000)>> {}
+	class opMap <<(V,#FF0000)>> {}
+	class wg <<(V,#FF0000)>> {}
+	class MessageQueueEventChanMap <<(V,#FF0000)>> {}
+	class evtMap <<(V,#FF0000)>> {}
+	class WebSocketEventChanMap <<(V,#FF0000)>> {}
+	class LoungeAckEventChanMap <<(V,#FF0000)>> {}
+	class cfg <<(V,#FF0000)>> {}
+	class config <<(V,#FF0000)>> {}
+
+	class TestCase_PartyConcurrently <<(C,#FF00FF)>> {}
+	class TestCase <<(C,#FF00FF)>> {}
+	class MockPlayerId <<(C,#FF00FF)>> {}
+	class MockEcSiteId <<(C,#FF00FF)>> {}
+	class TestCase_LoungeEpoch <<(C,#FF00FF)>> {}
+	class TestCase_PartyEpoch <<(C,#FF00FF)>> {}
+	class MockLoungeId <<(C,#FF00FF)>> {}
+	class TestCase_TimeKeeperEpoch <<(C,#FF00FF)>> {}
+	class MockPartyId <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party3.lounge #7d8f7e{
+
+	class Lounge <<(T,#00FF00)>> {
+		map rewardMap
+		context.CancelFunc disableHandler
+		point config
+		types.EcSiteId ecSiteId
+		types.PartyId partyId
+		storage.RedisAdapater redis
+		context.Context handlerCtx
+		types.ThemeId themeId
+		types.LoungeGuid guid
+		 messageQueuePublisherChan
+		storage.ArangodbAdapater arangodb
+		 messageChan
+		 partyAckChan
+		 gameCoreAckChan
+		point themeMap
+		types.LoungeId loungeId
+		games.FuncNameMap mqFuncNameMap
+	}
+	class gameRoomInfo <<(T,#00FF00)>> {
+		bool IsFinish
+		bool IsBotRoom
+	}
+	class loungeCache <<(T,#00FF00)>> {
+		[] Seats
+		util.ClockTime ClockTime
+		bool IsRealSettlement
+		[] BotNameList
+		types.TraceId LoungeTraceId
+		map CompetitionRoomMap
+		bool IsCompetitionFinish
+		bool IsWaitUpdateStatu
+		bool IsBotRoom
+		bool IsRoundFinish
+		int Round
+		bool ForcedCloseCommend
+		types.RoomType RoomType
+		types.RoomStatusCode Status
+		time.Time IdleTime
+		types.SequenceId NextSequenceId
+		p3.CreateLoungeCustomData CompetitionGame
+		p3.MergedCompetitionRecord MergedGameRecord
+		types.RoomStatusCode LastStatus
+		types.MessageQueueTopicId TimeKeeperTopic
+		time.Time CreatedTime
+		bool IsWaitCreateMulitRoom
+		bool IsFakePlaying
+		int BotCount
+	}
+	class seatInfo <<(T,#00FF00)>> {
+		time.Duration JoinTime
+		types.CompetitionRank Rank
+		int IconFrame
+		types.Balance Score
+		types.SeatId Id
+		bool IsRoundWin
+		string EcUserID
+		int Icon
+		int Status
+		time.Duration CompetitionRemainThinkTime
+		types.RoomGuid CurrentRoomGuid
+		types.PlayerId PlayerId
+		types.PlayerType PlayerType
+		string Nickname
+		types.Balance CarryAmount
+		bool IsAlive
+		types.SessionId SessionId
+		types.Balance Balance
+	}
+	class traceCache <<(T,#00FF00)>> {
+		point roomTraceRoot
+		string GamecoreTraceHeader
+		point gamecoreTraceRoot
+		string CreateRoomTraceHeader
+		string RoomTraceHeader
+	}
+
+
+	class NO_EVENTCODE <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party3.party #83c852{
+
+	class CustomData <<(T,#00FF00)>> {
+		int Type
+	}
+	class Party <<(T,#00FF00)>> {
+		games.FuncNameMap funcNameMap
+		games.FuncExecMap funcExecMap
+		loungeMap loungeMap
+		 webSocketWritterChan
+		storage.ArangodbAdapater arangodb
+		 messageChan
+		storage.RedisAdapater redis
+		point config
+		bool enabled
+		point ring
+		 loungeAckChan
+		 messageQueuePublisherChan
+		util.RoomCounter loungeCounter
+		context.Context ctx
+		types.PartyGuid guid
+		timekeeperMap timekeeperMap
+		sync.Map themeMap
+		requestMap requestMap
+		map ecSiteIdMap
+	}
+	class entryLoungeMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class entryTimekeeperMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class loungeMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class readOnlyLoungeMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class readOnlyTimekeeperMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class requestMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		map entry
+	}
+	class timekeeperMap <<(T,#00FF00)>> {
+		int misses
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+	}
+
+	class expungedLoungeMap <<(V,#FF0000)>> {}
+	class expungedTimekeeperMap <<(V,#FF0000)>> {}
+
+	class WebSocket_UpdateCompetition <<(C,#FF00FF)>> {}
+	class WebSocket_DeleteLounge <<(C,#FF00FF)>> {}
+	class WebSocket_CreateCustomRoom <<(C,#FF00FF)>> {}
+	class WebSocket_CreateLounge <<(C,#FF00FF)>> {}
+	class WebSocket_CreateMulitCustomeRoom <<(C,#FF00FF)>> {}
+	class NO_EVENTCODE <<(C,#FF00FF)>> {}
+	class WebSocket_JoinLounge <<(C,#FF00FF)>> {}
+	class WebSocket_RejoinLounge <<(C,#FF00FF)>> {}
+	class WebSocket_NewCompetition <<(C,#FF00FF)>> {}
+	class WebSocket_CreateCustomLounge <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_OpenByGame <<(C,#FF00FF)>> {}
+	class WebSocket_RecreateLounge <<(C,#FF00FF)>> {}
+	class WebSocket_CloseCompetition <<(C,#FF00FF)>> {}
+	class WebSocket_ForcedCloseCompetition <<(C,#FF00FF)>> {}
+	class MessageQueue_Notice_BalanceModify <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.parties.party3.storage #a600e0{
+	interface ArangodbAdapater {
+		GetDocument(context.Context,string,string,interface) (int,error)
+		GetDocuments(context.Context,string,[],interface) (int,error)
+		GetThemesByGameType(context.Context,string,string,interface) (int,error)
+		GetPlayerBalance(context.Context,types.PlayerId) (int,error,int64)
+		GetCompetitionGames(context.Context,types.EcSiteId,[]) (int,error,[])
+		UpdateCompetitionGame(context.Context,types.CompetitionId,int,int,point) (int,error)
+		CloseCompetitionGames(context.Context,[]) (int,error)
+		SetPlayerJoinCompetition(context.Context,protodao.CarryAmountLog,p3.OrderRecord,types.Balance,point) (int,error)
+		SetPlayerJoinScoreCompetition(context.Context,string,p3.OrderRecord,types.Balance,point) (int,error)
+		RefundCompetitionCarryAmount(context.Context,protodao.CarryAmountLog,p3.OrderRecord,types.Balance) (int,error)
+		RefundCompetitionPrice(context.Context,p3.OrderRecord,types.Balance) (int,error)
+		ForcedCloseCompetitionGames(context.Context,[]) (int,error)
+		GetCarryAmountToPlayer(context.Context,[],int64,point) (int,error)
+		RefundCarryAmountToPlayer(context.Context,[]) (int,error)
+		GetCompetitionLogs(context.Context,types.EcSiteId) (int,error,[])
+		SetCompetitionLog(context.Context,p3.CompetitionLog) (int,error)
+		CreateMergedCompetitionRecord(context.Context,point) (int,error)
+		UpdateMergedCompetitionRecord(context.Context,point) (int,error)
+		SetCompetitionOrderRecord(context.Context,[]) (int,error)
+		GetPlayerKKBalance(context.Context,string) (int,error,int64)
+	}
+	interface RedisAdapater {
+		Get(context.Context,string) (string,error)
+		Exists(context.Context,string) (int64,error)
+		SetEX(context.Context,string,interface,time.Duration) (string,error)
+		HGet(context.Context,string,string) (string,error)
+		HSet(context.Context,string,[]) (int64,error)
+		Del(context.Context,string) (int64,error)
+		HDel(context.Context,string,[]) (int64,error)
+		CreateGameRecordId(time.Time) string
+		CreaterOrderRecordId(time.Time) string
+		UpdateParadise(string,point) error
+	}
+
+	class mockArango <<(T,#00FF00)>> {}
+	class mockRedis <<(T,#00FF00)>> {}
+
+
+}
+
+namespace GameService.parties.party3.timekeeper #ce7242{
+
+	class CompetitionMember <<(T,#00FF00)>> {
+		[] PlayerIds
+		int BotCount
+	}
+	class TimeKeeper <<(T,#00FF00)>> {
+		 messageChan
+		waitCreateCompetitionIds waitCreateCompetitionIds
+		[] competitionLogs
+		games.FuncNameMap funcNameMap
+		context.Context handlerCtx
+		time.Time now
+		types.LoungeGuid guid
+		 partyAckChan
+		storage.ArangodbAdapater arangodb
+		point config
+		types.PartyId partyId
+		competitionGameMap competitionGameMap
+		types.EcSiteId ecSiteId
+		storage.RedisAdapater redis
+		 messageQueuePublisherChan
+		context.CancelFunc disableHandler
+		types.LoungeId loungeId
+	}
+	class competitionGameMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class competitionMemberMap <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class entryCompetitionGameMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class entryCompetitionMemberMap <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class entryWaitCreateCompetitionIds <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class readOnlyCompetitionGameMap <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class readOnlyCompetitionMemberMap <<(T,#00FF00)>> {
+		bool amended
+		map m
+	}
+	class readOnlyWaitCreateCompetitionIds <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+	class timeKeeperCache <<(T,#00FF00)>> {
+		competitionMemberMap CompetitionMemberMap
+		types.SequenceId NextSequenceId
+		types.RoomStatusCode Status
+	}
+	class waitCreateCompetitionIds <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+
+	class expungedCompetitionGameMap <<(V,#FF0000)>> {}
+	class expungedCompetitionMemberMap <<(V,#FF0000)>> {}
+	class expungedWaitCreateCompetitionIds <<(V,#FF0000)>> {}
+
+	class NO_EVENTCODE <<(C,#FF00FF)>> {}
+}
+
+namespace GameService.types #ecaada{
+
+	class ArangoNumber <<(T,#00FF00)>> {}
+	class Balance <<(T,#00FF00)>> {}
+	class ClubId <<(T,#00FF00)>> {}
+	class ClubLoungeGuid <<(T,#00FF00)>> {}
+	class ClubName <<(T,#00FF00)>> {}
+	class CompetitionCycleId <<(T,#00FF00)>> {}
+	class CompetitionId <<(T,#00FF00)>> {}
+	class CompetitionRank <<(T,#00FF00)>> {}
+	class CompetitionScoreType <<(T,#00FF00)>> {}
+	class EcSiteId <<(T,#00FF00)>> {}
+	class EcSiteNumId <<(T,#00FF00)>> {}
+	class EventCode <<(T,#00FF00)>> {}
+	class FuncNameMap <<(T,#00FF00)>> {}
+	class GameDelegatorId <<(T,#00FF00)>> {}
+	class GameGuid <<(T,#00FF00)>> {}
+	class GameId <<(T,#00FF00)>> {}
+	class GameNumId <<(T,#00FF00)>> {}
+	class GameRecordId <<(T,#00FF00)>> {}
+	class GameType <<(T,#00FF00)>> {}
+	class ItemType <<(T,#00FF00)>> {}
+	class LeaveReasonId <<(T,#00FF00)>> {}
+	class LoungeGuid <<(T,#00FF00)>> {}
+	class LoungeId <<(T,#00FF00)>> {}
+	class LoungeStatusCode <<(T,#00FF00)>> {}
+	class MergedGameRecordId <<(T,#00FF00)>> {}
+	class MessageQueueStatusCode <<(T,#00FF00)>> {}
+	class MessageQueueTopicId <<(T,#00FF00)>> {}
+	class ModuleId <<(T,#00FF00)>> {}
+	class OperationCode <<(T,#00FF00)>> {}
+	class OrderRecordEvent <<(T,#00FF00)>> {}
+	class OrderRecordType <<(T,#00FF00)>> {}
+	class PartyGuid <<(T,#00FF00)>> {}
+	class PartyId <<(T,#00FF00)>> {}
+	class Payload <<(T,#00FF00)>> {}
+	class PlayerId <<(T,#00FF00)>> {}
+	class PlayerMatchStatus <<(T,#00FF00)>> {}
+	class PlayerType <<(T,#00FF00)>> {}
+	class QueueGroup <<(T,#00FF00)>> {}
+	class RequestId <<(T,#00FF00)>> {}
+	class RoomGuid <<(T,#00FF00)>> {}
+	class RoomId <<(T,#00FF00)>> {}
+	class RoomNumId <<(T,#00FF00)>> {}
+	class RoomStatusCode <<(T,#00FF00)>> {}
+	class RoomType <<(T,#00FF00)>> {}
+	class SeatId <<(T,#00FF00)>> {}
+	class SequenceId <<(T,#00FF00)>> {}
+	class SessionId <<(T,#00FF00)>> {}
+	class SessionIds <<(T,#00FF00)>> {}
+	class ThemeId <<(T,#00FF00)>> {}
+	class ThemeNumId <<(T,#00FF00)>> {}
+	class TraceId <<(T,#00FF00)>> {}
+
+
+}
+
+namespace GameService.util #e67206{
+
+	class CBAvatar <<(T,#00FF00)>> {
+		string Url
+	}
+	class CBGithub <<(T,#00FF00)>> {
+		int Followers
+	}
+	class CBGravatar <<(T,#00FF00)>> {
+		[] Avatars
+	}
+	class CBName <<(T,#00FF00)>> {
+		string FullName
+	}
+	class CBPerson <<(T,#00FF00)>> {
+		point Name
+		point Github
+		point Gravatar
+	}
+	class ClockTime <<(T,#00FF00)>> {
+		time.Duration timer
+		time.Time dateTime
+		uint64 tickCount
+	}
+	class DSTopic <<(T,#00FF00)>> {
+		int Id
+		string Slug
+	}
+	class DSTopicsList <<(T,#00FF00)>> {
+		[] Topics
+		string MoreTopicsUrl
+	}
+	class DSUser <<(T,#00FF00)>> {
+		string Username
+	}
+	class DecodeResponse <<(T,#00FF00)>> {
+		types.OperationCode OperationCode
+		types.EventCode EventCode
+		[] Data
+	}
+	class EncodeData <<(T,#00FF00)>> {
+		types.OperationCode OperationCode
+		types.EventCode EventCode
+		interface Payload
+	}
+	class LargePayload <<(T,#00FF00)>> {
+		[] Users
+		point Topics
+	}
+	class MediumPayload <<(T,#00FF00)>> {
+		point Person
+		string Company
+	}
+	class Retry <<(T,#00FF00)>> {
+		int count
+		time.Duration interval
+	}
+	class RingBuffer <<(T,#00FF00)>> {
+		time.Duration interval
+		[] zone
+		point mux
+		int index
+	}
+	class RollBack <<(T,#00FF00)>> {
+		[] rollbackFuncs
+	}
+	class RoomCounter <<(T,#00FF00)>> {
+		sync.Mutex mu
+		atomic.Value read
+		map dirty
+		int misses
+	}
+	class SmallPayload <<(T,#00FF00)>> {
+		string Ip
+		int Tz
+		string Tt
+		int Gr
+		string Uuid
+		string Ua
+		int V
+		int St
+		int Sid
+	}
+	class entryRoomCounter <<(T,#00FF00)>> {
+		unsafe.Pointer p
+	}
+	class readOnlyRoomCounter <<(T,#00FF00)>> {
+		map m
+		bool amended
+	}
+
+	class expungedRoomCounter <<(V,#FF0000)>> {}
+	class smallFixture <<(V,#FF0000)>> {}
+	class mediumFixture <<(V,#FF0000)>> {}
+	class largeFixture <<(V,#FF0000)>> {}
+
+	class RetryCount <<(C,#FF00FF)>> {}
+	class RetryInterval <<(C,#FF00FF)>> {}
+}
+
+namespace bytes #da7224{
+
+
+
+}
+
+namespace context #e8391e{
+
+	class CancelFunc <<(T,#00FF00)>> {}
+	class Context <<(T,#00FF00)>> {}
+
+
+}
+
+namespace crypto.tls #fc38ec{
+
+
+
+}
+
+namespace encoding.binary #dae3ea{
+
+
+
+}
+
+namespace encoding.json #dd8e8e{
+
+
+
+}
+
+namespace errors #8ae4b2{
+
+
+
+}
+
+namespace fmt #5ee520{
+
+
+
+}
+
+namespace github_com.arangodb.go_driver #bae43a{
+
+	class Client <<(T,#00FF00)>> {}
+	class Cursor <<(T,#00FF00)>> {}
+	class Database <<(T,#00FF00)>> {}
+
+
+}
+
+namespace github_com.arangodb.go_driver.http #f98e48{
+
+
+
+}
+
+namespace github_com.go_redis.redis.v8 #a8ab84{
+
+	class Cmdable <<(T,#00FF00)>> {}
+	class Script <<(T,#00FF00)>> {}
+
+
+}
+
+namespace github_com.json_iterator.go #9ee480{
+
+	class Any <<(T,#00FF00)>> {}
+	class Decoder <<(T,#00FF00)>> {}
+	class Encoder <<(T,#00FF00)>> {}
+	class Extension <<(T,#00FF00)>> {}
+
+
+}
+
+namespace github_com.nats_io.nats_go #851da4{
+
+
+
+}
+
+namespace github_com.nats_io.nats_server.v2 {
+
+
+
+}
+
+namespace github_com.nats_io.nats_server.v2.server #b35614{
+
+
+
+}
+
+namespace github_com.nats_io.nats_streaming_server {
+
+
+
+}
+
+namespace github_com.nats_io.nats_streaming_server.server #af561e{
+
+
+
+}
+
+namespace github_com.nats_io.stan_go #94abb6{
+
+	class Conn <<(T,#00FF00)>> {}
+	class Subscription <<(T,#00FF00)>> {}
+
+
+}
+
+namespace github_com.prometheus.client_golang {
+
+
+
+}
+
+namespace github_com.prometheus.client_golang.prometheus #e18e84{
+
+
+
+}
+
+namespace github_com.prometheus.client_golang.prometheus.promhttp #aa00d6{
+
+
+
+}
+
+namespace github_com.rs.xid #b18efc{
+
+
+
+}
+
+namespace github_com.spf13.cobra #598fd8{
+
+
+
+}
+
+namespace github_com.spf13.viper #afc7e4{
+
+
+
+}
+
+namespace github_com.valyala.fastrand #6fc884{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.fortest.apmgoredisv8 #8a72ec{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore #dee3e0{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.commonutil.commonmath.uconv #827300{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.commonutil.commonmath.urand #7cabf2{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.commonutil.commonmj #97c820{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game1 #6e016c{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game1.conf #6bc88e{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game1.constant #f6e3a4{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game10 #b7c7d0{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game10.constant #6e7332{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game11 #74ac06{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game11.constant #fae39a{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game13 #df55a6{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game13.constant #8a0126{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game139 #7d1db8{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game139.constant #7c3a2c{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game14 #791dc2{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game14.constant #743a40{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game15 #5b56f0{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game15.constant #6c3a54{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game16 #ea0036{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game16.conf #ba00ae{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game16.constant #a439c8{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game17 #c27260{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game17.conf #758f92{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game17.constant #f43900{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game18 #fe71ca{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game18.conf #7f5696{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game18.constant #fe0004{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game2 #80abe8{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game2.conf #d51cdc{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game2.constant #ba7274{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game20 #66e50c{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game20.constant #bf55f6{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game21 #f8aabc{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game21.constant #5bc8b6{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game22 #c91cfa{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game22.constant #c8ab34{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game24 #acab7a{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game24.constant #6f56be{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game25 #87c848{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game25.constant #cf55ce{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game26 #658fba{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game26.constant #cfc794{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game27 #f0aad0{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game27.constant #76e4e4{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game29 #dfc76c{
+
+	class BetMap <<(T,#00FF00)>> {}
+	class Bot <<(T,#00FF00)>> {}
+	class GameRecordCountData <<(T,#00FF00)>> {}
+	class OnPlayerSettlementNotice <<(T,#00FF00)>> {}
+	class PlayerInfo <<(T,#00FF00)>> {}
+	class RoomDelegate <<(T,#00FF00)>> {}
+	class Seating <<(T,#00FF00)>> {}
+	class Settlement <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+	class WheelDraw <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game29.conf #c2009a{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game29.constant #9c39dc{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game31 #f91c82{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game31.constant #aa729c{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game32 #c755e2{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game32.constant #c98ec0{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game33 #c2e426{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game33.constant #97565a{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game35 #dbc776{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game35.conf #db55b0{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game35.constant #e2004a{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game36 #a3563c{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game36.conf #fb5560{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game36.constant #d11ce6{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game37 #d4ab16{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game37.conf #558fe2{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game37.constant #a200ea{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game39 #8e011c{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game39.conf #68ac24{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game39.constant #9a72c4{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game4 #eb5588{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game4.constant #a2e476{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game40 #643a68{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game40.conf #c8396e{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game40.constant #b58ef2{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game5 #d7c780{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game5.conf #c4ab3e{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game5.constant #60ac38{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game6 #891d9a{
+
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game6.conf #c67256{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game6.constant #ebc74e{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game61 #58ac4c{
+
+	class GameCoreNoticeBody <<(T,#00FF00)>> {}
+	class GameCoreResponseBody <<(T,#00FF00)>> {}
+	class Summary <<(T,#00FF00)>> {}
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game61.conf #803a22{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game61.fishcord #b200c2{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game7 #6b56c8{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game7.constant #b27288{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game8 #c11d0e{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game8.constant #c18ed4{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game9 #5d8fce{
+
+	class TableDelegate <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gamecore.games.game9.constant #cb55d8{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gologger {
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gologger.apm #858f6a{
+
+	class Apm <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gologger.constants #875682{
+
+	class ServiceCode <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.gologger.gracefulshutdown #e98e70{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gologger.logger #e58e7a{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.gologger.slackAlert #703a4a{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol #d83946{
+
+	class ErrorCode <<(T,#00FF00)>> {}
+	class TraceId <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.dao #fa000e{
+
+	class Accounting <<(T,#00FF00)>> {}
+	class CarryAmountLog <<(T,#00FF00)>> {}
+	class CreateCustomLoungeRequest <<(T,#00FF00)>> {}
+	class CreateCustomRoomRequest <<(T,#00FF00)>> {}
+	class CreateMultiCustomRoomRequest <<(T,#00FF00)>> {}
+	class EcSite <<(T,#00FF00)>> {}
+	class GameRecord <<(T,#00FF00)>> {}
+	class Jackpot <<(T,#00FF00)>> {}
+	class MemberData <<(T,#00FF00)>> {}
+	class MergedGameRecord <<(T,#00FF00)>> {}
+	class MessageQueueInternalNotice <<(T,#00FF00)>> {}
+	class MessageQueueRequestBody <<(T,#00FF00)>> {}
+	class MessageQueueResponseBody <<(T,#00FF00)>> {}
+	class Player <<(T,#00FF00)>> {}
+	class PlayerInfo <<(T,#00FF00)>> {}
+	class SlotTheme <<(T,#00FF00)>> {}
+	class TableMessage <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.errorcode #798f88{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.eventcode #fbc726{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game1 #6ee4f8{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game10 #5c3a7c{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game11 #583a86{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game13 #d8ab0c{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game139 #7bc866{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game14 #e91caa{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game15 #e27210{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game16 #be726a{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class CompetitionRankInfoNotice <<(T,#00FF00)>> {}
+	class DisbandResultNotice <<(T,#00FF00)>> {}
+	class InitiateDisbandResponse <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class PregameInfoNotice <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SettlementBody <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneInitiateDisbandNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReadyStartNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneVoteDisbandNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game17 #667346{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class CompetitionRankInfoNotice <<(T,#00FF00)>> {}
+	class DisbandResultNotice <<(T,#00FF00)>> {}
+	class InitiateDisbandResponse <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class PregameInfoNotice <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SettlementBody <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneInitiateDisbandNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReadyStartNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneVoteDisbandNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game18 #a272b0{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class CompetitionRankInfoNotice <<(T,#00FF00)>> {}
+	class DisbandResultNotice <<(T,#00FF00)>> {}
+	class InitiateDisbandResponse <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class PregameInfoNotice <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SettlementBody <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneInitiateDisbandNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReadyStartNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneVoteDisbandNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game2 #dd1cc8{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game20 #b600b8{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game21 #8d8f56{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game22 #ec3914{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game24 #ee002c{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game25 #9e72ba{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game26 #660180{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game27 #98abac{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game29 #d0395a{
+
+	class BetMap <<(T,#00FF00)>> {}
+	class Bot <<(T,#00FF00)>> {}
+	class Draw <<(T,#00FF00)>> {}
+	class GameInfo <<(T,#00FF00)>> {}
+	class ParameterOfDraw <<(T,#00FF00)>> {}
+	class PlayerBetRequest <<(T,#00FF00)>> {}
+	class PlayerInfo <<(T,#00FF00)>> {}
+	class PlayerSeatingWin <<(T,#00FF00)>> {}
+	class Seating <<(T,#00FF00)>> {}
+	class Theme <<(T,#00FF00)>> {}
+	class ThemeSetting <<(T,#00FF00)>> {}
+	class WheelDraw <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game31 #c43978{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game32 #62018a{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game33 #e51cb4{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game35 #811dae{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game36 #cee408{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game37 #ac39b4{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game39 #611dfe{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class CompetitionRankInfoNotice <<(T,#00FF00)>> {}
+	class DisbandResultNotice <<(T,#00FF00)>> {}
+	class InitiateDisbandResponse <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class PregameInfoNotice <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SettlementBody <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneInitiateDisbandNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReadyStartNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneVoteDisbandNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game4 #ae7292{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game40 #be00a4{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class CompetitionRankInfoNotice <<(T,#00FF00)>> {}
+	class DisbandResultNotice <<(T,#00FF00)>> {}
+	class InitiateDisbandResponse <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class PregameInfoNotice <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SettlementBody <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneInitiateDisbandNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReadyStartNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneVoteDisbandNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game5 #951d7c{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class Table <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game6 #e60040{
+
+	class CheatData <<(T,#00FF00)>> {}
+	class CompetitionRankInfoNotice <<(T,#00FF00)>> {}
+	class DisbandResultNotice <<(T,#00FF00)>> {}
+	class InitiateDisbandResponse <<(T,#00FF00)>> {}
+	class PlayerData <<(T,#00FF00)>> {}
+	class PregameInfoNotice <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SettlementBody <<(T,#00FF00)>> {}
+	class SomeoneDisconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneInitiateDisbandNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReadyStartNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class SomeoneVoteDisbandNotice <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game61 #83568c{
+
+	class GameCoreNoticeBody <<(T,#00FF00)>> {}
+	class GameCoreResponseBody <<(T,#00FF00)>> {}
+	class PlayerDelegate <<(T,#00FF00)>> {}
+	class Summary <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game7 #918f4c{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game8 #7fc85c{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.games.game9 #b83996{
+
+	class CheatData <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.operationcode #618fc4{
+
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.parties.party1 #aee458{
+
+	class ChangeGameSettingNotice <<(T,#00FF00)>> {}
+	class ChangeGameSettingRequest <<(T,#00FF00)>> {}
+	class ErrorMessageNotice <<(T,#00FF00)>> {}
+	class LeaveResponse <<(T,#00FF00)>> {}
+	class LoungeStatusResponse <<(T,#00FF00)>> {}
+	class OnStartGameNotice <<(T,#00FF00)>> {}
+	class PlayerDataUpdateNotice <<(T,#00FF00)>> {}
+	class SeatData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SetReadyStatusRequest <<(T,#00FF00)>> {}
+	class SetReadyStatusResponse <<(T,#00FF00)>> {}
+	class SomeoneChangeReadyStatusNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class StartGameResponse <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.parties.party2 #d60068{
+
+	class ChangeGameSettingNotice <<(T,#00FF00)>> {}
+	class ChangeGameSettingRequest <<(T,#00FF00)>> {}
+	class ClubRemovedNotice <<(T,#00FF00)>> {}
+	class ErrorMessageNotice <<(T,#00FF00)>> {}
+	class LeaveResponse <<(T,#00FF00)>> {}
+	class LoungeStatusResponse <<(T,#00FF00)>> {}
+	class OnStartGameNotice <<(T,#00FF00)>> {}
+	class PlayerDataUpdateNotice <<(T,#00FF00)>> {}
+	class SeatData <<(T,#00FF00)>> {}
+	class SelfJoinNotice <<(T,#00FF00)>> {}
+	class SelfLeaveNotice <<(T,#00FF00)>> {}
+	class SetReadyStatusRequest <<(T,#00FF00)>> {}
+	class SetReadyStatusResponse <<(T,#00FF00)>> {}
+	class ShortClubInfo <<(T,#00FF00)>> {}
+	class ShortMemberInfo <<(T,#00FF00)>> {}
+	class SomeoneChangeReadyStatusNotice <<(T,#00FF00)>> {}
+	class SomeoneJoinNotice <<(T,#00FF00)>> {}
+	class SomeoneLeaveNotice <<(T,#00FF00)>> {}
+	class SomeoneReconnectNotice <<(T,#00FF00)>> {}
+	class StartGameResponse <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.parties.party3 #8bc83e{
+
+	class CompetitionCustomSetting <<(T,#00FF00)>> {}
+	class CompetitionCustomSettingReward <<(T,#00FF00)>> {}
+	class CompetitionGame <<(T,#00FF00)>> {}
+	class CompetitionGameFinish <<(T,#00FF00)>> {}
+	class CompetitionGameFinishCustomData <<(T,#00FF00)>> {}
+	class CompetitionGameReady <<(T,#00FF00)>> {}
+	class CompetitionLog <<(T,#00FF00)>> {}
+	class CreateLoungeCustomData <<(T,#00FF00)>> {}
+	class ForcedCloseCompetitionNotice <<(T,#00FF00)>> {}
+	class LeaveCompetitionResponse <<(T,#00FF00)>> {}
+	class MergedCompetitionRecord <<(T,#00FF00)>> {}
+	class OnStartGameNotice <<(T,#00FF00)>> {}
+	class OrderRecord <<(T,#00FF00)>> {}
+
+
+}
+
+namespace gitlab_geax_io.demeter.protocol.subject #c6e41c{
+
+
+
+}
+
+namespace go_elastic_co.apm.module.apmhttp {
+
+
+
+}
+
+namespace go_uber_org.atomic #720162{
+
+	class Uint32 <<(T,#00FF00)>> {}
+
+
+}
+
+namespace go_uber_org.zap {
+
+
+
+}
+
+namespace golang_org.x.crypto {
+
+
+
+}
+
+namespace golang_org.x.mod {
+
+
+
+}
+
+namespace golang_org.x.net {
+
+
+
+}
+
+namespace golang_org.x.net.http2 #6d8fa6{
+
+
+
+}
+
+namespace golang_org.x.sys {
+
+
+
+}
+
+namespace golang_org.x.time {
+
+
+
+}
+
+namespace golang_org.x.time.rate #b51d2c{
+
+	class Limiter <<(T,#00FF00)>> {}
+
+
+}
+
+namespace golang_org.x.tools {
+
+
+
+}
+
+namespace gopkg_in.yaml_v2 #958f42{
+
+
+
+}
+
+namespace io #dcab02{
+
+	class Reader <<(T,#00FF00)>> {}
+	class Writer <<(T,#00FF00)>> {}
+
+
+}
+
+namespace io.ioutil #dc393c{
+
+
+
+}
+
+namespace log #d43950{
+
+
+
+}
+
+namespace math #9439f0{
+
+
+
+}
+
+namespace math.rand #ed8e66{
+
+
+
+}
+
+namespace net #bee430{
+
+
+
+}
+
+namespace net.http #f271e8{
+
+	class Request <<(T,#00FF00)>> {}
+	class ResponseWriter <<(T,#00FF00)>> {}
+
+
+}
+
+namespace net.http.pprof #d27238{
+
+
+
+}
+
+namespace net.url #f671de{
+
+
+
+}
+
+namespace nhooyr_io.websocket #7756aa{
+
+	class Conn <<(T,#00FF00)>> {}
+
+
+}
+
+namespace os #88abd4{
+
+
+
+}
+
+namespace os.signal #7ee4d0{
+
+
+
+}
+
+namespace reflect #96e494{
+
+
+
+}
+
+namespace regexp #8b5678{
+
+
+
+}
+
+namespace runtime #911d86{
+
+
+
+}
+
+namespace sort #82e4c6{
+
+
+
+}
+
+namespace strconv #bd8ede{
+
+
+
+}
+
+namespace strings #b7560a{
+
+
+
+}
+
+namespace sync #6ae502{
+
+	class Map <<(T,#00FF00)>> {}
+	class Mutex <<(T,#00FF00)>> {}
+	class Once <<(T,#00FF00)>> {}
+	class RWMutex <<(T,#00FF00)>> {}
+	class WaitGroup <<(T,#00FF00)>> {}
+
+
+}
+
+namespace sync.atomic #c3c7b2{
+
+	class Value <<(T,#00FF00)>> {}
+
+
+}
+
+namespace testing #e8aae4{
+
+	class B <<(T,#00FF00)>> {}
+	class T <<(T,#00FF00)>> {}
+
+
+}
+
+namespace time #ee71f2{
+
+	class Duration <<(T,#00FF00)>> {}
+	class Time <<(T,#00FF00)>> {}
+
+
+}
+
+namespace unsafe #f0390a{
+
+	class Pointer <<(T,#00FF00)>> {}
+
+
+}
+
+GameService.constant.CompetitionScoreType_Balance --> GameService.types.CompetitionScoreType #d0723d;line.dashed;
+GameService.constant.CompetitionScoreType_Score --> GameService.types.CompetitionScoreType #d0723d;line.dashed;
+GameService.constant.Identity_Bot --> GameService.types.PlayerType #d0723d;line.dashed;
+GameService.constant.Identity_Member --> GameService.types.PlayerType #d0723d;line.dashed;
+GameService.constant.Identity_None --> GameService.types.PlayerType #d0723d;line.dashed;
+GameService.constant.ItemType_Money --> GameService.types.ItemType #d0723d;line.dashed;
+GameService.constant.ModuleId_Club_Lounge --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.ModuleId_Club_Party --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.ModuleId_Game --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.ModuleId_Lounge --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.ModuleId_MessageQueue --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.ModuleId_Party --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.ModuleId_Room --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.ModuleId_WebSocket --> GameService.types.ModuleId #d0723d;line.dashed;
+GameService.constant.OrderRecordEvent_Join --> GameService.types.OrderRecordEvent #d0723d;line.dashed;
+GameService.constant.OrderRecordEvent_Leave --> GameService.types.OrderRecordEvent #d0723d;line.dashed;
+GameService.constant.OrderRecordEvent_Reward --> GameService.types.OrderRecordEvent #d0723d;line.dashed;
+GameService.constant.OrderRecordType_Competition --> GameService.types.OrderRecordType #d0723d;line.dashed;
+GameService.constant.PlayerMatchStatus_InLounge --> GameService.types.PlayerMatchStatus #d0723d;line.dashed;
+GameService.constant.PlayerMatchStatus_Matching --> GameService.types.PlayerMatchStatus #d0723d;line.dashed;
+GameService.constant.PlayerMatchStatus_Playing --> GameService.types.PlayerMatchStatus #d0723d;line.dashed;
+GameService.constant.PlayerRoomData_RoomType_Game --> GameService.types.RoomType #d0723d;line.dashed;
+GameService.constant.PlayerRoomData_RoomType_Lounge --> GameService.types.RoomType #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_CanRemove --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Closing --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Disbanding --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Empty --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Idle --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_InitializedTimeout --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Initializing --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Playing --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Ready --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Restart --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_Settlement --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_WaitRoomCreate --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_WaitingCompetitionGameReward --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_WaitingCompetitionGameStart --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_WaitingCompetitionSignUp --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.constant.RoomStatusCode_WaitingPlayerReady --> GameService.types.RoomStatusCode #d0723d;line.dashed;
+GameService.dao.MessageQueueSubscribeByOperationCodeRequest --> GameService.module.flow.Flow #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeByOperationCodeRequest --> GameService.types.MessageQueueTopicId #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeByOperationCodeRequest --> GameService.types.OperationCode #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeQueueGroupRequest --> GameService.module.flow.Flow #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeQueueGroupRequest --> GameService.types.MessageQueueTopicId #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeQueueGroupRequest --> GameService.types.QueueGroup #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeRequest --> GameService.module.flow.Flow #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeRequest --> GameService.types.MessageQueueTopicId #60018f;line.dashed;
+GameService.dao.MessageQueueSubscribeRequest --> GameService.types.SequenceId #60018f;line.dashed;
+GameService.dao.MessageQueueUnsubscribeRequest --> GameService.types.MessageQueueTopicId #60018f;line.dashed;
+GameService.dao.RequestId --> gitlab_geax_io.demeter.protocol.TraceId #60018f;line.dashed;
+GameService.env.ArangoDB --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Apm #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.ArangoDB #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Base #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Discovery #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Game #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Nats #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Redis #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Trace #8ce4ad;line.dashed;
+GameService.env.Config --> GameService.env.Websocket #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game10Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game11Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game139Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game13Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game14Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game15Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game16Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game17Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game18Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game1Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game20Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game21Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game22Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game24Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game25Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game26Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game27Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game29Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game2Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game31Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game32Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game33Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game35Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game36Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game37Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game39Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game40Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game4Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game5Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game61Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game6Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game7Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game8Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Game9Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.GameBase #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Party1Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Party2Config #8ce4ad;line.dashed;
+GameService.env.Game --> GameService.env.Party3Config #8ce4ad;line.dashed;
+GameService.env.Game16Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game16Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game16Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game17Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game17Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game17Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game18Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game18Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game18Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game1Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game1Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game1Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game29Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game2Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game2Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game2Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game35Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game35Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game35Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game36Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game36Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game36Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game37Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game37Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game37Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game39Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game39Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game39Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game40Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game40Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game40Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game5Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game5Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game5Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game61Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Game6Config --> GameService.env.BotConfig #8ce4ad;line.dashed;
+GameService.env.Game6Config --> GameService.types.GameType #8ce4ad;line.dashed;
+GameService.env.Game6Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.GameBase --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Nats --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Party1Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Party2Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Party3Config --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Redis --> time.Duration #8ce4ad;line.dashed;
+GameService.env.Setting --> GameService.env.Config #8ce4ad;line.dashed;
+GameService.env.Trace --> gitlab_geax_io.demeter.gologger.constants.ServiceCode #8ce4ad;line.dashed;
+GameService.env.Websocket --> time.Duration #8ce4ad;line.dashed;
+GameService.module.GameFuncMap --> GameService.module.entryGameFuncMap #5aac47;line.dashed;
+GameService.module.GameFuncMap --> sync.Mutex #5aac47;line.dashed;
+GameService.module.GameFuncMap --> sync.atomic.Value #5aac47;line.dashed;
+GameService.module.arangodb.G16CustomTheme --> GameService.module.arangodb.G16Options #a55637;line.dashed;
+GameService.module.arangodb.G16CustomTheme --> GameService.types.ArangoNumber #a55637;line.dashed;
+GameService.module.arangodb.G16CustomTheme --> gitlab_geax_io.demeter.protocol.dao.Accounting #a55637;line.dashed;
+GameService.module.arangodb.G16Options --> GameService.types.ArangoNumber #a55637;line.dashed;
+GameService.module.arangodb.Handler --> GameService.util.Retry #a55637;line.dashed;
+GameService.module.arangodb.Handler --> context.Context #a55637;line.dashed;
+GameService.module.arangodb.Handler --> github_com.arangodb.go_driver.Database #a55637;line.dashed;
+GameService.module.arangodb.handlerInstances --> GameService.module.arangodb.Handler #a55637;line.dashed;
+GameService.module.arangodb.mu --> sync.Mutex #a55637;line.dashed;
+GameService.module.arangodb.once --> sync.Once #a55637;line.dashed;
+GameService.module.entryGameFuncMap --> unsafe.Pointer #5aac47;line.dashed;
+GameService.module.flow.Flow --> GameService.types.EventCode #7aabf7;line.dashed;
+GameService.module.flow.Flow --> GameService.types.ModuleId #7aabf7;line.dashed;
+GameService.module.flow.Flow --> GameService.types.OperationCode #7aabf7;line.dashed;
+GameService.module.flow.Flow --> GameService.types.RoomGuid #7aabf7;line.dashed;
+GameService.module.flow.Flow --> GameService.types.TraceId #7aabf7;line.dashed;
+GameService.module.flow.Flow --> gitlab_geax_io.demeter.gologger.apm.Apm #7aabf7;line.dashed;
+GameService.module.flow.Flow --> gitlab_geax_io.demeter.protocol.ErrorCode #7aabf7;line.dashed;
+GameService.module.nats.Handler --> GameService.env.Nats #623a6d;line.dashed;
+GameService.module.nats.Handler --> GameService.module.flow.Flow #623a6d;line.dashed;
+GameService.module.nats.Handler --> GameService.module.nats.flowMap #623a6d;line.dashed;
+GameService.module.nats.Handler --> GameService.module.nats.subscriptionMap #623a6d;line.dashed;
+GameService.module.nats.Handler --> context.Context #623a6d;line.dashed;
+GameService.module.nats.Handler --> github_com.nats_io.stan_go.Conn #623a6d;line.dashed;
+GameService.module.nats.entryFlowMap --> unsafe.Pointer #623a6d;line.dashed;
+GameService.module.nats.entrySubscriptionMap --> unsafe.Pointer #623a6d;line.dashed;
+GameService.module.nats.flowMap --> GameService.module.nats.entryFlowMap #623a6d;line.dashed;
+GameService.module.nats.flowMap --> sync.Mutex #623a6d;line.dashed;
+GameService.module.nats.flowMap --> sync.atomic.Value #623a6d;line.dashed;
+GameService.module.nats.readOnlyFlowMap --> GameService.module.nats.entryFlowMap #623a6d;line.dashed;
+GameService.module.nats.readOnlySubscriptionMap --> GameService.module.nats.entrySubscriptionMap #623a6d;line.dashed;
+GameService.module.nats.subscriptionMap --> GameService.module.nats.entrySubscriptionMap #623a6d;line.dashed;
+GameService.module.nats.subscriptionMap --> sync.Mutex #623a6d;line.dashed;
+GameService.module.nats.subscriptionMap --> sync.atomic.Value #623a6d;line.dashed;
+GameService.module.noticehandler.Handler --> GameService.module.GameFuncMap #6c7337;line.dashed;
+GameService.module.noticehandler.Handler --> GameService.module.flow.Flow #6c7337;line.dashed;
+GameService.module.noticehandler.Handler --> GameService.types.GameGuid #6c7337;line.dashed;
+GameService.module.noticehandler.Handler --> GameService.types.PartyGuid #6c7337;line.dashed;
+GameService.module.readOnlyGameFuncMap --> GameService.module.entryGameFuncMap #5aac47;line.dashed;
+GameService.module.redis.Handler --> GameService.env.Redis #ff1c73;line.dashed;
+GameService.module.redis.Handler --> context.Context #ff1c73;line.dashed;
+GameService.module.redis.Handler --> github_com.go_redis.redis.v8.Cmdable #ff1c73;line.dashed;
+GameService.module.redis.accountingRedis --> GameService.types.Balance #ff1c73;line.dashed;
+GameService.module.redis.handlerInstance --> GameService.module.redis.Handler #ff1c73;line.dashed;
+GameService.module.redis.mutex --> sync.RWMutex #ff1c73;line.dashed;
+GameService.module.redis.once --> sync.Once #ff1c73;line.dashed;
+GameService.module.websocket.Handler --> GameService.env.Websocket #671def;line.dashed;
+GameService.module.websocket.Handler --> GameService.module.GameFuncMap #671def;line.dashed;
+GameService.module.websocket.Handler --> GameService.module.flow.Flow #671def;line.dashed;
+GameService.module.websocket.Handler --> GameService.module.websocket.flowMap #671def;line.dashed;
+GameService.module.websocket.Handler --> GameService.module.websocket.requestMap #671def;line.dashed;
+GameService.module.websocket.Handler --> GameService.util.RingBuffer #671def;line.dashed;
+GameService.module.websocket.Handler --> context.Context #671def;line.dashed;
+GameService.module.websocket.Handler --> nhooyr_io.websocket.Conn #671def;line.dashed;
+GameService.module.websocket.Handler --> time.Time #671def;line.dashed;
+GameService.module.websocket.entryFlowMap --> unsafe.Pointer #671def;line.dashed;
+GameService.module.websocket.flowMap --> GameService.module.websocket.entryFlowMap #671def;line.dashed;
+GameService.module.websocket.flowMap --> sync.Mutex #671def;line.dashed;
+GameService.module.websocket.flowMap --> sync.atomic.Value #671def;line.dashed;
+GameService.module.websocket.readOnlyFlowMap --> GameService.module.websocket.entryFlowMap #671def;line.dashed;
+GameService.module.websocket.requestMap --> sync.Mutex #671def;line.dashed;
+GameService.parties.party1.dao.Game40CustomOptions --> GameService.types.ArangoNumber #88012b;line.dashed;
+GameService.parties.party1.dao.Game40CustomOptions --> GameService.types.ThemeId #88012b;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.dao.Party1Config #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.module.flow.Flow #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.parties.party1.storage.ArangodbAdapater #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.parties.party1.storage.RedisAdapater #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.types.EcSiteId #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.types.LoungeGuid #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.types.LoungeId #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> GameService.types.PartyId #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> context.CancelFunc #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> context.Context #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> sync.Map #9072dd;line.dashed;
+GameService.parties.party1.lounge.Lounge --> time.Time #9072dd;line.dashed;
+GameService.parties.party1.lounge.loungeCache --> GameService.parties.party1.lounge.seatInfo #9072dd;line.dashed;
+GameService.parties.party1.lounge.loungeCache --> GameService.types.GameId #9072dd;line.dashed;
+GameService.parties.party1.lounge.loungeCache --> GameService.types.RoomStatusCode #9072dd;line.dashed;
+GameService.parties.party1.lounge.loungeCache --> GameService.types.RoomType #9072dd;line.dashed;
+GameService.parties.party1.lounge.loungeCache --> GameService.types.SequenceId #9072dd;line.dashed;
+GameService.parties.party1.lounge.loungeCache --> GameService.types.ThemeId #9072dd;line.dashed;
+GameService.parties.party1.lounge.loungeCache --> time.Time #9072dd;line.dashed;
+GameService.parties.party1.lounge.seatInfo --> GameService.types.Balance #9072dd;line.dashed;
+GameService.parties.party1.lounge.seatInfo --> GameService.types.PlayerId #9072dd;line.dashed;
+GameService.parties.party1.lounge.seatInfo --> GameService.types.SeatId #9072dd;line.dashed;
+GameService.parties.party1.lounge.seatInfo --> GameService.types.SessionId #9072dd;line.dashed;
+GameService.parties.party1.lounge.traceCache --> gitlab_geax_io.demeter.gologger.apm.Apm #9072dd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.dao.Party1Config #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.module.flow.Flow #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.parties.party1.party.loungeMap #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.parties.party1.party.requestMap #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.parties.party1.storage.ArangodbAdapater #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.parties.party1.storage.RedisAdapater #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.types.EcSiteId #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.types.PartyGuid #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.util.RingBuffer #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> GameService.util.RoomCounter #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> context.Context #b400bd;line.dashed;
+GameService.parties.party1.party.Party --> sync.Map #b400bd;line.dashed;
+GameService.parties.party1.party.entryLoungeMap --> unsafe.Pointer #b400bd;line.dashed;
+GameService.parties.party1.party.loungeMap --> GameService.parties.party1.party.entryLoungeMap #b400bd;line.dashed;
+GameService.parties.party1.party.loungeMap --> GameService.types.LoungeGuid #b400bd;line.dashed;
+GameService.parties.party1.party.loungeMap --> sync.Mutex #b400bd;line.dashed;
+GameService.parties.party1.party.loungeMap --> sync.atomic.Value #b400bd;line.dashed;
+GameService.parties.party1.party.readOnlyLoungeMap --> GameService.parties.party1.party.entryLoungeMap #b400bd;line.dashed;
+GameService.parties.party1.party.readOnlyLoungeMap --> GameService.types.LoungeGuid #b400bd;line.dashed;
+GameService.parties.party1.party.requestMap --> sync.Mutex #b400bd;line.dashed;
+GameService.parties.party2.dao.Game40CustomOptions --> GameService.types.ArangoNumber #6956cd;line.dashed;
+GameService.parties.party2.dao.Game40CustomOptions --> GameService.types.ThemeId #6956cd;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.dao.Party2Config #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.module.flow.Flow #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.parties.party2.storage.ArangodbAdapater #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.parties.party2.storage.RedisAdapater #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.types.EcSiteId #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.types.LoungeGuid #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.types.LoungeId #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> GameService.types.PartyId #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> context.CancelFunc #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> context.Context #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> sync.Map #caab2f;line.dashed;
+GameService.parties.party2.lounge.Lounge --> time.Time #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.parties.party2.lounge.seatInfo #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.types.Balance #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.types.ClubId #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.types.GameId #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.types.RoomStatusCode #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.types.RoomType #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.types.SequenceId #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> GameService.types.ThemeId #caab2f;line.dashed;
+GameService.parties.party2.lounge.loungeCache --> time.Time #caab2f;line.dashed;
+GameService.parties.party2.lounge.seatInfo --> GameService.types.Balance #caab2f;line.dashed;
+GameService.parties.party2.lounge.seatInfo --> GameService.types.PlayerId #caab2f;line.dashed;
+GameService.parties.party2.lounge.seatInfo --> GameService.types.SeatId #caab2f;line.dashed;
+GameService.parties.party2.lounge.seatInfo --> GameService.types.SessionId #caab2f;line.dashed;
+GameService.parties.party2.lounge.traceCache --> gitlab_geax_io.demeter.gologger.apm.Apm #caab2f;line.dashed;
+GameService.parties.party2.party.Party --> GameService.dao.Party2Config #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.module.flow.Flow #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.parties.party2.party.loungeMap #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.parties.party2.party.requestMap #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.parties.party2.storage.ArangodbAdapater #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.parties.party2.storage.RedisAdapater #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.types.EcSiteId #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.types.PartyGuid #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.util.RingBuffer #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> GameService.util.RoomCounter #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> context.Context #e71caf;line.dashed;
+GameService.parties.party2.party.Party --> sync.Map #e71caf;line.dashed;
+GameService.parties.party2.party.entryLoungeMap --> unsafe.Pointer #e71caf;line.dashed;
+GameService.parties.party2.party.entryRequestMap --> unsafe.Pointer #e71caf;line.dashed;
+GameService.parties.party2.party.loungeMap --> GameService.parties.party2.party.entryLoungeMap #e71caf;line.dashed;
+GameService.parties.party2.party.loungeMap --> GameService.types.LoungeGuid #e71caf;line.dashed;
+GameService.parties.party2.party.loungeMap --> sync.Mutex #e71caf;line.dashed;
+GameService.parties.party2.party.loungeMap --> sync.atomic.Value #e71caf;line.dashed;
+GameService.parties.party2.party.readOnlyLoungeMap --> GameService.parties.party2.party.entryLoungeMap #e71caf;line.dashed;
+GameService.parties.party2.party.readOnlyLoungeMap --> GameService.types.LoungeGuid #e71caf;line.dashed;
+GameService.parties.party2.party.readOnlyRequestMap --> GameService.parties.party2.party.entryRequestMap #e71caf;line.dashed;
+GameService.parties.party2.party.readOnlyRequestMap --> GameService.types.TraceId #e71caf;line.dashed;
+GameService.parties.party2.party.requestMap --> GameService.parties.party2.party.entryRequestMap #e71caf;line.dashed;
+GameService.parties.party2.party.requestMap --> GameService.types.TraceId #e71caf;line.dashed;
+GameService.parties.party2.party.requestMap --> sync.Mutex #e71caf;line.dashed;
+GameService.parties.party2.party.requestMap --> sync.atomic.Value #e71caf;line.dashed;
+GameService.parties.party3.example.LoungeAckEventChanMap --> GameService.module.flow.Flow #f0e3b3;line.dashed;
+GameService.parties.party3.example.LoungeAckEventChanMap --> GameService.parties.party3.example.ChanEventName #f0e3b3;line.dashed;
+GameService.parties.party3.example.MessageQueueEventChanMap --> GameService.module.flow.Flow #f0e3b3;line.dashed;
+GameService.parties.party3.example.MessageQueueEventChanMap --> GameService.parties.party3.example.ChanEventName #f0e3b3;line.dashed;
+GameService.parties.party3.example.MockEcSiteId --> GameService.types.EcSiteId #f0e3b3;line.dashed;
+GameService.parties.party3.example.MockLoungeId --> GameService.types.LoungeId #f0e3b3;line.dashed;
+GameService.parties.party3.example.MockPartyId --> GameService.types.PartyId #f0e3b3;line.dashed;
+GameService.parties.party3.example.MockPlayerId --> GameService.types.PlayerId #f0e3b3;line.dashed;
+GameService.parties.party3.example.WebSocketEventChanMap --> GameService.module.flow.Flow #f0e3b3;line.dashed;
+GameService.parties.party3.example.WebSocketEventChanMap --> GameService.parties.party3.example.ChanEventName #f0e3b3;line.dashed;
+GameService.parties.party3.example.wg --> sync.WaitGroup #f0e3b3;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.dao.Party3Config #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.module.flow.Flow #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.parties.party3.storage.ArangodbAdapater #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.parties.party3.storage.RedisAdapater #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.types.CompetitionRank #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.types.EcSiteId #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.types.LoungeGuid #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.types.LoungeId #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.types.PartyId #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> GameService.types.ThemeId #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> context.CancelFunc #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> context.Context #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> gitlab_geax_io.demeter.protocol.parties.party3.CompetitionCustomSettingReward #7d569b;line.dashed;
+GameService.parties.party3.lounge.Lounge --> sync.Map #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.parties.party3.lounge.gameRoomInfo #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.parties.party3.lounge.seatInfo #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.types.MessageQueueTopicId #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.types.RoomGuid #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.types.RoomStatusCode #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.types.RoomType #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.types.SequenceId #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.types.TraceId #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> GameService.util.ClockTime #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> gitlab_geax_io.demeter.protocol.parties.party3.CreateLoungeCustomData #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> gitlab_geax_io.demeter.protocol.parties.party3.MergedCompetitionRecord #7d569b;line.dashed;
+GameService.parties.party3.lounge.loungeCache --> time.Time #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> GameService.types.Balance #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> GameService.types.CompetitionRank #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> GameService.types.PlayerId #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> GameService.types.PlayerType #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> GameService.types.RoomGuid #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> GameService.types.SeatId #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> GameService.types.SessionId #7d569b;line.dashed;
+GameService.parties.party3.lounge.seatInfo --> time.Duration #7d569b;line.dashed;
+GameService.parties.party3.lounge.traceCache --> gitlab_geax_io.demeter.gologger.apm.Apm #7d569b;line.dashed;
+GameService.parties.party3.party.Party --> GameService.dao.Party3Config #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.module.flow.Flow #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.parties.party3.party.loungeMap #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.parties.party3.party.requestMap #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.parties.party3.party.timekeeperMap #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.parties.party3.storage.ArangodbAdapater #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.parties.party3.storage.RedisAdapater #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.types.EcSiteId #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.types.PartyGuid #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.util.RingBuffer #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> GameService.util.RoomCounter #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> context.Context #838f6f;line.dashed;
+GameService.parties.party3.party.Party --> sync.Map #838f6f;line.dashed;
+GameService.parties.party3.party.entryLoungeMap --> unsafe.Pointer #838f6f;line.dashed;
+GameService.parties.party3.party.entryTimekeeperMap --> unsafe.Pointer #838f6f;line.dashed;
+GameService.parties.party3.party.loungeMap --> GameService.parties.party3.party.entryLoungeMap #838f6f;line.dashed;
+GameService.parties.party3.party.loungeMap --> GameService.types.LoungeGuid #838f6f;line.dashed;
+GameService.parties.party3.party.loungeMap --> sync.Mutex #838f6f;line.dashed;
+GameService.parties.party3.party.loungeMap --> sync.atomic.Value #838f6f;line.dashed;
+GameService.parties.party3.party.readOnlyLoungeMap --> GameService.parties.party3.party.entryLoungeMap #838f6f;line.dashed;
+GameService.parties.party3.party.readOnlyLoungeMap --> GameService.types.LoungeGuid #838f6f;line.dashed;
+GameService.parties.party3.party.readOnlyTimekeeperMap --> GameService.parties.party3.party.entryTimekeeperMap #838f6f;line.dashed;
+GameService.parties.party3.party.readOnlyTimekeeperMap --> GameService.types.LoungeGuid #838f6f;line.dashed;
+GameService.parties.party3.party.requestMap --> sync.Mutex #838f6f;line.dashed;
+GameService.parties.party3.party.timekeeperMap --> GameService.parties.party3.party.entryTimekeeperMap #838f6f;line.dashed;
+GameService.parties.party3.party.timekeeperMap --> GameService.types.LoungeGuid #838f6f;line.dashed;
+GameService.parties.party3.party.timekeeperMap --> sync.Mutex #838f6f;line.dashed;
+GameService.parties.party3.party.timekeeperMap --> sync.atomic.Value #838f6f;line.dashed;
+GameService.parties.party3.timekeeper.CompetitionMember --> GameService.types.PlayerId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.dao.Party3Config #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.module.flow.Flow #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.parties.party3.storage.ArangodbAdapater #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.parties.party3.storage.RedisAdapater #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.parties.party3.timekeeper.competitionGameMap #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.parties.party3.timekeeper.waitCreateCompetitionIds #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.types.EcSiteId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.types.LoungeGuid #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.types.LoungeId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> GameService.types.PartyId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> context.CancelFunc #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> context.Context #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> gitlab_geax_io.demeter.protocol.parties.party3.CompetitionLog #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.TimeKeeper --> time.Time #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionGameMap --> GameService.parties.party3.timekeeper.entryCompetitionGameMap #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionGameMap --> GameService.types.CompetitionId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionGameMap --> sync.Mutex #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionGameMap --> sync.atomic.Value #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionMemberMap --> GameService.parties.party3.timekeeper.entryCompetitionMemberMap #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionMemberMap --> GameService.types.CompetitionId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionMemberMap --> sync.Mutex #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.competitionMemberMap --> sync.atomic.Value #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.entryCompetitionGameMap --> unsafe.Pointer #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.entryCompetitionMemberMap --> unsafe.Pointer #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.entryWaitCreateCompetitionIds --> unsafe.Pointer #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.readOnlyCompetitionGameMap --> GameService.parties.party3.timekeeper.entryCompetitionGameMap #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.readOnlyCompetitionGameMap --> GameService.types.CompetitionId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.readOnlyCompetitionMemberMap --> GameService.parties.party3.timekeeper.entryCompetitionMemberMap #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.readOnlyCompetitionMemberMap --> GameService.types.CompetitionId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.readOnlyWaitCreateCompetitionIds --> GameService.parties.party3.timekeeper.entryWaitCreateCompetitionIds #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.readOnlyWaitCreateCompetitionIds --> GameService.types.CompetitionId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.timeKeeperCache --> GameService.parties.party3.timekeeper.competitionMemberMap #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.timeKeeperCache --> GameService.types.RoomStatusCode #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.timeKeeperCache --> GameService.types.SequenceId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.waitCreateCompetitionIds --> GameService.parties.party3.timekeeper.entryWaitCreateCompetitionIds #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.waitCreateCompetitionIds --> GameService.types.CompetitionId #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.waitCreateCompetitionIds --> sync.Mutex #ce395f;line.dashed;
+GameService.parties.party3.timekeeper.waitCreateCompetitionIds --> sync.atomic.Value #ce395f;line.dashed;
+GameService.types.SessionIds --> GameService.types.SessionId #ec71f7;line.dashed;
+GameService.util.CBGravatar --> GameService.util.CBAvatar #e63923;line.dashed;
+GameService.util.CBPerson --> GameService.util.CBGithub #e63923;line.dashed;
+GameService.util.CBPerson --> GameService.util.CBGravatar #e63923;line.dashed;
+GameService.util.CBPerson --> GameService.util.CBName #e63923;line.dashed;
+GameService.util.ClockTime --> time.Duration #e63923;line.dashed;
+GameService.util.ClockTime --> time.Time #e63923;line.dashed;
+GameService.util.DecodeResponse --> GameService.types.EventCode #e63923;line.dashed;
+GameService.util.DecodeResponse --> GameService.types.OperationCode #e63923;line.dashed;
+GameService.util.EncodeData --> GameService.types.EventCode #e63923;line.dashed;
+GameService.util.EncodeData --> GameService.types.OperationCode #e63923;line.dashed;
+GameService.util.LargePayload --> GameService.util.DSTopicsList #e63923;line.dashed;
+GameService.util.LargePayload --> GameService.util.DSUser #e63923;line.dashed;
+GameService.util.MediumPayload --> GameService.util.CBPerson #e63923;line.dashed;
+GameService.util.Retry --> time.Duration #e63923;line.dashed;
+GameService.util.RingBuffer --> sync.Mutex #e63923;line.dashed;
+GameService.util.RingBuffer --> time.Duration #e63923;line.dashed;
+GameService.util.RoomCounter --> GameService.util.entryRoomCounter #e63923;line.dashed;
+GameService.util.RoomCounter --> sync.Mutex #e63923;line.dashed;
+GameService.util.RoomCounter --> sync.atomic.Value #e63923;line.dashed;
+GameService.util.entryRoomCounter --> unsafe.Pointer #e63923;line.dashed;
+GameService.util.readOnlyRoomCounter --> GameService.util.entryRoomCounter #e63923;line.dashed;
+@enduml

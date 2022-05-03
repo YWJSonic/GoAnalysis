@@ -57,6 +57,7 @@ Arguments      = "(" [ ( ExpressionList | Type [ "," ExpressionList ] ) [ "..." 
 // Operand =========================================================================
 Operand     = Literal | OperandName | "(" Expression ")" .
 Literal     = BasicLit | CompositeLit | FunctionLit .
+FunctionLit = "func" Signature FunctionBody .
 BasicLit    = int_lit | float_lit | imaginary_lit | rune_lit | string_lit .
 OperandName = identifier | QualifiedIdent .
 
@@ -88,6 +89,16 @@ func() int(x)    // x is converted to func() int (unambiguous)
 // MethodExpr =========================================================================
 MethodExpr    = ReceiverType "." MethodName .
 ReceiverType  = Type .
+
+T.Mv
+(*T).Mp
+
+
+t.Mv(7)
+T.Mv(t, 7)
+(T).Mv(t, 7)
+f1 := T.Mv; f1(t, 7)
+f2 := (T).Mv; f2(t, 7)
 
 type T struct {
 	a int
@@ -148,3 +159,50 @@ noteFrequency := map[string]float32{
 	"C0": 16.35, "D0": 18.35, "E0": 20.60, "F0": 21.83,
 	"G0": 24.50, "A0": 27.50, "B0": 30.87,
 }
+
+// Integer literals =========================================================================
+int_lit        = decimal_lit | binary_lit | octal_lit | hex_lit .
+decimal_lit    = "0" | ( "1" … "9" ) [ [ "_" ] decimal_digits ] .
+binary_lit     = "0" ( "b" | "B" ) [ "_" ] binary_digits .
+octal_lit      = "0" [ "o" | "O" ] [ "_" ] octal_digits .
+hex_lit        = "0" ( "x" | "X" ) [ "_" ] hex_digits .
+
+decimal_digits = decimal_digit { [ "_" ] decimal_digit } .
+binary_digits  = binary_digit { [ "_" ] binary_digit } .
+octal_digits   = octal_digit { [ "_" ] octal_digit } .
+hex_digits     = hex_digit { [ "_" ] hex_digit } .
+
+// Floating-point literals =========================================================================
+float_lit         = decimal_float_lit | hex_float_lit .
+
+decimal_float_lit = decimal_digits "." [ decimal_digits ] [ decimal_exponent ] |
+                    decimal_digits decimal_exponent |
+                    "." decimal_digits [ decimal_exponent ] .
+decimal_exponent  = ( "e" | "E" ) [ "+" | "-" ] decimal_digits .
+
+hex_float_lit     = "0" ( "x" | "X" ) hex_mantissa hex_exponent .
+hex_mantissa      = [ "_" ] hex_digits "." [ hex_digits ] |
+                    [ "_" ] hex_digits |
+                    "." hex_digits .
+hex_exponent      = ( "p" | "P" ) [ "+" | "-" ] decimal_digits .
+
+// Imaginary literals =========================================================================
+imaginary_lit = (decimal_digits | int_lit | float_lit) "i" .
+
+// Rune literals =========================================================================
+rune_lit         = "'" ( unicode_value | byte_value ) "'" .
+unicode_value    = unicode_char | little_u_value | big_u_value | escaped_char .
+byte_value       = octal_byte_value | hex_byte_value .
+octal_byte_value = `\` octal_digit octal_digit octal_digit .
+hex_byte_value   = `\` "x" hex_digit hex_digit .
+little_u_value   = `\` "u" hex_digit hex_digit hex_digit hex_digit .
+big_u_value      = `\` "U" hex_digit hex_digit hex_digit hex_digit
+                           hex_digit hex_digit hex_digit hex_digit .
+escaped_char     = `\` ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
+
+// Characters =========================================================================
+newline        = /* the Unicode code point U+000A */ .
+unicode_char   = /* an arbitrary Unicode code point except newline */ .
+unicode_letter = /* a Unicode code point classified as "Letter" */ .
+unicode_digit  = /* a Unicode code point classified as "Number, decimal digit" */ .
+

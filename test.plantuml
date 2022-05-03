@@ -1,0 +1,8 @@
+@startuml
+
+A --> B #9072dd;line.dashed;
+B -[#9072dd,dashed]-> A 
+B -[#9072dd,dashed,thickness=16]-> C
+
+
+@enduml
